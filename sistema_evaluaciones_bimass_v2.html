@@ -1,0 +1,1053 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);font-size:14px;background:var(--color-background-tertiary);color:var(--color-text-primary)}
+.app{max-width:960px;margin:0 auto;padding:10px}
+/* TOP BAR */
+.topbar{background:#1a5fa8;color:#fff;border-radius:12px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.topbar h1{font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.tbr{display:flex;gap:6px;align-items:center}
+.count-pill{background:rgba(255,255,255,.2);border-radius:20px;padding:2px 10px;font-size:12px}
+.btn-new{background:rgba(255,255,255,.15);color:#fff;border:0.5px solid rgba(255,255,255,.35);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-new:hover{background:rgba(255,255,255,.25)}
+/* NAV TABS */
+.nav{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px}
+.ntab{padding:7px 13px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;font-size:12.5px;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:all .12s}
+.ntab:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.ntab.on{background:#1a5fa8;color:#fff;border-color:transparent}
+.ntab.cert-a{border-color:#0f6e56;color:#0f6e56}
+.ntab.cert-a.on{background:#0f6e56;color:#fff}
+.ntab.cert-b{border-color:#7c3aed;color:#7c3aed}
+.ntab.cert-b.on{background:#7c3aed;color:#fff}
+/* PANELS */
+.pnl{display:none}.pnl.on{display:block}
+/* CARDS */
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:14px;margin-bottom:10px}
+.ctitle{font-size:12.5px;font-weight:500;color:#1a5fa8;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:7px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.ctitle.green{color:#0f6e56}
+.ctitle.purple{color:#7c3aed}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+/* FIELDS */
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:11px;color:var(--color-text-secondary)}
+.fld input,.fld select,.fld textarea{border:0.5px solid var(--color-border-secondary);border-radius:7px;padding:6px 9px;font-size:12.5px;background:var(--color-background-primary);color:var(--color-text-primary);width:100%}
+.fld textarea{resize:vertical;min-height:54px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:#1a5fa8}
+.fld input[readonly]{background:var(--color-background-secondary)}
+/* RADIO TOGGLE */
+.tog{display:flex;gap:4px}
+.tog label{padding:4px 11px;border-radius:7px;border:0.5px solid var(--color-border-secondary);font-size:12px;cursor:pointer;user-select:none;transition:all .1s}
+.tog label:has(input:checked){background:#e8f1fb;border-color:#1a5fa8;color:#1a5fa8;font-weight:500}
+.tog label:has(input[value="Positivo"]:checked),.tog label:has(input[value="Sí"]:checked),.tog label:has(input[value="Con datos"]:checked){background:#e8f1fb;border-color:#1a5fa8;color:#1a5fa8}
+.tog input{display:none}
+/* BOOL ROW */
+.brow{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.brow:last-child{border:none}
+.blbl{font-size:12.5px}
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;transition:all .12s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-save{background:#0f6e56;color:#fff;border-color:transparent}.btn-save:hover{background:#0a5240}
+.btn-pri{background:#1a5fa8;color:#fff;border-color:transparent}.btn-pri:hover{background:#1450a0}
+.btn-red{background:#c0392b;color:#fff;border-color:transparent}.btn-red:hover{background:#a93226}
+.btn-pur{background:#7c3aed;color:#fff;border-color:transparent}.btn-pur:hover{background:#6d28d9}
+.btn-sm{padding:4px 10px;font-size:11.5px}
+.acts{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap;align-items:center}
+/* ALERT */
+#alrt{min-height:0;transition:all .2s}
+.alert{border-radius:8px;padding:9px 13px;font-size:12.5px;margin-bottom:8px}
+.al-ok{background:#e1f5ee;color:#0f6e56;border:0.5px solid #9fe1cb}
+.al-inf{background:#e8f1fb;color:#1a5fa8;border:0.5px solid #b5d4f4}
+/* DB LIST */
+.dbi{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:9px;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .12s;margin-bottom:5px}
+.dbi:hover{border-color:#1a5fa8;background:#f0f5fd}
+.dbi-name{font-weight:500;font-size:13px}
+.dbi-meta{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.spill{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500}
+.s-ok{background:#e1f5ee;color:#0f6e56}
+.s-warn{background:#fdf3e4;color:#b7770a}
+.s-no{background:#fbe8e8;color:#c0392b}
+.empty{text-align:center;padding:36px;color:var(--color-text-secondary);font-size:13px}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:var(--color-background-secondary);padding:7px 9px;text-align:left;font-weight:500;font-size:11.5px;color:var(--color-text-secondary)}
+.tbl td{padding:6px 9px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tbl tr:hover td{background:var(--color-background-secondary)}
+/* AUD */
+.hz-in{width:72px;border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:4px;text-align:center;background:var(--color-background-primary);color:var(--color-text-primary);font-size:12.5px}
+.hbc-box{background:#e8f1fb;border:0.5px solid #b5d4f4;border-radius:8px;padding:11px;margin-top:9px}
+.hbc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.hbc-cell{display:flex;flex-direction:column;gap:2px}
+.hbc-lbl{font-size:11px;color:var(--color-text-secondary)}
+.hbc-val{font-size:13px;font-weight:500;color:#1a5fa8}
+.concl{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:500;margin-top:4px}
+.cn{background:#e1f5ee;color:#0f6e56}
+.cl{background:#fdf3e4;color:#b7770a}
+.cm{background:#fbe8e8;color:#c0392b}
+.ach{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:11px}
+.cwrap{position:relative;width:100%;height:230px}
+/* CERT PREVIEW */
+.cert-prev{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:10px;padding:24px 28px;font-size:13px;line-height:1.7;margin-bottom:10px}
+.cert-prev h3{font-size:15px;font-weight:500;border-bottom:1px solid var(--color-border-tertiary);padding-bottom:8px;margin-bottom:14px;color:#1a5fa8}
+.cert-prev h3.green{color:#0f6e56}
+.cert-prev h3.purple{color:#7c3aed}
+.cert-row{display:flex;gap:8px;margin:4px 0}
+.cert-lbl{color:var(--color-text-secondary);min-width:160px;font-size:12px}
+.cert-val{font-weight:500}
+.cert-body{background:var(--color-background-secondary);border-radius:8px;padding:12px;margin:12px 0;font-size:12.5px;line-height:1.8}
+.cert-sig{text-align:center;margin-top:28px;padding-top:14px;border-top:0.5px solid var(--color-border-tertiary)}
+/* ANTIDOPING */
+.anti-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.anti-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:8px;font-size:12.5px}
+/* LAB / AHF rows */
+.lab-hdr{display:grid;grid-template-columns:1.4fr 0.7fr 0.7fr 1fr 1.5fr 1.3fr 22px;gap:5px;font-size:10.5px;color:var(--color-text-secondary);font-weight:500;padding:0 0 4px}
+.lab-row{display:grid;grid-template-columns:1.4fr 0.7fr 0.7fr 1fr 1.5fr 1.3fr 22px;gap:5px;margin-bottom:4px;align-items:center}
+.ahf-hdr{display:grid;grid-template-columns:1fr 1fr 2fr 22px;gap:5px;font-size:10.5px;color:var(--color-text-secondary);font-weight:500;padding:0 0 4px}
+.ahf-row{display:grid;grid-template-columns:1fr 1fr 2fr 22px;gap:5px;margin-bottom:4px;align-items:center}
+.ri{border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:5px 7px;font-size:12px;background:var(--color-background-primary);color:var(--color-text-primary);width:100%}
+.del-btn{width:22px;height:22px;border:none;background:none;color:var(--color-text-secondary);cursor:pointer;border-radius:4px;font-size:14px;display:flex;align-items:center;justify-content:center}
+.del-btn:hover{background:var(--color-background-secondary);color:#c0392b}
+.nordic-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.nordic-tbl th{background:var(--color-background-secondary);padding:6px 8px;font-size:11.5px;color:var(--color-text-secondary);text-align:center}
+.nordic-tbl th:first-child{text-align:left}
+.nordic-tbl td{padding:5px 6px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nordic-tbl td:first-child{font-weight:500}
+.sec-lbl{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.4px;margin:12px 0 6px}
+</style>
+
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <h1><i class="ti ti-stethoscope" aria-hidden="true"></i> Sistema de Evaluaciones Médicas — Clínica BiMASS</h1>
+  <div class="tbr">
+    <span class="count-pill" id="cnt">0 evaluaciones</span>
+    <button class="btn-new" onclick="newEval()"><i class="ti ti-plus" aria-hidden="true"></i> Nueva evaluación</button>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav">
+  <button class="ntab on"  data-t="db"    onclick="goTab('db')"><i class="ti ti-database" aria-hidden="true"></i> Base de datos</button>
+  <button class="ntab"     data-t="hc"    onclick="goTab('hc')"><i class="ti ti-clipboard-text" aria-hidden="true"></i> Historia Clínica</button>
+  <button class="ntab"     data-t="ef"    onclick="goTab('ef')"><i class="ti ti-activity" aria-hidden="true"></i> Exploración Física</button>
+  <button class="ntab"     data-t="nor"   onclick="goTab('nor')"><i class="ti ti-body-scan" aria-hidden="true"></i> Cuestionario Nórdico</button>
+  <button class="ntab"     data-t="exm"   onclick="goTab('exm')"><i class="ti ti-eye" aria-hidden="true"></i> Exámenes Médicos</button>
+  <button class="ntab"     data-t="anti"  onclick="goTab('anti')"><i class="ti ti-test-pipe" aria-hidden="true"></i> Antidoping</button>
+  <button class="ntab"     data-t="aud"   onclick="goTab('aud')"><i class="ti ti-ear" aria-hidden="true"></i> Audiometría</button>
+  <button class="ntab cert-a" data-t="clab" onclick="goTab('clab')"><i class="ti ti-file-certificate" aria-hidden="true"></i> Cert. Médico Laboral</button>
+  <button class="ntab cert-b" data-t="cgen" onclick="goTab('cgen')"><i class="ti ti-certificate" aria-hidden="true"></i> Cert. Médico General</button>
+</div>
+
+<div id="alrt"></div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: BASE DE DATOS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-db" class="pnl on">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-database" aria-hidden="true"></i> Evaluaciones guardadas</div>
+    <div style="display:flex;gap:7px;margin-bottom:11px">
+      <input id="srch" type="text" placeholder="Buscar por nombre, nómina o empresa..." oninput="renderDB()" style="flex:1;border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:6px 10px;font-size:12.5px;background:var(--color-background-primary);color:var(--color-text-primary)">
+      <button class="btn btn-pri" onclick="newEval()"><i class="ti ti-plus" aria-hidden="true"></i> Nueva evaluación</button>
+      <button class="btn" onclick="exportAll()"><i class="ti ti-download" aria-hidden="true"></i> Exportar</button>
+    </div>
+    <div id="db-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: HISTORIA CLÍNICA -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-hc" class="pnl">
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-id" aria-hidden="true"></i> Ficha de identificación</div>
+    <div class="g4" style="margin-bottom:9px">
+      <div class="fld"><label>Fecha</label><input type="date" id="h-fecha"></div>
+      <div class="fld"><label>Tipo de checkup</label><select id="h-checkup"><option>Ingreso</option><option>Periódico</option><option>Egreso</option><option>Especial</option></select></div>
+      <div class="fld" style="grid-column:span 2"><label>Empresa / Atención</label><input type="text" id="h-empresa" placeholder="Ej. Ford HSAP, Martinrea..."></div>
+    </div>
+    <div class="g3" style="margin-bottom:9px">
+      <div class="fld"><label>Nómina / Empleado</label><input type="text" id="h-nomina"></div>
+      <div class="fld" style="grid-column:span 2"><label>Nombre completo (Apellidos, Nombre)</label><input type="text" id="h-nombre" placeholder="Apellidos Nombre"></div>
+    </div>
+    <div class="g5">
+      <div class="fld"><label>F. Nacimiento</label><input type="date" id="h-fnac" oninput="calcEdad()"></div>
+      <div class="fld"><label>Edad</label><input type="text" id="h-edad" placeholder="años" readonly></div>
+      <div class="fld"><label>Sexo</label><select id="h-sexo"><option>Masculino</option><option>Femenino</option></select></div>
+      <div class="fld"><label>Tipo Sangre</label><select id="h-sangre"><option>O (+)</option><option>O (-)</option><option>A (+)</option><option>A (-)</option><option>B (+)</option><option>B (-)</option><option>AB (+)</option><option>AB (-)</option></select></div>
+      <div class="fld"><label>Religión</label><input type="text" id="h-religion" placeholder="Católico..."></div>
+    </div>
+    <div class="g4" style="margin-top:9px">
+      <div class="fld"><label>Puesto</label><input type="text" id="h-puesto"></div>
+      <div class="fld"><label>Área</label><input type="text" id="h-area"></div>
+      <div class="fld"><label>Escolaridad</label><select id="h-esc"><option>Primaria</option><option>Secundaria</option><option>Preparatoria</option><option>Técnico</option><option>Licenciatura</option><option>Posgrado</option></select></div>
+      <div class="fld"><label>Estado Civil</label><select id="h-civil"><option>Soltero(a)</option><option>Casado(a)</option><option>Unión libre</option><option>Divorciado(a)</option><option>Viudo(a)</option></select></div>
+    </div>
+    <div class="g4" style="margin-top:9px">
+      <div class="fld"><label>Tipo ID</label><select id="h-tidid"><option>INE</option><option>Pasaporte</option><option>CURP</option><option>Otro</option></select></div>
+      <div class="fld"><label>Número ID</label><input type="text" id="h-nid"></div>
+      <div class="fld"><label>Teléfono</label><input type="tel" id="h-tel"></div>
+      <div class="fld"><label>Contacto emergencia</label><input type="tel" id="h-cont"></div>
+    </div>
+    <div class="g3" style="margin-top:9px">
+      <div class="fld" style="grid-column:span 2"><label>Calle / Número / Colonia</label><input type="text" id="h-calle"></div>
+      <div class="fld"><label>Ciudad / Estado</label><input type="text" id="h-ciudad" placeholder="Hermosillo, Sonora"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-building-factory-2" aria-hidden="true"></i> Antecedentes Laborales</div>
+    <div class="lab-hdr"><span>Empresa</span><span>Desde</span><span>Hasta</span><span>Puesto</span><span>Expuesto a</span><span>EPP Utilizado</span><span></span></div>
+    <div id="lab-rows"></div>
+    <button class="btn btn-sm" onclick="addLab()" style="margin-top:5px"><i class="ti ti-plus" aria-hidden="true"></i> Agregar</button>
+    <div class="sec-lbl" style="margin-top:14px">Riesgos IMSS</div>
+    <div class="brow"><span class="blbl">¿Ha tenido riesgos de trabajo ante el IMSS?</span><div class="tog"><label><input type="radio" name="rimss" value="Sí">Sí</label><label><input type="radio" name="rimss" value="No" checked>No</label></div></div>
+    <div class="brow"><span class="blbl">¿Pensión por riesgo de trabajo (IPP/ITP)?</span><div class="tog"><label><input type="radio" name="pension" value="Sí">Sí</label><label><input type="radio" name="pension" value="No" checked>No</label></div></div>
+    <div class="brow"><span class="blbl">¿Invalidez por enfermedad general ante el IMSS?</span><div class="tog"><label><input type="radio" name="invali" value="Sí">Sí</label><label><input type="radio" name="invali" value="No" checked>No</label></div></div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones / Plan de rotación</label><textarea id="h-lab-obs" placeholder="Tipo de riesgos, diagnóstico previo, fecha de rotación..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-users" aria-hidden="true"></i> Antecedentes Heredofamiliares</div>
+    <div class="ahf-hdr"><span>Familiar</span><span>Vivo / Muerto</span><span>Comorbilidades / Causa de muerte</span><span></span></div>
+    <div id="ahf-rows"></div>
+    <button class="btn btn-sm" onclick="addAHF()" style="margin-top:5px"><i class="ti ti-plus" aria-hidden="true"></i> Agregar familiar</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-user" aria-hidden="true"></i> Antecedentes Personales No Patológicos</div>
+    <div class="g2">
+      <div>
+        <div class="brow"><span class="blbl">Tabaquismo</span><div class="tog"><label><input type="radio" name="apnp-tab" value="Positivo">Positivo</label><label><input type="radio" name="apnp-tab" value="Negativo" checked>Negativo</label></div></div>
+        <div class="brow"><span class="blbl">Alcoholismo</span><div class="tog"><label><input type="radio" name="apnp-alc" value="Positivo">Positivo</label><label><input type="radio" name="apnp-alc" value="Negativo" checked>Negativo</label></div></div>
+        <div class="brow"><span class="blbl">Drogadicción</span><div class="tog"><label><input type="radio" name="apnp-dro" value="Positivo">Positivo</label><label><input type="radio" name="apnp-dro" value="Negativo" checked>Negativo</label></div></div>
+        <div class="brow"><span class="blbl">Zoonosis</span><div class="tog"><label><input type="radio" name="apnp-zoo" value="Positivo">Positivo</label><label><input type="radio" name="apnp-zoo" value="Negativo" checked>Negativo</label></div></div>
+      </div>
+      <div>
+        <div class="brow"><span class="blbl">Actividad física</span><div class="tog"><label><input type="radio" name="apnp-act" value="Positivo">Positivo</label><label><input type="radio" name="apnp-act" value="Negativo" checked>Negativo</label></div></div>
+        <div class="brow"><span class="blbl">Inmunizaciones</span><div class="tog"><label><input type="radio" name="apnp-inm" value="Positivo">Positivo</label><label><input type="radio" name="apnp-inm" value="Negativo" checked>Negativo</label></div></div>
+        <div class="brow"><span class="blbl">Hacinamiento</span><div class="tog"><label><input type="radio" name="apnp-hac" value="Positivo">Positivo</label><label><input type="radio" name="apnp-hac" value="Negativo" checked>Negativo</label></div></div>
+        <div class="brow"><span class="blbl">Alimentación adecuada</span><div class="tog"><label><input type="radio" name="apnp-ali" value="Positivo">Positivo</label><label><input type="radio" name="apnp-ali" value="Negativo" checked>Negativo</label></div></div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Casa / Servicios / Observaciones APNP</label><textarea id="h-apnp-obs" placeholder="Rentada, propia... servicios, higiene..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-virus" aria-hidden="true"></i> Antecedentes Personales Patológicos</div>
+    <div class="g2">
+      <div>
+        <div class="brow"><span class="blbl">Exantemáticas</span><div class="tog"><label><input type="radio" name="app-exa" value="Sí">Sí</label><label><input type="radio" name="app-exa" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Quirúrgicos</span><div class="tog"><label><input type="radio" name="app-qui" value="Sí">Sí</label><label><input type="radio" name="app-qui" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Traumáticos</span><div class="tog"><label><input type="radio" name="app-trau" value="Sí">Sí</label><label><input type="radio" name="app-trau" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Transfusionales</span><div class="tog"><label><input type="radio" name="app-tra" value="Sí">Sí</label><label><input type="radio" name="app-tra" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Alergias</span><div class="tog"><label><input type="radio" name="app-ale" value="Sí">Sí</label><label><input type="radio" name="app-ale" value="No" checked>No</label></div></div>
+      </div>
+      <div>
+        <div class="brow"><span class="blbl">Crónico-degenerativos</span><div class="tog"><label><input type="radio" name="app-cro" value="Sí">Sí</label><label><input type="radio" name="app-cro" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Hospitalizaciones</span><div class="tog"><label><input type="radio" name="app-hos" value="Sí">Sí</label><label><input type="radio" name="app-hos" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Infectocontagiosos</span><div class="tog"><label><input type="radio" name="app-inf" value="Sí">Sí</label><label><input type="radio" name="app-inf" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Adicciones</span><div class="tog"><label><input type="radio" name="app-adi" value="Sí">Sí</label><label><input type="radio" name="app-adi" value="No" checked>No</label></div></div>
+        <div class="brow"><span class="blbl">Discapacidad</span><div class="tog"><label><input type="radio" name="app-dis" value="Sí">Sí</label><label><input type="radio" name="app-dis" value="No" checked>No</label></div></div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones APP</label><textarea id="h-app-obs" placeholder="Describe cada antecedente positivo con detalle..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-gender-female" aria-hidden="true"></i> Antecedentes Gineco-obstétricos</div>
+    <div class="g4">
+      <div class="fld"><label>Menarca (años)</label><input type="text" id="h-menarca" placeholder="NA"></div>
+      <div class="fld"><label>FUM</label><input type="date" id="h-fum"></div>
+      <div class="fld"><label>IVSA (años)</label><input type="text" id="h-ivsa" placeholder="NA"></div>
+      <div class="fld"><label>Menopausia (años)</label><input type="text" id="h-meno" placeholder="NA"></div>
+      <div class="fld"><label>Ritmo menstrual</label><input type="text" id="h-ritmo" placeholder="NA"></div>
+      <div class="fld"><label>Gestas</label><input type="number" id="h-gest" placeholder="0"></div>
+      <div class="fld"><label>Partos</label><input type="number" id="h-part" placeholder="0"></div>
+      <div class="fld"><label>Abortos</label><input type="number" id="h-abort" placeholder="0"></div>
+    </div>
+    <div class="g4" style="margin-top:9px">
+      <div class="fld"><label>Cesáreas</label><input type="number" id="h-cesar" placeholder="0"></div>
+      <div class="fld"><label>Método anticonceptivo</label><input type="text" id="h-mac" placeholder="NA"></div>
+      <div class="brow" style="border:none;padding:0;margin-top:14px"><span class="blbl" style="font-size:11px">Embarazo actual</span><div class="tog" style="margin-left:8px"><label><input type="radio" name="hemb" value="Sí">Sí</label><label><input type="radio" name="hemb" value="No" checked>No</label></div></div>
+      <div class="brow" style="border:none;padding:0;margin-top:14px"><span class="blbl" style="font-size:11px">Sospecha embarazo</span><div class="tog" style="margin-left:8px"><label><input type="radio" name="hsosp" value="Sí">Sí</label><label><input type="radio" name="hsosp" value="No" checked>No</label></div></div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones AGO</label><textarea id="h-ago-obs" placeholder="NA si masculino"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-stethoscope" aria-hidden="true"></i> Interrogatorio por aparatos y sistemas</div>
+    <div class="g2">
+      <div>
+        <div class="brow"><span class="blbl">Digestivo</span><div class="tog"><label><input type="radio" name="ias-dig" value="Con Datos">Con datos</label><label><input type="radio" name="ias-dig" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Cardiovascular</span><div class="tog"><label><input type="radio" name="ias-car" value="Con Datos">Con datos</label><label><input type="radio" name="ias-car" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Respiratorio</span><div class="tog"><label><input type="radio" name="ias-res" value="Con Datos">Con datos</label><label><input type="radio" name="ias-res" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Genitourinario</span><div class="tog"><label><input type="radio" name="ias-gen" value="Con Datos">Con datos</label><label><input type="radio" name="ias-gen" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Audición</span><div class="tog"><label><input type="radio" name="ias-aud" value="Con Datos">Con datos</label><label><input type="radio" name="ias-aud" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Visión</span><div class="tog"><label><input type="radio" name="ias-vis" value="Con Datos">Con datos</label><label><input type="radio" name="ias-vis" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Olfato</span><div class="tog"><label><input type="radio" name="ias-olf" value="Con Datos">Con datos</label><label><input type="radio" name="ias-olf" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Tacto</span><div class="tog"><label><input type="radio" name="ias-tac" value="Con Datos">Con datos</label><label><input type="radio" name="ias-tac" value="Sin Datos" checked>Sin datos</label></div></div>
+      </div>
+      <div>
+        <div class="brow"><span class="blbl">Musculoesquelético</span><div class="tog"><label><input type="radio" name="ias-mus" value="Con Datos">Con datos</label><label><input type="radio" name="ias-mus" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Piel y anexos</span><div class="tog"><label><input type="radio" name="ias-pie" value="Con Datos">Con datos</label><label><input type="radio" name="ias-pie" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Hematopoyético</span><div class="tog"><label><input type="radio" name="ias-hem" value="Con Datos">Con datos</label><label><input type="radio" name="ias-hem" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Endocrino</span><div class="tog"><label><input type="radio" name="ias-end" value="Con Datos">Con datos</label><label><input type="radio" name="ias-end" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Reproductor</span><div class="tog"><label><input type="radio" name="ias-rep" value="Con Datos">Con datos</label><label><input type="radio" name="ias-rep" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Nervioso</span><div class="tog"><label><input type="radio" name="ias-ner" value="Con Datos">Con datos</label><label><input type="radio" name="ias-ner" value="Sin Datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Psiquiátrico</span><div class="tog"><label><input type="radio" name="ias-psi" value="Con Datos">Con datos</label><label><input type="radio" name="ias-psi" value="Sin Datos" checked>Sin datos</label></div></div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones por aparatos y sistemas</label><textarea id="h-ias-obs" placeholder="Interrogados y negados / describe datos positivos..."></textarea></div>
+  </div>
+
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('hc','ef')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+    <button class="btn btn-red" onclick="clearAll()"><i class="ti ti-trash" aria-hidden="true"></i> Limpiar formulario</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: EXPLORACIÓN FÍSICA -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-ef" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-activity" aria-hidden="true"></i> Signos vitales y somatometría</div>
+    <div class="g5">
+      <div class="fld"><label>Peso (kg)</label><input type="number" id="e-peso" step="0.1" oninput="calcIMC()"></div>
+      <div class="fld"><label>Talla (m)</label><input type="number" id="e-talla" step="0.01" oninput="calcIMC()"></div>
+      <div class="fld"><label>IMC</label><input type="number" id="e-imc" readonly></div>
+      <div class="fld"><label>Clasificación IMC</label><input type="text" id="e-imcc" readonly></div>
+      <div class="fld"><label>SaO₂ (%)</label><input type="number" id="e-sao2" step="0.1"></div>
+      <div class="fld"><label>FC (lpm)</label><input type="number" id="e-fc"></div>
+      <div class="fld"><label>FR (rpm)</label><input type="number" id="e-fr"></div>
+      <div class="fld"><label>T° (°C)</label><input type="number" id="e-temp" step="0.1"></div>
+      <div class="fld"><label>TA Sistólica</label><input type="number" id="e-tas"></div>
+      <div class="fld"><label>TA Diastólica</label><input type="number" id="e-tad"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-body-scan" aria-hidden="true"></i> Exploración física por segmentos</div>
+    <div class="g2">
+      <div>
+        <div class="brow"><span class="blbl">Cabeza</span><div class="tog"><label><input type="radio" name="ef-cab" value="Con datos">Con datos</label><label><input type="radio" name="ef-cab" value="Sin datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Cuello</span><div class="tog"><label><input type="radio" name="ef-cue" value="Con datos">Con datos</label><label><input type="radio" name="ef-cue" value="Sin datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Tórax</span><div class="tog"><label><input type="radio" name="ef-tor" value="Con datos">Con datos</label><label><input type="radio" name="ef-tor" value="Sin datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Abdomen</span><div class="tog"><label><input type="radio" name="ef-abd" value="Con datos">Con datos</label><label><input type="radio" name="ef-abd" value="Sin datos" checked>Sin datos</label></div></div>
+      </div>
+      <div>
+        <div class="brow"><span class="blbl">Columna</span><div class="tog"><label><input type="radio" name="ef-col" value="Con datos">Con datos</label><label><input type="radio" name="ef-col" value="Sin datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Extremidades superiores</span><div class="tog"><label><input type="radio" name="ef-exs" value="Con datos">Con datos</label><label><input type="radio" name="ef-exs" value="Sin datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Extremidades inferiores</span><div class="tog"><label><input type="radio" name="ef-exi" value="Con datos">Con datos</label><label><input type="radio" name="ef-exi" value="Sin datos" checked>Sin datos</label></div></div>
+        <div class="brow"><span class="blbl">Genitales</span><div class="tog"><label><input type="radio" name="ef-genit" value="Con datos">Con datos</label><label><input type="radio" name="ef-genit" value="Sin datos" checked>Sin datos</label></div></div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones exploración física</label><textarea id="e-ef-obs" placeholder="Sin datos patológicos a la exploración física..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-moon" aria-hidden="true"></i> Cuestionario de Berlín — SAOS</div>
+    <div class="g2">
+      <div>
+        <div class="brow"><span class="blbl">¿Ronca más alto que conversación?</span><div class="tog"><label><input type="radio" name="s1" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s1" value="No" checked onchange="berlin()">No</label></div></div>
+        <div class="brow"><span class="blbl">¿Ronca más de 3×/semana?</span><div class="tog"><label><input type="radio" name="s2" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s2" value="No" checked onchange="berlin()">No</label></div></div>
+        <div class="brow"><span class="blbl">¿Ronquido molesta a otros?</span><div class="tog"><label><input type="radio" name="s3" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s3" value="No" checked onchange="berlin()">No</label></div></div>
+        <div class="brow"><span class="blbl">¿Deja de respirar al dormir?</span><div class="tog"><label><input type="radio" name="s4" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s4" value="No" checked onchange="berlin()">No</label></div></div>
+      </div>
+      <div>
+        <div class="brow"><span class="blbl">¿Se despierta cansado más de 3×/semana?</span><div class="tog"><label><input type="radio" name="s5" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s5" value="No" checked onchange="berlin()">No</label></div></div>
+        <div class="brow"><span class="blbl">¿Agotamiento diurno más de 3×/semana?</span><div class="tog"><label><input type="radio" name="s6" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s6" value="No" checked onchange="berlin()">No</label></div></div>
+        <div class="brow"><span class="blbl">¿Se ha dormido conduciendo?</span><div class="tog"><label><input type="radio" name="s7" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s7" value="No" checked onchange="berlin()">No</label></div></div>
+        <div class="brow"><span class="blbl">¿HTA o IMC &gt; 30?</span><div class="tog"><label><input type="radio" name="s8" value="Sí" onchange="berlin()">Sí</label><label><input type="radio" name="s8" value="No" checked onchange="berlin()">No</label></div></div>
+      </div>
+    </div>
+    <div style="margin-top:9px;padding:8px 12px;background:#e8f1fb;border-radius:8px;font-size:12.5px">
+      Resultado Berlín: <strong id="berlin-r" style="color:#1a5fa8">Negativo (Sin riesgo SAOS)</strong>
+    </div>
+  </div>
+
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('ef','nor')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: NÓRDICO -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-nor" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-body-scan" aria-hidden="true"></i> Cuestionario Nórdico de Kuorinka</div>
+    <div class="brow" style="margin-bottom:11px">
+      <span class="blbl">¿Actividad de levantamiento ≥ 3 kg en el último año?</span>
+      <div class="tog"><label><input type="radio" name="n-lev" value="Sí">Sí</label><label><input type="radio" name="n-lev" value="No" checked>No</label></div>
+    </div>
+    <div class="g3" style="margin-bottom:11px">
+      <div class="fld"><label>Tiempo en mismo trabajo (años)</label><input type="number" id="n-anios" placeholder="0"></div>
+      <div class="fld"><label>Tiempo en mismo trabajo (meses)</label><input type="number" id="n-meses" placeholder="0"></div>
+    </div>
+    <table class="nordic-tbl">
+      <thead><tr><th>Región</th><th>¿Dolor último año?</th><th>Meses</th><th>Días</th></tr></thead>
+      <tbody id="n-body"></tbody>
+    </table>
+    <div class="sec-lbl" style="margin-top:12px">Seguimiento</div>
+    <div class="brow"><span class="blbl">¿Limitación para realizar actividades en el último año?</span><div class="tog"><label><input type="radio" name="n-lim" value="Sí">Sí</label><label><input type="radio" name="n-lim" value="No" checked>No</label></div></div>
+    <div class="brow"><span class="blbl">¿Problemas en los últimos 7 días?</span><div class="tog"><label><input type="radio" name="n-7d" value="Sí">Sí</label><label><input type="radio" name="n-7d" value="No" checked>No</label></div></div>
+    <div class="brow"><span class="blbl">¿Tratamiento médico en el último año?</span><div class="tog"><label><input type="radio" name="n-trat" value="Sí">Sí</label><label><input type="radio" name="n-trat" value="No" checked>No</label></div></div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones Nórdico</label><textarea id="n-obs"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('nor','exm')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: EXÁMENES MÉDICOS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-exm" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-eye" aria-hidden="true"></i> Agudeza Visual</div>
+    <div class="g4" style="margin-bottom:9px">
+      <div class="brow" style="border:none"><span class="blbl">Usa lentes</span><div class="tog"><label><input type="radio" name="av-len" value="Sí">Sí</label><label><input type="radio" name="av-len" value="No" checked>No</label></div></div>
+      <div class="brow" style="border:none"><span class="blbl">Visión corregida</span><div class="tog"><label><input type="radio" name="av-cor" value="Sí">Sí</label><label><input type="radio" name="av-cor" value="No" checked>No</label></div></div>
+      <div class="brow" style="border:none"><span class="blbl">Daltonismo</span><div class="tog"><label><input type="radio" name="av-dal" value="Sí">Sí</label><label><input type="radio" name="av-dal" value="No" checked>No</label></div></div>
+      <div class="brow" style="border:none"><span class="blbl">Pterigion OD</span><div class="tog"><label><input type="radio" name="av-ptod" value="Sí">Sí</label><label><input type="radio" name="av-ptod" value="No" checked>No</label></div></div>
+      <div class="brow" style="border:none;grid-column:span 1"><span class="blbl">Pterigion OI</span><div class="tog"><label><input type="radio" name="av-ptoi" value="Sí">Sí</label><label><input type="radio" name="av-ptoi" value="No" checked>No</label></div></div>
+    </div>
+    <table class="tbl" style="margin-bottom:9px">
+      <thead><tr><th>Condición</th><th style="text-align:center">V. Cercana 20/</th><th style="text-align:center">V. Lejana 20/</th></tr></thead>
+      <tbody>
+        <tr><td>Ambos ojos</td><td style="text-align:center"><input class="hz-in" type="number" id="av-bc" style="width:80px"></td><td style="text-align:center"><input class="hz-in" type="number" id="av-bl" style="width:80px"></td></tr>
+        <tr><td>Ojo derecho</td><td style="text-align:center"><input class="hz-in" type="number" id="av-dc" style="width:80px"></td><td style="text-align:center"><input class="hz-in" type="number" id="av-dl" style="width:80px"></td></tr>
+        <tr><td>Ojo izquierdo</td><td style="text-align:center"><input class="hz-in" type="number" id="av-ic" style="width:80px"></td><td style="text-align:center"><input class="hz-in" type="number" id="av-il" style="width:80px"></td></tr>
+        <tr><td>Campimetría (%)</td><td style="text-align:center"><input class="hz-in" type="number" id="av-camp" style="width:80px"></td><td style="text-align:center">—</td></tr>
+      </tbody>
+    </table>
+    <div class="fld"><label>Observaciones agudeza visual</label><textarea id="av-obs"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-lungs" aria-hidden="true"></i> Espirometría</div>
+    <div class="g2">
+      <div class="fld"><label>Resultado</label>
+        <select id="esp-res"><option>No solicitado</option><option>Normal</option><option>Obstructivo leve</option><option>Obstructivo moderado</option><option>Obstructivo severo</option><option>Restrictivo</option><option>Mixto</option></select>
+      </div>
+    </div>
+    <div class="sec-lbl" style="margin-top:10px">Criterios de exclusión</div>
+    <div class="g2">
+      <div class="brow"><span class="blbl">Aparato de soporte respiratorio</span><div class="tog"><label><input type="radio" name="ex-sr" value="Sí">Sí</label><label><input type="radio" name="ex-sr" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Broncodilatadores</span><div class="tog"><label><input type="radio" name="ex-bd" value="Sí">Sí</label><label><input type="radio" name="ex-bd" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Cirugía ocular últimos 3 meses</span><div class="tog"><label><input type="radio" name="ex-co" value="Sí">Sí</label><label><input type="radio" name="ex-co" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Desprendimiento de retina últimos 3 meses</span><div class="tog"><label><input type="radio" name="ex-dr" value="Sí">Sí</label><label><input type="radio" name="ex-dr" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Infarto cardiaco últimos 3 meses</span><div class="tog"><label><input type="radio" name="ex-ic" value="Sí">Sí</label><label><input type="radio" name="ex-ic" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Tuberculosis activa</span><div class="tog"><label><input type="radio" name="ex-tb" value="Sí">Sí</label><label><input type="radio" name="ex-tb" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Embarazo actual</span><div class="tog"><label><input type="radio" name="ex-em" value="Sí">Sí</label><label><input type="radio" name="ex-em" value="No" checked>No</label></div></div>
+      <div class="brow"><span class="blbl">Otra enfermedad respiratoria activa</span><div class="tog"><label><input type="radio" name="ex-er" value="Sí">Sí</label><label><input type="radio" name="ex-er" value="No" checked>No</label></div></div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones espirometría</label><textarea id="esp-obs"></textarea></div>
+  </div>
+
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('exm','anti')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: ANTIDOPING -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-anti" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-test-pipe" aria-hidden="true"></i> Antidoping</div>
+    <div class="anti-grid" id="anti-grid"></div>
+    <div class="fld" style="margin-top:11px"><label>Observaciones antidoping</label><textarea id="anti-obs"></textarea></div>
+    <div style="margin-top:9px;padding:8px 12px;background:#e8f1fb;border-radius:8px;font-size:12.5px">
+      Resultado general: <strong id="anti-result" style="color:#0f6e56">Todos negativos</strong>
+    </div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('anti','aud')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: AUDIOMETRÍA -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-aud" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-ear" aria-hidden="true"></i> Reporte audiométrico de tonos puros — Conducción aérea</div>
+    <table class="tbl" style="margin-bottom:11px">
+      <thead><tr><th>Hz</th><th style="text-align:center;color:#1a5fa8">dB Oído Derecho (O)</th><th style="text-align:center;color:#c0392b">dB Oído Izquierdo (X)</th></tr></thead>
+      <tbody id="aud-body"></tbody>
+      <tfoot><tr style="background:var(--color-background-secondary);font-weight:500"><td style="padding:7px">Promedio</td><td style="text-align:center" id="ap-d">—</td><td style="text-align:center" id="ap-i">—</td></tr></tfoot>
+    </table>
+    <div class="hbc-box">
+      <div style="font-size:12px;font-weight:500;color:#1a5fa8">Índice de Fletcher (% HBC)</div>
+      <div class="hbc-grid">
+        <div class="hbc-cell"><span class="hbc-lbl">Promedio OD</span><span class="hbc-val" id="hbc-pd">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">Promedio OI</span><span class="hbc-val" id="hbc-pi">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">Pérdida OD (%)</span><span class="hbc-val" id="hbc-ld">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">Pérdida OI (%)</span><span class="hbc-val" id="hbc-li">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">Oído menos sordo</span><span class="hbc-val" id="hbc-ms">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">Oído más sordo</span><span class="hbc-val" id="hbc-mas">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">% HBC total</span><span class="hbc-val" id="hbc-tot">—</span></div>
+        <div class="hbc-cell"><span class="hbc-lbl">Conclusión</span><span class="concl cn" id="hbc-concl">Normal</span></div>
+      </div>
+    </div>
+    <div class="ach">
+      <div>
+        <div style="font-size:12px;font-weight:500;color:#1a5fa8;margin-bottom:5px">Audiograma — Oído Derecho</div>
+        <div class="cwrap"><canvas id="ch-d" role="img" aria-label="Audiograma oído derecho">Audiograma derecho</canvas></div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:#c0392b;margin-bottom:5px">Audiograma — Oído Izquierdo</div>
+        <div class="cwrap"><canvas id="ch-i" role="img" aria-label="Audiograma oído izquierdo">Audiograma izquierdo</canvas></div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:11px"><label>Observaciones audiometría</label><textarea id="aud-obs" rows="3"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('aud','clab')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: CERTIFICADO MÉDICO LABORAL -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-clab" class="pnl">
+  <div class="card">
+    <div class="ctitle green"><i class="ti ti-file-certificate" aria-hidden="true"></i> Certificado Médico Laboral</div>
+    <div class="g3" style="margin-bottom:9px">
+      <div class="fld"><label>Empresa / Atención</label><input type="text" id="cl-empresa" placeholder="Nombre de la empresa"></div>
+      <div class="fld"><label>Fecha del certificado</label><input type="date" id="cl-fecha"></div>
+      <div class="fld"><label>Puesto evaluado</label><input type="text" id="cl-puesto"></div>
+    </div>
+    <div class="sec-lbl">Hallazgos de estudios</div>
+    <div class="g2">
+      <div class="fld"><label>Historia clínica</label><select id="cl-hc"><option>Sin datos patológicos al momento de la historia clínica</option><option>Con datos patológicos — ver historia</option></select></div>
+      <div class="fld"><label>Laboratorios clínicos</label><select id="cl-lab"><option>No solicitado</option><option>Dentro de parámetros normales</option><option>Con alteraciones — ver resultados</option></select></div>
+      <div class="fld"><label>Audiometría</label><select id="cl-aud"><option>No solicitado</option><option>Normal</option><option>Hipoacusia leve</option><option>Hipoacusia moderada</option><option>Hipoacusia severa</option></select></div>
+      <div class="fld"><label>Rayos X</label><select id="cl-rx"><option>No solicitado</option><option>Normal</option><option>Con hallazgos</option></select></div>
+      <div class="fld"><label>Espirometría</label><select id="cl-esp"><option>No solicitado</option><option>Normal</option><option>Obstructivo</option><option>Restrictivo</option></select></div>
+      <div class="fld"><label>Electrocardiograma</label><select id="cl-ecg"><option>No solicitado</option><option>Normal</option><option>Con alteraciones</option></select></div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Antidoping (resumen)</label><textarea id="cl-anti" placeholder="Evaluación de Cocaína (COC), Marihuana (THC), Anfetaminas (AMP), Metanfetaminas (MET), Opiaceos (OPI) TODOS NEGATIVOS."></textarea></div>
+    <div class="g2" style="margin-top:9px">
+      <div class="fld"><label>Resultado de evaluación ocupacional</label><select id="cl-res"><option>Recomendado</option><option>Recomendado con restricciones</option><option>No recomendado</option><option>Pendiente de resultados</option></select></div>
+      <div class="fld"><label>Restricciones laborales</label><select id="cl-rest"><option value="NO">Sin restricciones (NO)</option><option>Restricción de altura</option><option>Sin manejo de maquinaria</option><option>Restricción de levantamiento</option><option>Otra — ver comentarios</option></select></div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Comentarios del médico</label><textarea id="cl-com" placeholder="Recomendado de acuerdo al perfil biológico del puesto de trabajo..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle green"><i class="ti ti-user-star" aria-hidden="true"></i> Médico certificante</div>
+    <div class="g3">
+      <div class="fld"><label>Nombre del médico</label><input type="text" id="cl-med" value="Dr. Jorge Alonso Matus Duarte"></div>
+      <div class="fld"><label>Cédula profesional</label><input type="text" id="cl-ced" value="8086374"></div>
+      <div class="fld"><label>SSP / Autorización</label><input type="text" id="cl-ssp" value="9151/15"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle green"><i class="ti ti-eye" aria-hidden="true"></i> Vista previa del certificado</div>
+    <div class="cert-prev" id="prev-clab">
+      <h3 class="green">Certificado Médico Laboral</h3>
+      <p style="color:var(--color-text-secondary);font-size:12px;margin-bottom:12px"><em>Vista previa — se actualiza al guardar</em></p>
+    </div>
+  </div>
+
+  <div class="acts">
+    <button class="btn btn-save" onclick="sc('clab','cgen')"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar evaluación</button>
+    <button class="btn" style="background:#0f6e56;color:#fff;border:none" onclick="printCert('laboral')"><i class="ti ti-printer" aria-hidden="true"></i> Imprimir Cert. Laboral</button>
+    <button class="btn btn-pri" onclick="save()"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Solo guardar</button>
+    <button class="btn" onclick="newEval()"><i class="ti ti-plus" aria-hidden="true"></i> Nueva evaluación</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PANEL: CERTIFICADO MÉDICO GENERAL -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="pnl-cgen" class="pnl">
+  <div class="card">
+    <div class="ctitle purple"><i class="ti ti-certificate" aria-hidden="true"></i> Certificado Médico General</div>
+    <div class="g3" style="margin-bottom:9px">
+      <div class="fld"><label>Empresa / Atención</label><input type="text" id="cg-empresa" placeholder="Nombre empresa o PRESENTE"></div>
+      <div class="fld"><label>Fecha del certificado</label><input type="date" id="cg-fecha"></div>
+    </div>
+    <div class="g3" style="margin-bottom:9px">
+      <div class="fld"><label>Nombre del médico</label><input type="text" id="cg-med" value="Jorge Alonso Matus Duarte"></div>
+      <div class="fld"><label>Profesión</label><input type="text" id="cg-prof" value="Médico Cirujano"></div>
+      <div class="fld"><label>Universidad</label><input type="text" id="cg-uni" value="Universidad Autónoma de Sinaloa"></div>
+    </div>
+    <div class="g3" style="margin-bottom:9px">
+      <div class="fld"><label>Cédula profesional</label><input type="text" id="cg-ced" value="8086374"></div>
+      <div class="fld"><label>Autorización / SSP</label><input type="text" id="cg-ssp" value="9151/13"></div>
+      <div class="fld"><label>Cédula especialista</label><input type="text" id="cg-cesp" value="15384715"></div>
+    </div>
+    <div class="fld" style="margin-bottom:9px"><label>Domicilio del consultorio</label><input type="text" id="cg-dom" value="Calle Agustín de Vildosola 335, local 13, Hermosillo, Sonora. C.P. 83290"></div>
+    <div class="sec-lbl">Datos del paciente evaluado</div>
+    <div class="g4">
+      <div class="fld" style="grid-column:span 2"><label>Nombre completo</label><input type="text" id="cg-pac" placeholder="Se llena desde historia clínica"></div>
+      <div class="fld"><label>Sexo</label><select id="cg-sexo"><option>Masculino</option><option>Femenino</option></select></div>
+      <div class="fld"><label>Edad (años)</label><input type="number" id="cg-edad"></div>
+    </div>
+    <div class="g3" style="margin-top:9px">
+      <div class="fld"><label>Tipo de identificación</label><select id="cg-tid"><option>INE</option><option>Pasaporte</option><option>CURP</option><option>Otro</option></select></div>
+      <div class="fld"><label>Estudios realizados</label><input type="text" id="cg-estudios" value="antidoping de 10 reactivos y demás pruebas correspondientes"></div>
+      <div class="fld"><label>Resultado general</label><select id="cg-res"><option>en BUEN estado de salud actual y APTO para laborar</option><option>en estado de salud REGULAR</option><option>con hallazgos — ver indicaciones</option></select></div>
+    </div>
+    <div class="fld" style="margin-top:9px"><label>Observaciones / indicaciones adicionales</label><textarea id="cg-obs" placeholder="Lo anterior para los fines legales o personales que le interesen al paciente. Sin más, quedo a la orden..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle purple"><i class="ti ti-eye" aria-hidden="true"></i> Vista previa del certificado</div>
+    <div class="cert-prev" id="prev-cgen">
+      <h3 class="purple">Certificado Médico General</h3>
+      <p style="color:var(--color-text-secondary);font-size:12px;margin-bottom:12px"><em>Vista previa — se actualiza al guardar</em></p>
+    </div>
+  </div>
+
+  <div class="acts">
+    <button class="btn btn-save" onclick="save()"><i class="ti ti-device-floppy" aria-hidden="true"></i> Guardar evaluación completa</button>
+    <button class="btn btn-pur" onclick="printCert('general')"><i class="ti ti-printer" aria-hidden="true"></i> Imprimir Cert. General</button>
+    <button class="btn btn-pri" onclick="syncCertGeneral()"><i class="ti ti-refresh" aria-hidden="true"></i> Sincronizar datos</button>
+    <button class="btn" onclick="newEval()"><i class="ti ti-plus" aria-hidden="true"></i> Nueva evaluación</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const HZ=[250,500,1000,2000,4000,8000];
+const NORDIC=['Cuello','Hombro','Codo','Muñeca','Región dorsal','Región lumbar','Cadera(s)/Pierna(s)','Rodilla(s)','Tobillo(s)/pie(s)'];
+const ANTIDP=[
+  {c:'COC',n:'Cocaína'},{c:'THC',n:'Marihuana'},{c:'AMP',n:'Anfetaminas'},
+  {c:'MET',n:'Metanfetaminas'},{c:'OPI',n:'Opiaceos'},{c:'BAR',n:'Barbitúricos'},
+  {c:'BZD',n:'Benzodiacepinas'},{c:'PCP',n:'Fenciclidina'},{c:'TCA',n:'Antidepresivos (TCA)'},
+  {c:'MTD',n:'Metadona'},{c:'PPX',n:'Propoxifeno'},{c:'MDMA',n:'Éxtasis'},
+  {c:'MFD',n:'Metilfenidato'},
+];
+
+let DB=JSON.parse(localStorage.getItem('bimass_v2')||'[]');
+let cid=null;
+let chD=null,chI=null;
+
+// ── helpers ──────────────────────────────────────────
+const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v??'';};
+const gr=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:'';};
+const sr=(n,v)=>{const e=document.querySelector(`input[name="${n}"][value="${v}"]`);if(e)e.checked=true;};
+
+function goTab(t){
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelector(`[data-t="${t}"]`).classList.add('on');
+  document.getElementById('pnl-'+t).classList.add('on');
+  if(t==='aud')setTimeout(calcHBC,120);
+  if(t==='clab')updatePrevClab();
+  if(t==='cgen')updatePrevCgen();
+}
+function sc(cur,next){save();goTab(next);}
+
+function alert_(msg,type='ok'){
+  const el=document.getElementById('alrt');
+  el.innerHTML=`<div class="alert al-${type}">${msg}</div>`;
+  setTimeout(()=>el.innerHTML='',3200);
+}
+
+// ── EDAD AUTO ────────────────────────────────────────
+function calcEdad(){
+  const v=gv('h-fnac');
+  if(!v)return;
+  const d=new Date(v),n=new Date();
+  let a=n.getFullYear()-d.getFullYear();
+  if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;
+  sv('h-edad',a+' años');
+}
+
+// ── IMC AUTO ─────────────────────────────────────────
+function calcIMC(){
+  const p=parseFloat(gv('e-peso')),t=parseFloat(gv('e-talla'));
+  if(!p||!t)return;
+  const imc=p/(t*t);
+  sv('e-imc',imc.toFixed(2));
+  const cls=imc<18.5?'Bajo peso':imc<25?'Normal':imc<30?'Sobrepeso':imc<35?'Obesidad grado I':imc<40?'Obesidad grado II':'Obesidad grado III';
+  sv('e-imcc',cls);
+}
+
+// ── BERLÍN ───────────────────────────────────────────
+function berlin(){
+  const c1=gr('s1')==='Sí'||gr('s2')==='Sí'||gr('s3')==='Sí'||gr('s4')==='Sí';
+  const c2=gr('s5')==='Sí'||gr('s6')==='Sí'||gr('s7')==='Sí';
+  const c3=gr('s8')==='Sí';
+  const n=[c1,c2,c3].filter(Boolean).length;
+  const el=document.getElementById('berlin-r');
+  el.textContent=n>=2?'Positivo — Alto riesgo SAOS':'Negativo (Sin riesgo SAOS)';
+  el.style.color=n>=2?'#c0392b':'#0f6e56';
+}
+
+// ── HBC CALC ─────────────────────────────────────────
+function calcHBC(){
+  const rows=HZ.map(h=>({der:parseFloat(gv('ad-d-'+h))||0,izq:parseFloat(gv('ad-i-'+h))||0}));
+  const pd=rows.reduce((s,r)=>s+r.der,0)/6;
+  const pi=rows.reduce((s,r)=>s+r.izq,0)/6;
+  const ld=pd*0.8,li=pi*0.8;
+  const ms=Math.min(ld,li),mas=Math.max(ld,li);
+  const tot=(ms*7+mas)/8;
+  const concl=tot<15?'Normal':tot<30?'Hipoacusia leve':tot<60?'Hipoacusia moderada':'Hipoacusia severa';
+  document.getElementById('ap-d').textContent=pd.toFixed(1)+' dB';
+  document.getElementById('ap-i').textContent=pi.toFixed(1)+' dB';
+  document.getElementById('hbc-pd').textContent=pd.toFixed(2)+' dB';
+  document.getElementById('hbc-pi').textContent=pi.toFixed(2)+' dB';
+  document.getElementById('hbc-ld').textContent=ld.toFixed(2)+'%';
+  document.getElementById('hbc-li').textContent=li.toFixed(2)+'%';
+  document.getElementById('hbc-ms').textContent=ms.toFixed(2)+'%';
+  document.getElementById('hbc-mas').textContent=mas.toFixed(2)+'%';
+  document.getElementById('hbc-tot').textContent=tot.toFixed(2)+'%';
+  const cel=document.getElementById('hbc-concl');
+  cel.textContent=concl;
+  cel.className='concl '+(concl==='Normal'?'cn':concl.includes('leve')?'cl':'cm');
+  drawCharts(rows,pd,pi);
+}
+
+function drawCharts(rows){
+  const lbl=HZ.map(h=>h>=1000?h/1000+'kHz':h+'Hz');
+  const od=rows.map(r=>r.der),oi=rows.map(r=>r.izq);
+  const opts=(clr,dash)=>({
+    responsive:true,maintainAspectRatio:false,
+    scales:{
+      y:{reverse:true,min:-10,max:120,title:{display:true,text:'dB HL',font:{size:10}},ticks:{stepSize:20,font:{size:10}},grid:{color:'rgba(128,128,128,0.12)'}},
+      x:{title:{display:true,text:'Frecuencia (Hz)',font:{size:10}},ticks:{font:{size:10}},grid:{color:'rgba(128,128,128,0.12)'}}
+    },
+    plugins:{legend:{display:false}},
+    elements:{point:{radius:5,hoverRadius:7},line:{tension:0.1,borderDash:dash||[]}}
+  });
+  if(chD)chD.destroy();
+  chD=new Chart(document.getElementById('ch-d'),{type:'line',data:{labels:lbl,datasets:[{data:od,borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.1)',pointStyle:'circle',pointBackgroundColor:'#1a5fa8',borderWidth:2,fill:false}]},options:opts('#1a5fa8',[])});
+  if(chI)chI.destroy();
+  chI=new Chart(document.getElementById('ch-i'),{type:'line',data:{labels:lbl,datasets:[{data:oi,borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,0.1)',pointStyle:'crossRot',pointRadius:6,pointBackgroundColor:'#c0392b',borderWidth:2,borderDash:[5,3],fill:false}]},options:opts('#c0392b',[5,3])});
+}
+
+// ── ANTIDOPING RESULT ────────────────────────────────
+function updateAntiResult(){
+  const pos=ANTIDP.filter(a=>{const e=document.querySelector(`input[name="anti-${a.c}"][value="Positivo"]:checked`);return e;});
+  const el=document.getElementById('anti-result');
+  if(pos.length){el.textContent='POSITIVO: '+pos.map(a=>a.n).join(', ');el.style.color='#c0392b';}
+  else{el.textContent='Todos negativos';el.style.color='#0f6e56';}
+}
+
+// ── CERT PREVIEWS ────────────────────────────────────
+function updatePrevClab(){
+  const n=gv('h-nombre')||'[Nombre del paciente]';
+  const p=gv('cl-puesto')||gv('h-puesto')||'[Puesto]';
+  const emp=gv('cl-empresa')||gv('h-empresa')||'[Empresa]';
+  const f=gv('cl-fecha')||new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  const med=gv('cl-med');const ced=gv('cl-ced');const ssp=gv('cl-ssp');
+  const res=gv('cl-res')||'Recomendado';const rest=gv('cl-rest')||'NO';
+  const com=gv('cl-com')||'';
+  const anti=gv('cl-anti')||'Evaluación de Cocaína (COC), Marihuana (THC), Anfetaminas (AMP), Metanfetaminas (MET), Opiaceos (OPI) TODOS NEGATIVOS.';
+  document.getElementById('prev-clab').innerHTML=`
+    <h3 class="green">Certificado Médico Laboral</h3>
+    <div class="cert-row"><span class="cert-lbl">Atención:</span><span class="cert-val">${emp}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Fecha:</span><span class="cert-val">${f}</span></div>
+    <div class="cert-body">
+      El que suscribe, legalmente autorizado para el ejercicio de su profesión, certifica y hace constar, haber realizado el examen médico de admisión al puesto de <strong>"${p}"</strong>, apoyado en una historia clínica con enfoque ocupacional, además de estudios de laboratorio y de gabinete, a:<br><br>
+      <strong>${n}</strong>
+    </div>
+    <p style="font-weight:500;margin:10px 0 6px">Encontrando lo siguiente:</p>
+    <div class="cert-row"><span class="cert-lbl">Historia clínica</span><span class="cert-val">${gv('cl-hc')||'Sin datos patológicos al momento de la historia clínica'}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Laboratorios clínicos</span><span class="cert-val">${gv('cl-lab')||'No solicitado'}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Audiometría</span><span class="cert-val">${gv('cl-aud')||'No solicitado'}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Rayos X</span><span class="cert-val">${gv('cl-rx')||'No solicitado'}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Espirometría</span><span class="cert-val">${gv('cl-esp')||'No solicitado'}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Electrocardiograma</span><span class="cert-val">${gv('cl-ecg')||'No solicitado'}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Antidoping</span><span class="cert-val">${anti}</span></div>
+    <div style="margin:12px 0;padding:10px 14px;background:#e1f5ee;border-radius:8px;border:0.5px solid #9fe1cb">
+      <div><strong>Resultado de evaluación Ocupacional:</strong> ${res}</div>
+      <div><strong>Restricciones laborales:</strong> ${rest}</div>
+      ${com?`<div style="margin-top:6px"><strong>Comentarios:</strong> ${com}</div>`:''}
+    </div>
+    <div class="cert-sig">
+      <div>Médico que certifica:</div>
+      <div style="font-weight:500;margin-top:4px">${med}</div>
+      <div style="font-size:12px;color:var(--color-text-secondary)">C.P. ${ced} &nbsp;&nbsp; S.S.P. ${ssp}</div>
+    </div>`;
+}
+
+function updatePrevCgen(){
+  const n=gv('cg-pac')||gv('h-nombre')||'[Nombre del paciente]';
+  const sx=gv('cg-sexo')||'Masculino';
+  const ed=gv('cg-edad')||gv('h-edad')||'';
+  const tid=gv('cg-tid')||'INE';
+  const emp=gv('cg-empresa')||gv('h-empresa')||'PRESENTE';
+  const f=gv('cg-fecha')||new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  const med=gv('cg-med');const prof=gv('cg-prof');const uni=gv('cg-uni');
+  const ced=gv('cg-ced');const ssp=gv('cg-ssp');const cesp=gv('cg-cesp');
+  const dom=gv('cg-dom');
+  const est=gv('cg-estudios');
+  const res=gv('cg-res');
+  const obs=gv('cg-obs');
+  const pronombre=sx==='Femenino'?'la C.':'el C.';
+  const iden=sx==='Femenino'?'la cual se identifica':'el cual se identifica';
+  document.getElementById('prev-cgen').innerHTML=`
+    <h3 class="purple">Certificado Médico General</h3>
+    <div class="cert-row"><span class="cert-lbl">Atención:</span><span class="cert-val">${emp}</span></div>
+    <div class="cert-row"><span class="cert-lbl">Fecha:</span><span class="cert-val">${f}</span></div>
+    <div class="cert-row"><span class="cert-lbl">PRESENTE</span></div>
+    <div class="cert-body">
+      El que suscribe de nombre <strong>${med}</strong> de profesión <strong>${prof}</strong>, egresado de la <strong>${uni}</strong>, con cédula profesional N. <strong>${ced}</strong> expedida por la Dirección General de Profesionales de la Secretaría de Educación Pública y con autorización número <strong>${ssp}</strong> expedida por la Secretaría de Salud del Estado de Sonora. Además de cédula de especialista en Seguridad e Higiene Industrial <strong>${cesp}</strong>. Con domicilio actual en ${dom}.<br><br>
+      Hago constar bajo protesta de decir la verdad, que hoy atendí a ${pronombre} <strong>${n}</strong><br><br>
+      <strong>${sx}</strong> de <strong>${ed}</strong> de edad, ${iden} con <strong>${tid}</strong>, de mi personal conocimiento. A quien, después de realizar un interrogatorio dirigido, exploración física completa, ${est}, encuentro <strong>${res}</strong>.<br><br>
+      ${obs||'Lo anterior para los fines legales o personales que le interesen al paciente. Sin más, quedo a la orden por cualquier duda o aclaración.'}
+    </div>
+    <div class="cert-sig">
+      <div>Médico que certifica:</div>
+      <div style="font-weight:500;margin-top:4px">${med}</div>
+      <div style="font-size:12px;color:var(--color-text-secondary)">C.P. ${ced} &nbsp;&nbsp; S.S.P. ${ssp}</div>
+    </div>`;
+}
+
+function syncCertGeneral(){
+  sv('cg-pac',gv('h-nombre'));
+  sv('cg-sexo',gv('h-sexo'));
+  sv('cg-edad',gv('h-edad').replace(' años',''));
+  sv('cg-empresa',gv('h-empresa'));
+  sv('cg-fecha',gv('h-fecha'));
+  sr('cg-sexo',gv('h-sexo'));
+  updatePrevCgen();
+  alert_('<i class="ti ti-refresh" aria-hidden="true"></i> Datos sincronizados desde historia clínica','inf');
+}
+
+// ── PRINT ────────────────────────────────────────────
+function printCert(tipo){
+  let html='';
+  if(tipo==='laboral'){
+    const p=document.getElementById('prev-clab');
+    html=p?p.innerHTML:'';
+  } else {
+    const p=document.getElementById('prev-cgen');
+    html=p?p.innerHTML:'';
+  }
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Certificado ${tipo}</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:700px;margin:40px auto;color:#222;line-height:1.7}.cert-row{display:flex;gap:8px;margin:4px 0}.cert-lbl{color:#666;min-width:160px;font-size:12px}.cert-val{font-weight:500}.cert-body{background:#f8f8f8;border-radius:8px;padding:14px;margin:14px 0;line-height:1.8;font-size:13px}.cert-sig{text-align:center;margin-top:40px;padding-top:14px;border-top:1px solid #ccc}h3{color:${tipo==='laboral'?'#0f6e56':'#7c3aed'};border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:14px}@media print{button{display:none}}</style></head><body><button onclick="window.print()" style="background:#1a5fa8;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;margin-bottom:16px;font-size:13px">Imprimir</button>${html}</body></html>`);
+  w.document.close();
+}
+
+// ── LAB ROWS ─────────────────────────────────────────
+function addLab(d={}){
+  const c=document.getElementById('lab-rows');
+  const row=document.createElement('div');
+  row.className='lab-row';
+  const inp=(ph,f,v)=>`<input class="ri" type="text" placeholder="${ph}" value="${v||''}" data-f="${f}">`;
+  const inpN=(ph,f,v)=>`<input class="ri" type="number" placeholder="${ph}" value="${v||''}" data-f="${f}" style="width:100%">`;
+  row.innerHTML=inp('Empresa','emp',d.emp)+inpN('2020','desde',d.desde)+inpN('2026','hasta',d.hasta)+inp('Puesto','puesto',d.puesto)+inp('Expuesto a...','exp',d.exp)+inp('EPP','epp',d.epp)+`<button class="del-btn" onclick="this.parentElement.remove()" title="Eliminar"><i class="ti ti-x" aria-hidden="true"></i></button>`;
+  c.appendChild(row);
+}
+
+function addAHF(d={}){
+  const c=document.getElementById('ahf-rows');
+  const row=document.createElement('div');
+  row.className='ahf-row';
+  row.innerHTML=`<input class="ri" type="text" placeholder="Familiar" value="${d.familiar||''}" data-f="familiar"><select class="ri" data-f="estado"><option ${d.estado==='Vivo'?'selected':''}>Vivo</option><option ${d.estado==='Muerta'?'selected':''}>Muerta</option><option ${d.estado==='Muerto'?'selected':''}>Muerto</option></select><input class="ri" type="text" placeholder="Comorbilidades / causa de muerte" value="${d.comorbilidades||''}" data-f="comorbilidades"><button class="del-btn" onclick="this.parentElement.remove()" title="Eliminar"><i class="ti ti-x" aria-hidden="true"></i></button>`;
+  c.appendChild(row);
+}
+
+function cLab(){return [...document.querySelectorAll('#lab-rows .lab-row')].map(r=>({emp:r.querySelector('[data-f=emp]')?.value||'',desde:r.querySelector('[data-f=desde]')?.value||'',hasta:r.querySelector('[data-f=hasta]')?.value||'',puesto:r.querySelector('[data-f=puesto]')?.value||'',exp:r.querySelector('[data-f=exp]')?.value||'',epp:r.querySelector('[data-f=epp]')?.value||''}));}
+function cAHF(){return [...document.querySelectorAll('#ahf-rows .ahf-row')].map(r=>({familiar:r.querySelector('[data-f=familiar]')?.value||'',estado:r.querySelector('[data-f=estado]')?.value||'',comorbilidades:r.querySelector('[data-f=comorbilidades]')?.value||''}));}
+function cNor(){return NORDIC.map((z,i)=>({zona:z,dolor:gr('n-'+i)||'No',meses:gv('nm-'+i)||'',dias:gv('nd-'+i)||''}));}
+function cAnti(){return ANTIDP.map(a=>({c:a.c,n:a.n,r:gr('anti-'+a.c)||'Negativo'}));}
+function cAud(){return HZ.map(h=>({hz:h,der:parseFloat(gv('ad-d-'+h))||0,izq:parseFloat(gv('ad-i-'+h))||0}));}
+
+// ── COLLECT ALL ──────────────────────────────────────
+function collect(){
+  return{
+    id:cid||Date.now().toString(),ts:new Date().toISOString(),
+    hc:{fecha:gv('h-fecha'),checkup:gv('h-checkup'),empresa:gv('h-empresa'),nomina:gv('h-nomina'),nombre:gv('h-nombre'),fnac:gv('h-fnac'),edad:gv('h-edad'),sexo:gv('h-sexo'),sangre:gv('h-sangre'),religion:gv('h-religion'),puesto:gv('h-puesto'),area:gv('h-area'),esc:gv('h-esc'),civil:gv('h-civil'),tidid:gv('h-tidid'),nid:gv('h-nid'),tel:gv('h-tel'),cont:gv('h-cont'),calle:gv('h-calle'),ciudad:gv('h-ciudad'),lab_rows:cLab(),rimss:gr('rimss'),pension:gr('pension'),invali:gr('invali'),lab_obs:gv('h-lab-obs'),ahf_rows:cAHF(),tab:gr('apnp-tab'),alc:gr('apnp-alc'),dro:gr('apnp-dro'),zoo:gr('apnp-zoo'),act:gr('apnp-act'),inm:gr('apnp-inm'),hac:gr('apnp-hac'),ali:gr('apnp-ali'),apnp_obs:gv('h-apnp-obs'),app_exa:gr('app-exa'),app_qui:gr('app-qui'),app_trau:gr('app-trau'),app_tra:gr('app-tra'),app_ale:gr('app-ale'),app_cro:gr('app-cro'),app_hos:gr('app-hos'),app_inf:gr('app-inf'),app_adi:gr('app-adi'),app_dis:gr('app-dis'),app_obs:gv('h-app-obs'),menarca:gv('h-menarca'),fum:gv('h-fum'),ivsa:gv('h-ivsa'),meno:gv('h-meno'),ritmo:gv('h-ritmo'),gest:gv('h-gest'),part:gv('h-part'),abort:gv('h-abort'),cesar:gv('h-cesar'),mac:gv('h-mac'),hemb:gr('hemb'),hsosp:gr('hsosp'),ago_obs:gv('h-ago-obs'),ias_dig:gr('ias-dig'),ias_car:gr('ias-car'),ias_res:gr('ias-res'),ias_gen:gr('ias-gen'),ias_aud:gr('ias-aud'),ias_vis:gr('ias-vis'),ias_olf:gr('ias-olf'),ias_tac:gr('ias-tac'),ias_mus:gr('ias-mus'),ias_pie:gr('ias-pie'),ias_hem:gr('ias-hem'),ias_end:gr('ias-end'),ias_rep:gr('ias-rep'),ias_ner:gr('ias-ner'),ias_psi:gr('ias-psi'),ias_obs:gv('h-ias-obs')},
+    ef:{peso:gv('e-peso'),talla:gv('e-talla'),imc:gv('e-imc'),imcc:gv('e-imcc'),sao2:gv('e-sao2'),fc:gv('e-fc'),fr:gv('e-fr'),temp:gv('e-temp'),tas:gv('e-tas'),tad:gv('e-tad'),cab:gr('ef-cab'),cue:gr('ef-cue'),tor:gr('ef-tor'),abd:gr('ef-abd'),col:gr('ef-col'),exs:gr('ef-exs'),exi:gr('ef-exi'),genit:gr('ef-genit'),obs:gv('e-ef-obs'),s1:gr('s1'),s2:gr('s2'),s3:gr('s3'),s4:gr('s4'),s5:gr('s5'),s6:gr('s6'),s7:gr('s7'),s8:gr('s8')},
+    nor:{lev:gr('n-lev'),anios:gv('n-anios'),meses:gv('n-meses'),rows:cNor(),lim:gr('n-lim'),dias7:gr('n-7d'),trat:gr('n-trat'),obs:gv('n-obs')},
+    exm:{lentes:gr('av-len'),cor:gr('av-cor'),dal:gr('av-dal'),ptod:gr('av-ptod'),ptoi:gr('av-ptoi'),bc:gv('av-bc'),bl:gv('av-bl'),dc:gv('av-dc'),dl:gv('av-dl'),ic:gv('av-ic'),il:gv('av-il'),camp:gv('av-camp'),av_obs:gv('av-obs'),esp:gv('esp-res'),esp_obs:gv('esp-obs'),ex_sr:gr('ex-sr'),ex_bd:gr('ex-bd'),ex_co:gr('ex-co'),ex_dr:gr('ex-dr'),ex_ic:gr('ex-ic'),ex_tb:gr('ex-tb'),ex_em:gr('ex-em'),ex_er:gr('ex-er')},
+    anti:{rows:cAnti(),obs:gv('anti-obs')},
+    aud:{rows:cAud(),obs:gv('aud-obs')},
+    clab:{empresa:gv('cl-empresa'),fecha:gv('cl-fecha'),puesto:gv('cl-puesto'),hc:gv('cl-hc'),lab:gv('cl-lab'),aud:gv('cl-aud'),rx:gv('cl-rx'),esp:gv('cl-esp'),ecg:gv('cl-ecg'),anti:gv('cl-anti'),res:gv('cl-res'),rest:gv('cl-rest'),com:gv('cl-com'),med:gv('cl-med'),ced:gv('cl-ced'),ssp:gv('cl-ssp')},
+    cgen:{empresa:gv('cg-empresa'),fecha:gv('cg-fecha'),med:gv('cg-med'),prof:gv('cg-prof'),uni:gv('cg-uni'),ced:gv('cg-ced'),ssp:gv('cg-ssp'),cesp:gv('cg-cesp'),dom:gv('cg-dom'),pac:gv('cg-pac'),sexo:gv('cg-sexo'),edad:gv('cg-edad'),tid:gv('cg-tid'),estudios:gv('cg-estudios'),res:gv('cg-res'),obs:gv('cg-obs')},
+  };
+}
+
+// ── FILL FORM ─────────────────────────────────────────
+function fill(ev){
+  const h=ev.hc||{};
+  sv('h-fecha',h.fecha);sv('h-checkup',h.checkup);sv('h-empresa',h.empresa);sv('h-nomina',h.nomina);sv('h-nombre',h.nombre);sv('h-fnac',h.fnac);sv('h-edad',h.edad);sv('h-sexo',h.sexo);sv('h-sangre',h.sangre);sv('h-religion',h.religion);sv('h-puesto',h.puesto);sv('h-area',h.area);sv('h-esc',h.esc);sv('h-civil',h.civil);sv('h-tidid',h.tidid);sv('h-nid',h.nid);sv('h-tel',h.tel);sv('h-cont',h.cont);sv('h-calle',h.calle);sv('h-ciudad',h.ciudad);
+  document.getElementById('lab-rows').innerHTML='';(h.lab_rows||[]).forEach(r=>addLab(r));
+  sr('rimss',h.rimss||'No');sr('pension',h.pension||'No');sr('invali',h.invali||'No');sv('h-lab-obs',h.lab_obs);
+  document.getElementById('ahf-rows').innerHTML='';(h.ahf_rows||[]).forEach(r=>addAHF(r));
+  ['tab','alc','dro','zoo','act','inm','hac','ali'].forEach(k=>sr('apnp-'+k,h[k]||'Negativo'));sv('h-apnp-obs',h.apnp_obs);
+  ['exa','qui','trau','tra','ale','cro','hos','inf','adi','dis'].forEach(k=>sr('app-'+k,h['app_'+k]||'No'));sv('h-app-obs',h.app_obs);
+  sv('h-menarca',h.menarca);sv('h-fum',h.fum);sv('h-ivsa',h.ivsa);sv('h-meno',h.meno);sv('h-ritmo',h.ritmo);sv('h-gest',h.gest);sv('h-part',h.part);sv('h-abort',h.abort);sv('h-cesar',h.cesar);sv('h-mac',h.mac);sr('hemb',h.hemb||'No');sr('hsosp',h.hsosp||'No');sv('h-ago-obs',h.ago_obs);
+  ['dig','car','res','gen','aud','vis','olf','tac','mus','pie','hem','end','rep','ner','psi'].forEach(k=>sr('ias-'+k,h['ias_'+k]||'Sin Datos'));sv('h-ias-obs',h.ias_obs);
+  const e=ev.ef||{};
+  sv('e-peso',e.peso);sv('e-talla',e.talla);sv('e-imc',e.imc);sv('e-imcc',e.imcc);sv('e-sao2',e.sao2);sv('e-fc',e.fc);sv('e-fr',e.fr);sv('e-temp',e.temp);sv('e-tas',e.tas);sv('e-tad',e.tad);
+  ['cab','cue','tor','abd','col','exs','exi','genit'].forEach(k=>sr('ef-'+k,e[k]||'Sin datos'));sv('e-ef-obs',e.obs);
+  ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(k=>sr(k,e[k]||'No'));
+  const n=ev.nor||{};
+  sr('n-lev',n.lev||'No');sv('n-anios',n.anios);sv('n-meses',n.meses);
+  (n.rows||[]).forEach((r,i)=>{sr('n-'+i,r.dolor||'No');sv('nm-'+i,r.meses);sv('nd-'+i,r.dias);});
+  sr('n-lim',n.lim||'No');sr('n-7d',n.dias7||'No');sr('n-trat',n.trat||'No');sv('n-obs',n.obs);
+  const x=ev.exm||{};
+  sr('av-len',x.lentes||'No');sr('av-cor',x.cor||'No');sr('av-dal',x.dal||'No');sr('av-ptod',x.ptod||'No');sr('av-ptoi',x.ptoi||'No');
+  sv('av-bc',x.bc);sv('av-bl',x.bl);sv('av-dc',x.dc);sv('av-dl',x.dl);sv('av-ic',x.ic);sv('av-il',x.il);sv('av-camp',x.camp);sv('av-obs',x.av_obs);
+  sv('esp-res',x.esp);sv('esp-obs',x.esp_obs);
+  const an=ev.anti||{};
+  (an.rows||[]).forEach(r=>sr('anti-'+r.c,r.r||'Negativo'));sv('anti-obs',an.obs);
+  const au=ev.aud||{};
+  (au.rows||[]).forEach(r=>{sv('ad-d-'+r.hz,r.der);sv('ad-i-'+r.hz,r.izq);});sv('aud-obs',au.obs);
+  const cl=ev.clab||{};
+  sv('cl-empresa',cl.empresa);sv('cl-fecha',cl.fecha);sv('cl-puesto',cl.puesto);sv('cl-hc',cl.hc);sv('cl-lab',cl.lab);sv('cl-aud',cl.aud);sv('cl-rx',cl.rx);sv('cl-esp',cl.esp);sv('cl-ecg',cl.ecg);sv('cl-anti',cl.anti);sv('cl-res',cl.res);sv('cl-rest',cl.rest);sv('cl-com',cl.com);sv('cl-med',cl.med||'Dr. Jorge Alonso Matus Duarte');sv('cl-ced',cl.ced||'8086374');sv('cl-ssp',cl.ssp||'9151/15');
+  const cg=ev.cgen||{};
+  sv('cg-empresa',cg.empresa);sv('cg-fecha',cg.fecha);sv('cg-med',cg.med||'Jorge Alonso Matus Duarte');sv('cg-prof',cg.prof||'Médico Cirujano');sv('cg-uni',cg.uni||'Universidad Autónoma de Sinaloa');sv('cg-ced',cg.ced||'8086374');sv('cg-ssp',cg.ssp||'9151/13');sv('cg-cesp',cg.cesp||'15384715');sv('cg-dom',cg.dom||'Calle Agustín de Vildosola 335, local 13, Hermosillo, Sonora. C.P. 83290');sv('cg-pac',cg.pac||h.nombre);sv('cg-sexo',cg.sexo||h.sexo);sv('cg-edad',cg.edad||(h.edad||'').replace(' años',''));sv('cg-tid',cg.tid||h.tidid||'INE');sv('cg-estudios',cg.estudios);sv('cg-res',cg.res);sv('cg-obs',cg.obs);
+  berlin();updateAntiResult();setTimeout(calcHBC,200);
+}
+
+// ── SAVE / LOAD / DELETE ─────────────────────────────
+function save(){
+  const ev=collect();cid=ev.id;
+  const idx=DB.findIndex(e=>e.id===ev.id);
+  if(idx>=0)DB[idx]=ev;else DB.unshift(ev);
+  localStorage.setItem('bimass_v2',JSON.stringify(DB));
+  updateCnt();renderDB();
+  // also update cert previews if visible
+  updatePrevClab();updatePrevCgen();
+  alert_('<i class="ti ti-check" aria-hidden="true"></i> Guardado: <strong>'+(ev.hc.nombre||'Sin nombre')+'</strong>');
+}
+
+function loadEv(id){
+  const ev=DB.find(e=>e.id===id);if(!ev)return;
+  cid=ev.id;fill(ev);goTab('hc');
+  alert_('<i class="ti ti-user" aria-hidden="true"></i> Cargando: <strong>'+ev.hc.nombre+'</strong>','inf');
+}
+
+function delEv(id,name,e){
+  e.stopPropagation();
+  if(!confirm('¿Eliminar la evaluación de '+name+'?'))return;
+  DB=DB.filter(ev=>ev.id!==id);
+  localStorage.setItem('bimass_v2',JSON.stringify(DB));
+  if(cid===id)cid=null;
+  updateCnt();renderDB();
+}
+
+function newEval(){
+  cid=null;
+  document.querySelectorAll('input[type=text],input[type=number],input[type=date],input[type=tel],textarea').forEach(el=>{if(!el.readOnly&&!el.dataset.keep)el.value='';});
+  document.querySelectorAll('input[type=radio][value="No"]').forEach(e=>e.checked=true);
+  document.querySelectorAll('input[type=radio][value="Negativo"]').forEach(e=>e.checked=true);
+  document.querySelectorAll('input[type=radio][value="Sin Datos"]').forEach(e=>e.checked=true);
+  document.querySelectorAll('input[type=radio][value="Sin datos"]').forEach(e=>e.checked=true);
+  document.getElementById('lab-rows').innerHTML='';
+  document.getElementById('ahf-rows').innerHTML='';
+  sv('h-fecha',new Date().toISOString().split('T')[0]);
+  sv('cl-fecha',new Date().toISOString().split('T')[0]);
+  sv('cg-fecha',new Date().toISOString().split('T')[0]);
+  sv('cl-med','Dr. Jorge Alonso Matus Duarte');sv('cl-ced','8086374');sv('cl-ssp','9151/15');
+  sv('cg-med','Jorge Alonso Matus Duarte');sv('cg-prof','Médico Cirujano');
+  sv('cg-uni','Universidad Autónoma de Sinaloa');sv('cg-ced','8086374');sv('cg-ssp','9151/13');
+  sv('cg-cesp','15384715');sv('cg-dom','Calle Agustín de Vildosola 335, local 13, Hermosillo, Sonora. C.P. 83290');
+  sv('cg-estudios','antidoping de 10 reactivos y demás pruebas correspondientes');
+  HZ.forEach(h=>{sv('ad-d-'+h,0);sv('ad-i-'+h,0);});
+  setTimeout(calcHBC,150);
+  goTab('hc');
+  alert_('<i class="ti ti-plus" aria-hidden="true"></i> Nueva evaluación iniciada','inf');
+}
+
+function clearAll(){if(confirm('¿Limpiar todo el formulario?'))newEval();}
+
+function exportAll(){
+  const b=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='bimass_'+new Date().toISOString().split('T')[0]+'.json';a.click();
+}
+
+function updateCnt(){
+  document.getElementById('cnt').textContent=DB.length+' evaluación'+(DB.length!==1?'es':'');
+}
+
+function renderDB(){
+  const q=(gv('srch')||'').toLowerCase();
+  const list=document.getElementById('db-list');
+  const f=DB.filter(e=>{
+    const n=(e.hc?.nombre||'').toLowerCase();
+    const nom=(e.hc?.nomina||'').toLowerCase();
+    const emp=(e.hc?.empresa||'').toLowerCase();
+    return !q||n.includes(q)||nom.includes(q)||emp.includes(q);
+  });
+  if(!f.length){list.innerHTML='<div class="empty"><i class="ti ti-clipboard-off" aria-hidden="true" style="font-size:36px;display:block;margin-bottom:10px;opacity:.35"></i>Sin evaluaciones guardadas.<br><br><button class="btn btn-pri" onclick="newEval()"><i class="ti ti-plus" aria-hidden="true"></i> Crear primera evaluación</button></div>';return;}
+  list.innerHTML='';
+  f.forEach(ev=>{
+    const d=new Date(ev.ts);
+    const df=d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+    const tf=d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+    const res=ev.clab?.res||'';
+    const spill=res==='Recomendado'?'s-ok':res==='No recomendado'?'s-no':res?'s-warn':'';
+    const item=document.createElement('div');item.className='dbi';item.onclick=()=>loadEv(ev.id);
+    item.innerHTML=`<div class="dbi-info" style="flex:1">
+      <div class="dbi-name"><i class="ti ti-user-circle" aria-hidden="true" style="font-size:15px;vertical-align:-2px;margin-right:4px"></i>${ev.hc?.nombre||'Sin nombre'} ${res?`<span class="spill ${spill}">${res}</span>`:''}</div>
+      <div class="dbi-meta">${ev.hc?.nomina||'—'} &nbsp;|&nbsp; ${ev.hc?.puesto||'—'} &nbsp;|&nbsp; ${ev.hc?.empresa||'—'} &nbsp;|&nbsp; ${ev.hc?.checkup||'—'} &nbsp;· ${df} ${tf}</div>
+    </div>
+    <div style="display:flex;gap:5px;align-items:center">
+      <button class="btn btn-sm btn-pri" onclick="event.stopPropagation();loadEv('${ev.id}')"><i class="ti ti-edit" aria-hidden="true"></i> Editar</button>
+      <button class="btn btn-sm btn-red" onclick="delEv('${ev.id}','${(ev.hc?.nombre||'').replace(/'/g,'')}',event)"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>`;
+    list.appendChild(item);
+  });
+}
+
+// ── BUILD DYNAMIC DOM ────────────────────────────────
+function buildNordic(){
+  const t=document.getElementById('n-body');
+  NORDIC.forEach((z,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${z}</td><td style="text-align:center"><div class="tog" style="justify-content:center"><label><input type="radio" name="n-${i}" value="Sí">Sí</label><label><input type="radio" name="n-${i}" value="No" checked>No</label></div></td><td style="text-align:center"><input type="number" id="nm-${i}" placeholder="0" style="width:55px;border:0.5px solid var(--color-border-secondary);border-radius:5px;padding:3px 5px;text-align:center;background:var(--color-background-primary);color:var(--color-text-primary)"></td><td style="text-align:center"><input type="number" id="nd-${i}" placeholder="0" style="width:55px;border:0.5px solid var(--color-border-secondary);border-radius:5px;padding:3px 5px;text-align:center;background:var(--color-background-primary);color:var(--color-text-primary)"></td>`;
+    t.appendChild(tr);
+  });
+}
+
+function buildAudi(){
+  const t=document.getElementById('aud-body');
+  HZ.forEach(h=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:500;padding:6px 9px">${h>=1000?h/1000+'k':h} Hz</td><td style="text-align:center;padding:4px"><input class="hz-in" type="number" id="ad-d-${h}" value="0" min="0" max="120" step="5" oninput="calcHBC()"></td><td style="text-align:center;padding:4px"><input class="hz-in" type="number" id="ad-i-${h}" value="0" min="0" max="120" step="5" oninput="calcHBC()"></td>`;
+    t.appendChild(tr);
+  });
+}
+
+function buildAnti(){
+  const g=document.getElementById('anti-grid');
+  ANTIDP.forEach(a=>{
+    const d=document.createElement('div');d.className='anti-item';
+    d.innerHTML=`<span>${a.n} (${a.c})</span><div class="tog"><label><input type="radio" name="anti-${a.c}" value="Negativo" checked onchange="updateAntiResult()"> Neg</label><label><input type="radio" name="anti-${a.c}" value="Positivo" onchange="updateAntiResult()"> Pos</label><label><input type="radio" name="anti-${a.c}" value="No solicitado" onchange="updateAntiResult()"> N/S</label></div>`;
+    g.appendChild(d);
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────
+buildNordic();buildAudi();buildAnti();
+sv('h-fecha',new Date().toISOString().split('T')[0]);
+sv('cl-fecha',new Date().toISOString().split('T')[0]);
+sv('cg-fecha',new Date().toISOString().split('T')[0]);
+sv('cl-med','Dr. Jorge Alonso Matus Duarte');sv('cl-ced','8086374');sv('cl-ssp','9151/15');
+sv('cg-med','Jorge Alonso Matus Duarte');sv('cg-prof','Médico Cirujano');sv('cg-uni','Universidad Autónoma de Sinaloa');sv('cg-ced','8086374');sv('cg-ssp','9151/13');sv('cg-cesp','15384715');
+sv('cg-dom','Calle Agustín de Vildosola 335, local 13, Hermosillo, Sonora. C.P. 83290');
+sv('cg-estudios','antidoping de 10 reactivos y demás pruebas correspondientes');
+updateCnt();renderDB();
+setTimeout(calcHBC,200);
+</script>
