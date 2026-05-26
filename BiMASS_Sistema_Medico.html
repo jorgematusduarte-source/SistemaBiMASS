@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BiMASS — Sistema de Evaluaciones Médicas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a5fa8'/><path d='M50 20v60M20 50h60' stroke='white' stroke-width='12' stroke-linecap='round'/></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1a5fa8;--blue-dark:#1a3a5c;--blue-lt:#e8f1fb;
+  --green:#0f6e56;--green-lt:#e1f5ee;
+  --red:#c0392b;--red-lt:#fbe8e8;
+  --amber:#b45309;--amber-lt:#fdf3e4;
+  --purple:#7c3aed;--purple-lt:#ede9fe;
+  --cyan:#0891b2;--cyan-lt:#e0f2fe;
+  --gray-100:#f8fafc;--gray-200:#f1f5f9;--gray-300:#e2e8f0;
+  --gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.05);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;background:#f0f4f8;color:var(--gray-900);line-height:1.5}
+.app{max-width:1000px;margin:0 auto;padding:12px}
+
+/* ── AUTH ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0f4f8 0%,#dbeafe 100%);padding:20px;margin:-12px}
+.auth-card{background:#fff;border-radius:var(--radius-xl);padding:36px;width:100%;max-width:500px;box-shadow:var(--shadow-md);border:1px solid var(--gray-300)}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo-icon{width:56px;height:56px;background:var(--blue);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px}
+.auth-logo h2{font-size:24px;font-weight:700;color:var(--blue-dark)}
+.auth-logo p{font-size:12.5px;color:var(--gray-500);margin-top:4px}
+.auth-tabs{display:flex;background:var(--gray-100);border-radius:10px;padding:4px;gap:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:9px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray-500);border-radius:8px;transition:all .15s}
+.auth-tab.on{background:#fff;color:var(--blue);box-shadow:var(--shadow)}
+
+/* ── TOPBAR ── */
+.topbar{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue) 100%);color:#fff;border-radius:var(--radius-lg);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;box-shadow:var(--shadow-md)}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.brand-icon{width:30px;height:30px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.tbr{display:flex;gap:6px;align-items:center}
+.user-pill{background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:12px;display:flex;align-items:center;gap:5px;font-weight:500}
+.sync-pill{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;font-size:11px;display:flex;align-items:center;gap:5px}
+.sdot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0}
+.sdot.s{background:#fbbf24;animation:pulse 1s infinite}
+.sdot.e{background:#f87171}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── NAV ── */
+.nav{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px}
+.ntab{padding:6px 13px;border-radius:var(--radius);border:1px solid var(--gray-300);background:#fff;color:var(--gray-500);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:all .15s;box-shadow:var(--shadow)}
+.ntab:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-lt)}
+.ntab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ntab.grn{border-color:var(--green);color:var(--green)}.ntab.grn.on{background:var(--green);color:#fff;border-color:var(--green)}
+.ntab.pur{border-color:var(--purple);color:var(--purple)}.ntab.pur.on{background:var(--purple);color:#fff;border-color:var(--purple)}
+.ntab.amb{border-color:var(--amber);color:var(--amber)}.ntab.amb.on{background:var(--amber);color:#fff;border-color:var(--amber)}
+.ntab.red{border-color:var(--red);color:var(--red)}.ntab.red.on{background:var(--red);color:#fff;border-color:var(--red)}
+.ntab.concl{border-color:var(--cyan);color:var(--cyan)}.ntab.concl.on{background:var(--cyan);color:#fff;border-color:var(--cyan)}
+
+.pnl{display:none}.pnl.on{display:block}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--gray-300);border-radius:var(--radius-lg);padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.ctitle{font-size:13px;font-weight:600;color:var(--blue);border-bottom:1px solid var(--gray-200);padding-bottom:8px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.ctitle.grn{color:var(--green)}.ctitle.pur{color:var(--purple)}.ctitle.amb{color:var(--amber)}.ctitle.red{color:var(--red)}.ctitle.cyan{color:var(--cyan)}
+
+/* ── FORM ── */
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.fld label{font-size:11.5px;color:var(--gray-500);font-weight:600;letter-spacing:.01em}
+.fld input,.fld select,.fld textarea{border:1px solid var(--gray-300);border-radius:var(--radius);padding:8px 10px;font-size:12.5px;font-family:inherit;background:#fff;color:var(--gray-900);width:100%;transition:border-color .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,95,168,.1)}
+.fld input[readonly]{background:var(--gray-100);color:var(--gray-500)}
+.fld textarea{resize:vertical;min-height:56px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+
+/* ── TOGGLE ── */
+.tog{display:flex;gap:4px}
+.tog label{padding:5px 11px;border-radius:var(--radius);border:1px solid var(--gray-300);font-size:12px;font-weight:500;cursor:pointer;user-select:none;transition:all .12s;background:#fff}
+.tog label:has(input:checked){background:var(--blue-lt);border-color:var(--blue);color:var(--blue)}
+.tog input{display:none}
+.brow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-200)}
+.brow:last-child{border:none}
+.brow span{font-size:12.5px;color:var(--gray-700)}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 14px;border-radius:var(--radius);border:1px solid var(--gray-300);background:#fff;color:var(--gray-700);cursor:pointer;font-size:12.5px;font-weight:500;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .15s;box-shadow:var(--shadow)}
+.btn:hover{background:var(--gray-100);border-color:var(--gray-400)}
+.btn-pri{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-pri:hover{background:#1450a0;border-color:#1450a0}
+.btn-grn{background:var(--green);color:#fff;border-color:var(--green)}.btn-grn:hover{background:#0a5240}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red)}.btn-red:hover{background:#a93226}
+.btn-amb{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-pur{background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn-cyan{background:var(--cyan);color:#fff;border-color:var(--cyan)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-full{width:100%;justify-content:center;padding:11px;font-size:14px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* ── ALERTS ── */
+#alrt{min-height:0}
+.alert{border-radius:var(--radius);padding:10px 14px;font-size:12.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px;font-weight:500}
+.al-ok{background:var(--green-lt);color:var(--green);border:1px solid #9fe1cb}
+.al-inf{background:var(--blue-lt);color:var(--blue);border:1px solid #b5d4f4}
+.al-err{background:var(--red-lt);color:var(--red);border:1px solid #f5b7b1}
+.al-wrn{background:var(--amber-lt);color:var(--amber);border:1px solid #f9c97c}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:var(--gray-100);padding:8px 10px;text-align:left;font-weight:600;font-size:11.5px;color:var(--gray-500);border-bottom:1px solid var(--gray-300)}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--gray-200);vertical-align:middle}
+.tbl tr:hover td{background:var(--gray-100)}
+.badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-ok{background:var(--green-lt);color:var(--green)}
+.b-warn{background:var(--amber-lt);color:var(--amber)}
+.b-err{background:var(--red-lt);color:var(--red)}
+.b-info{background:var(--blue-lt);color:var(--blue)}
+
+/* ── INV STATS ── */
+.inv-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.stat-card{background:#fff;border:1px solid var(--gray-300);border-radius:var(--radius-lg);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.stat-n{font-size:24px;font-weight:700}
+.stat-l{font-size:11.5px;color:var(--gray-500);margin-top:3px;font-weight:500}
+.stock-bar{height:5px;border-radius:3px;background:var(--gray-200);margin-top:4px;overflow:hidden}
+.stock-fill{height:100%;border-radius:3px;background:var(--green);transition:width .3s}
+.stock-fill.warn{background:var(--amber)}
+.stock-fill.low{background:var(--red)}
+
+/* ── RECETA BIMASS ── */
+.rx-wrap{background:#fff;border:1px solid #ddd;border-radius:var(--radius);overflow:hidden;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#1a3a5c;font-size:12px;box-shadow:var(--shadow)}
+.rx-top{padding:16px 20px 12px;border-bottom:3px solid #1a5fa8}
+.rx-brand{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.rx-brand-name{font-size:20px;font-weight:800;color:#1a3a5c}
+.rx-title{font-size:22px;font-weight:800;color:#1a3a5c;margin-bottom:2px}
+.rx-title-line{width:56px;height:3px;background:#1a5fa8;margin-bottom:12px;border-radius:2px}
+.rx-fields-row{display:flex;gap:14px;align-items:flex-end;margin-bottom:8px;flex-wrap:wrap}
+.rx-field{display:flex;align-items:flex-end;gap:4px;font-weight:700;font-size:11px}
+.rx-field-val{border-bottom:1.5px solid #1a3a5c;min-width:90px;padding-bottom:2px;font-weight:400;font-size:11px;color:#333}
+.rx-field-val.wide{min-width:200px}
+.rx-body{padding:14px 20px;min-height:180px}
+.rx-med-item{padding:9px 0;border-bottom:0.5px dashed #ccc}
+.rx-med-name{font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:3px}
+.rx-med-detail{color:#555;font-size:11px;line-height:1.6}
+.rx-footer-bar{background:linear-gradient(135deg,#1a3a5c 0%,#1a5fa8 100%);padding:14px 20px;display:flex;justify-content:space-around;align-items:center;gap:10px}
+.rx-footer-item{display:flex;align-items:center;gap:8px;color:#fff;font-size:11px}
+.rx-footer-icon{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rx-sig-zone{padding:12px 20px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid #eee}
+.rx-sig-box{text-align:center}
+.rx-sig-line{width:160px;border-bottom:1.5px solid #1a3a5c;margin:0 auto 5px}
+.rx-sig-name{font-weight:700;font-size:11px;color:#1a3a5c}
+.rx-sig-sub{font-size:10px;color:#555}
+
+/* ── CONCLUSIÓN ── */
+.concl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.concl-btn{border:2px solid var(--gray-300);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .15s;background:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow)}
+.concl-btn:hover{border-color:var(--blue);background:var(--blue-lt);transform:translateY(-1px)}
+.concl-btn.sel-ok{border-color:var(--green);background:var(--green-lt)}
+.concl-btn.sel-warn{border-color:var(--amber);background:var(--amber-lt)}
+.concl-btn.sel-err{border-color:var(--red);background:var(--red-lt)}
+.concl-btn.sel-info{border-color:var(--cyan);background:var(--cyan-lt)}
+.concl-icon{font-size:26px}
+.concl-label{font-size:13px;font-weight:600}
+.concl-desc{font-size:11px;color:var(--gray-500)}
+
+/* ── MODALS ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius-xl);padding:22px;width:92%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;color:var(--gray-900)}
+.modal-close{cursor:pointer;color:var(--gray-500);background:none;border:none;font-size:22px;line-height:1;padding:2px 6px;border-radius:6px}
+.modal-close:hover{background:var(--gray-100)}
+
+/* ── ADMIN ── */
+.user-card{background:var(--gray-100);border:1px solid var(--gray-300);border-radius:var(--radius-lg);padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.user-name{font-weight:600;font-size:13px;color:var(--gray-900)}
+.user-meta{font-size:11.5px;color:var(--gray-500);margin-top:3px}
+
+.search-bar{border:1px solid var(--gray-300);border-radius:var(--radius);padding:8px 11px;font-size:13px;font-family:inherit;background:#fff;color:var(--gray-900);width:100%;transition:border-color .15s}
+.search-bar:focus{outline:none;border-color:var(--blue)}
+.hidden{display:none!important}
+.loader{display:flex;align-items:center;gap:8px;padding:24px;color:var(--gray-500);font-size:13px;justify-content:center}
+.spin{width:18px;height:18px;border:2px solid var(--gray-300);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .g4,.g5{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  .inv-stats{grid-template-columns:1fr 1fr}
+  .concl-grid{grid-template-columns:1fr}
+  #pnl-rx>div{grid-template-columns:1fr!important}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- ══ AUTH ══════════════════════════════════════ -->
+<div id="auth-screen" class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <path d="M15 5v20M5 15h20" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>BiMASS</h2>
+      <p>Sistema de Evaluaciones Médicas · Hermosillo, Sonora</p>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tab-login" onclick="showAuthTab('login')">Iniciar sesión</div>
+      <div class="auth-tab" id="tab-reg" onclick="showAuthTab('reg')">Registrarse</div>
+    </div>
+    <div id="auth-login">
+      <div class="fld"><label>Correo electrónico</label><input type="email" id="l-email" placeholder="doctor@bimass.mx"></div>
+      <div class="fld"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div id="l-err" class="alert al-err hidden"></div>
+      <button class="btn btn-pri btn-full" style="margin-top:8px" onclick="doLogin()"><i class="ti ti-login"></i> Entrar al sistema</button>
+    </div>
+    <div id="auth-reg" class="hidden">
+      <div class="g2">
+        <div class="fld" style="grid-column:span 2"><label>Nombre completo *</label><input type="text" id="r-nombre" placeholder="Dr. Nombre Apellido Apellido"></div>
+        <div class="fld"><label>Correo electrónico *</label><input type="email" id="r-email"></div>
+        <div class="fld"><label>Contraseña * (mín. 6 caracteres)</label><input type="password" id="r-pass"></div>
+        <div class="fld"><label>Cédula Profesional *</label><input type="text" id="r-ced"></div>
+        <div class="fld"><label>Especialidad</label><input type="text" id="r-esp" placeholder="Medicina Ocupacional"></div>
+        <div class="fld"><label>CURP *</label><input type="text" id="r-curp" style="text-transform:uppercase" placeholder="XXXX000000XXXXXX00"></div>
+        <div class="fld"><label>RFC</label><input type="text" id="r-rfc" style="text-transform:uppercase"></div>
+        <div class="fld"><label>Teléfono</label><input type="tel" id="r-tel"></div>
+        <div class="fld"><label>Ciudad</label><input type="text" id="r-ciudad" placeholder="Hermosillo, Sonora"></div>
+        <div class="fld" style="grid-column:span 2"><label>Dirección del consultorio</label><input type="text" id="r-dir" placeholder="Calle, número, colonia, ciudad"></div>
+      </div>
+      <div id="r-err" class="alert al-err hidden" style="margin-top:8px"></div>
+      <button class="btn btn-pri btn-full" style="margin-top:8px" onclick="doRegister()"><i class="ti ti-user-plus"></i> Solicitar acceso</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══════════════════════════════════ -->
+<div id="main-app" class="hidden">
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 3v12M3 9h12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    BiMASS · Sistema Médico Integral
+  </div>
+  <div class="tbr">
+    <span class="sync-pill"><span class="sdot s" id="sdot"></span><span id="stxt">Conectando...</span></span>
+    <span class="user-pill"><i class="ti ti-user-circle"></i><span id="user-name">—</span></span>
+    <button onclick="doLogout()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:5px"><i class="ti ti-logout"></i> Salir</button>
+  </div>
+</div>
+
+<div class="nav" id="main-nav">
+  <button class="ntab on"    data-t="db"    onclick="goTab('db')"><i class="ti ti-database"></i> Evaluaciones</button>
+  <button class="ntab"       data-t="hc"    onclick="goTab('hc')"><i class="ti ti-clipboard-text"></i> Historia Clínica</button>
+  <button class="ntab"       data-t="ef"    onclick="goTab('ef')"><i class="ti ti-activity"></i> Exploración</button>
+  <button class="ntab"       data-t="exm"   onclick="goTab('exm')"><i class="ti ti-eye"></i> Exámenes</button>
+  <button class="ntab"       data-t="anti"  onclick="goTab('anti')"><i class="ti ti-test-pipe"></i> Antidoping</button>
+  <button class="ntab"       data-t="aud"   onclick="goTab('aud')"><i class="ti ti-ear"></i> Audiometría</button>
+  <button class="ntab grn"   data-t="clab"  onclick="goTab('clab')"><i class="ti ti-file-certificate"></i> Cert. Laboral</button>
+  <button class="ntab pur"   data-t="cgen"  onclick="goTab('cgen')"><i class="ti ti-certificate"></i> Cert. General</button>
+  <button class="ntab amb"   data-t="inv"   onclick="goTab('inv')"><i class="ti ti-package"></i> Inventario</button>
+  <button class="ntab red"   data-t="rx"    onclick="goTab('rx')"><i class="ti ti-prescription"></i> Receta Médica</button>
+  <button class="ntab concl" data-t="concl" onclick="goTab('concl')"><i class="ti ti-clipboard-check"></i> Conclusión</button>
+  <button class="ntab" data-t="admin" id="tab-admin" onclick="goTab('admin')" style="display:none;border-color:var(--purple);color:var(--purple)"><i class="ti ti-shield"></i> Admin</button>
+</div>
+
+<div id="alrt"></div>
+
+<!-- BASE DE DATOS -->
+<div id="pnl-db" class="pnl on">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-database"></i> Evaluaciones guardadas · Google Sheets</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="search-bar" id="srch" placeholder="Buscar por nombre, nómina o empresa..." oninput="renderDB()" style="flex:1">
+      <button class="btn btn-pri" onclick="newEval()"><i class="ti ti-plus"></i> Nueva evaluación</button>
+      <button class="btn" onclick="loadEvals(true)"><i class="ti ti-refresh"></i> Actualizar</button>
+    </div>
+    <div id="db-list"></div>
+  </div>
+</div>
+
+<!-- HISTORIA CLÍNICA -->
+<div id="pnl-hc" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-id"></i> Ficha de identificación</div>
+    <div class="g4" style="margin-bottom:8px">
+      <div class="fld"><label>Fecha</label><input type="date" id="h-fecha"></div>
+      <div class="fld"><label>Tipo checkup</label><select id="h-checkup"><option>Ingreso</option><option>Periódico</option><option>Egreso</option><option>Especial</option></select></div>
+      <div class="fld" style="grid-column:span 2"><label>Empresa</label><input type="text" id="h-empresa"></div>
+    </div>
+    <div class="g3" style="margin-bottom:8px">
+      <div class="fld"><label>Nómina</label><input type="text" id="h-nomina"></div>
+      <div class="fld" style="grid-column:span 2"><label>Nombre completo</label><input type="text" id="h-nombre" oninput="syncRxPac()"></div>
+    </div>
+    <div class="g5">
+      <div class="fld"><label>F. Nacimiento</label><input type="date" id="h-fnac" oninput="calcEdad()"></div>
+      <div class="fld"><label>Edad</label><input type="text" id="h-edad" readonly></div>
+      <div class="fld"><label>Sexo</label><select id="h-sexo"><option>Masculino</option><option>Femenino</option></select></div>
+      <div class="fld"><label>Tipo Sangre</label><select id="h-sangre"><option>O (+)</option><option>O (-)</option><option>A (+)</option><option>A (-)</option><option>B (+)</option><option>B (-)</option><option>AB (+)</option><option>AB (-)</option></select></div>
+      <div class="fld"><label>Puesto</label><input type="text" id="h-puesto"></div>
+    </div>
+    <div class="g4" style="margin-top:8px">
+      <div class="fld"><label>Área</label><input type="text" id="h-area"></div>
+      <div class="fld"><label>Teléfono</label><input type="tel" id="h-tel"></div>
+      <div class="fld"><label>Estado Civil</label><select id="h-civil"><option>Soltero(a)</option><option>Casado(a)</option><option>Unión libre</option><option>Divorciado(a)</option></select></div>
+      <div class="fld"><label>Ciudad / Estado</label><input type="text" id="h-ciudad" placeholder="Hermosillo, Sonora"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-virus"></i> Antecedentes Patológicos</div>
+    <div class="g2">
+      <div>
+        <div class="brow"><span>Exantemáticas</span><div class="tog"><label><input type="radio" name="app-exa" value="Sí"> Sí</label><label><input type="radio" name="app-exa" value="No" checked> No</label></div></div>
+        <div class="brow"><span>Quirúrgicos</span><div class="tog"><label><input type="radio" name="app-qui" value="Sí"> Sí</label><label><input type="radio" name="app-qui" value="No" checked> No</label></div></div>
+        <div class="brow"><span>Traumáticos</span><div class="tog"><label><input type="radio" name="app-trau" value="Sí"> Sí</label><label><input type="radio" name="app-trau" value="No" checked> No</label></div></div>
+        <div class="brow"><span>Alergias</span><div class="tog"><label><input type="radio" name="app-ale" value="Sí"> Sí</label><label><input type="radio" name="app-ale" value="No" checked> No</label></div></div>
+      </div>
+      <div>
+        <div class="brow"><span>Crónico-degenerativos</span><div class="tog"><label><input type="radio" name="app-cro" value="Sí"> Sí</label><label><input type="radio" name="app-cro" value="No" checked> No</label></div></div>
+        <div class="brow"><span>Hospitalizaciones</span><div class="tog"><label><input type="radio" name="app-hos" value="Sí"> Sí</label><label><input type="radio" name="app-hos" value="No" checked> No</label></div></div>
+        <div class="brow"><span>Tabaquismo</span><div class="tog"><label><input type="radio" name="apnp-tab" value="Positivo"> Positivo</label><label><input type="radio" name="apnp-tab" value="Negativo" checked> Negativo</label></div></div>
+        <div class="brow"><span>Drogadicción</span><div class="tog"><label><input type="radio" name="apnp-dro" value="Positivo"> Positivo</label><label><input type="radio" name="apnp-dro" value="Negativo" checked> Negativo</label></div></div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:8px"><label>Observaciones / Padecimiento actual</label><textarea id="h-app-obs" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('hc','ef')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="saveEval()"><i class="ti ti-cloud-upload"></i> Guardar en Sheets</button>
+    <button class="btn btn-red" onclick="clearAll()"><i class="ti ti-trash"></i> Limpiar formulario</button>
+  </div>
+</div>
+
+<!-- EXPLORACIÓN FÍSICA -->
+<div id="pnl-ef" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-activity"></i> Signos vitales y somatometría</div>
+    <div class="g5">
+      <div class="fld"><label>Peso (kg)</label><input type="number" id="e-peso" step="0.1" oninput="calcIMC();syncRxVitales()"></div>
+      <div class="fld"><label>Talla (m)</label><input type="number" id="e-talla" step="0.01" oninput="calcIMC()"></div>
+      <div class="fld"><label>IMC</label><input type="number" id="e-imc" readonly></div>
+      <div class="fld"><label>Clasificación IMC</label><input type="text" id="e-imcc" readonly></div>
+      <div class="fld"><label>SaO₂ (%)</label><input type="number" id="e-sao2"></div>
+      <div class="fld"><label>FC (lpm)</label><input type="number" id="e-fc" oninput="syncRxVitales()"></div>
+      <div class="fld"><label>FR (rpm)</label><input type="number" id="e-fr" oninput="syncRxVitales()"></div>
+      <div class="fld"><label>T° (°C)</label><input type="number" id="e-temp" step="0.1" oninput="syncRxVitales()"></div>
+      <div class="fld"><label>TA</label><input type="text" id="e-ta" placeholder="120/80" oninput="syncRxVitales()"></div>
+      <div class="fld"><label>Alergias</label><input type="text" id="e-alergias" oninput="syncRxVitales()"></div>
+    </div>
+    <div class="fld" style="margin-top:8px"><label>Observaciones exploración física</label><textarea id="e-obs" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('ef','exm')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="saveEval()"><i class="ti ti-cloud-upload"></i> Guardar en Sheets</button>
+  </div>
+</div>
+
+<!-- EXÁMENES -->
+<div id="pnl-exm" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-eye"></i> Agudeza Visual</div>
+    <div class="g4">
+      <div class="brow" style="border:none"><span>Usa lentes</span><div class="tog"><label><input type="radio" name="av-len" value="Sí"> Sí</label><label><input type="radio" name="av-len" value="No" checked> No</label></div></div>
+      <div class="brow" style="border:none"><span>Daltonismo</span><div class="tog"><label><input type="radio" name="av-dal" value="Sí"> Sí</label><label><input type="radio" name="av-dal" value="No" checked> No</label></div></div>
+      <div class="fld"><label>AV ambos ojos</label><input type="number" id="av-bc"></div>
+      <div class="fld"><label>AV ojo derecho</label><input type="number" id="av-dc"></div>
+    </div>
+    <div class="fld" style="margin-top:8px"><label>Observaciones AV</label><textarea id="av-obs" rows="2"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-lungs"></i> Espirometría</div>
+    <div class="fld"><label>Resultado</label><select id="esp-res"><option>No solicitado</option><option>Normal</option><option>Obstructivo leve</option><option>Obstructivo moderado</option><option>Restrictivo</option><option>Mixto</option></select></div>
+    <div class="fld" style="margin-top:8px"><label>Observaciones</label><textarea id="esp-obs" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('exm','anti')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="saveEval()"><i class="ti ti-cloud-upload"></i> Guardar en Sheets</button>
+  </div>
+</div>
+
+<!-- ANTIDOPING -->
+<div id="pnl-anti" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-test-pipe"></i> Antidoping</div>
+    <div id="anti-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+    <div class="fld" style="margin-top:12px"><label>Observaciones antidoping</label><textarea id="anti-obs" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('anti','aud')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="saveEval()"><i class="ti ti-cloud-upload"></i> Guardar en Sheets</button>
+  </div>
+</div>
+
+<!-- AUDIOMETRÍA -->
+<div id="pnl-aud" class="pnl">
+  <div class="card">
+    <div class="ctitle"><i class="ti ti-ear"></i> Audiometría de tonos puros — Conducción aérea</div>
+    <table class="tbl" style="margin-bottom:12px">
+      <thead><tr><th>Hz</th><th style="text-align:center;color:var(--blue)">dB Oído Derecho (O)</th><th style="text-align:center;color:var(--red)">dB Oído Izquierdo (X)</th></tr></thead>
+      <tbody id="aud-body"></tbody>
+      <tfoot><tr style="background:var(--gray-100);font-weight:600"><td style="padding:8px 10px">Promedio</td><td id="ap-d" style="text-align:center">—</td><td id="ap-i" style="text-align:center">—</td></tr></tfoot>
+    </table>
+    <div style="background:var(--blue-lt);border-radius:var(--radius-lg);padding:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+      <div><div style="font-size:11px;color:var(--gray-500);font-weight:600">% HBC Total</div><div style="font-size:16px;font-weight:700;color:var(--blue);margin-top:2px" id="hbc-tot">—</div></div>
+      <div><div style="font-size:11px;color:var(--gray-500);font-weight:600">Pérdida OD</div><div style="font-size:16px;font-weight:700;color:var(--blue);margin-top:2px" id="hbc-ld">—</div></div>
+      <div><div style="font-size:11px;color:var(--gray-500);font-weight:600">Pérdida OI</div><div style="font-size:16px;font-weight:700;color:var(--blue);margin-top:2px" id="hbc-li">—</div></div>
+      <div><div style="font-size:11px;color:var(--gray-500);font-weight:600">Conclusión</div><div class="badge b-ok" id="hbc-concl" style="margin-top:4px;display:inline-block">Normal</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><div style="font-size:12px;font-weight:600;color:var(--blue);margin-bottom:6px"><i class="ti ti-circle" style="font-size:10px"></i> Oído Derecho</div><div style="position:relative;height:190px"><canvas id="ch-d" role="img" aria-label="Audiograma oído derecho">Audiograma derecho</canvas></div></div>
+      <div><div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:6px"><i class="ti ti-x" style="font-size:10px"></i> Oído Izquierdo</div><div style="position:relative;height:190px"><canvas id="ch-i" role="img" aria-label="Audiograma oído izquierdo">Audiograma izquierdo</canvas></div></div>
+    </div>
+    <div class="fld" style="margin-top:12px"><label>Observaciones audiometría</label><textarea id="aud-obs" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('aud','clab')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn btn-pri" onclick="saveEval()"><i class="ti ti-cloud-upload"></i> Guardar en Sheets</button>
+  </div>
+</div>
+
+<!-- CERT LABORAL -->
+<div id="pnl-clab" class="pnl">
+  <div class="card">
+    <div class="ctitle grn"><i class="ti ti-file-certificate"></i> Certificado Médico Laboral</div>
+    <div class="g3" style="margin-bottom:8px">
+      <div class="fld"><label>Empresa / Atención</label><input type="text" id="cl-empresa"></div>
+      <div class="fld"><label>Fecha</label><input type="date" id="cl-fecha"></div>
+      <div class="fld"><label>Puesto evaluado</label><input type="text" id="cl-puesto"></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Historia clínica</label><select id="cl-hc"><option>Sin datos patológicos al momento de la historia clínica</option><option>Con datos patológicos</option></select></div>
+      <div class="fld"><label>Laboratorios clínicos</label><select id="cl-lab"><option>No solicitado</option><option>Dentro de parámetros normales</option><option>Con alteraciones</option></select></div>
+      <div class="fld"><label>Audiometría</label><select id="cl-aud"><option>No solicitado</option><option>Normal</option><option>Hipoacusia leve</option><option>Hipoacusia moderada</option></select></div>
+      <div class="fld"><label>Espirometría</label><select id="cl-esp"><option>No solicitado</option><option>Normal</option><option>Obstructivo</option><option>Restrictivo</option></select></div>
+    </div>
+    <div class="fld" style="margin-top:8px"><label>Antidoping — resumen</label><textarea id="cl-anti" rows="2"></textarea></div>
+    <div class="g2" style="margin-top:8px">
+      <div class="fld"><label>Resultado ocupacional</label><select id="cl-res"><option>Recomendado</option><option>Recomendado con restricciones</option><option>No recomendado</option></select></div>
+      <div class="fld"><label>Restricciones laborales</label><select id="cl-rest"><option value="NO">Sin restricciones</option><option>Restricción de altura</option><option>Sin manejo de maquinaria</option><option>Restricción de levantamiento</option></select></div>
+    </div>
+    <div class="fld" style="margin-top:8px"><label>Comentarios del médico</label><textarea id="cl-com" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('clab','cgen')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn" style="background:var(--green);color:#fff;border-color:var(--green)" onclick="printCert('laboral')"><i class="ti ti-printer"></i> Imprimir</button>
+    <button class="btn btn-pri" onclick="saveEval()"><i class="ti ti-cloud-upload"></i> Guardar</button>
+  </div>
+</div>
+
+<!-- CERT GENERAL -->
+<div id="pnl-cgen" class="pnl">
+  <div class="card">
+    <div class="ctitle pur"><i class="ti ti-certificate"></i> Certificado Médico General</div>
+    <div class="g3" style="margin-bottom:8px">
+      <div class="fld"><label>Empresa / Atención</label><input type="text" id="cg-empresa"></div>
+      <div class="fld"><label>Fecha</label><input type="date" id="cg-fecha"></div>
+    </div>
+    <div class="g4" style="margin-bottom:8px">
+      <div class="fld" style="grid-column:span 2"><label>Nombre del paciente</label><input type="text" id="cg-pac"></div>
+      <div class="fld"><label>Sexo</label><select id="cg-sexo"><option>Masculino</option><option>Femenino</option></select></div>
+      <div class="fld"><label>Edad</label><input type="number" id="cg-edad"></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Tipo ID</label><select id="cg-tid"><option>INE</option><option>Pasaporte</option><option>CURP</option></select></div>
+      <div class="fld"><label>Resultado</label><select id="cg-res"><option>en BUEN estado de salud actual y APTO para laborar</option><option>en estado de salud REGULAR</option><option>con hallazgos — ver indicaciones</option></select></div>
+    </div>
+    <div class="fld" style="margin-top:8px"><label>Observaciones adicionales</label><textarea id="cg-obs" rows="2"></textarea></div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" onclick="sc('cgen','inv')"><i class="ti ti-device-floppy"></i> Guardar y continuar</button>
+    <button class="btn btn-pur" onclick="printCert('general')"><i class="ti ti-printer"></i> Imprimir</button>
+    <button class="btn btn-pri" onclick="syncCG()"><i class="ti ti-refresh"></i> Sincronizar datos</button>
+  </div>
+</div>
+
+<!-- INVENTARIO -->
+<div id="pnl-inv" class="pnl">
+  <div class="inv-stats">
+    <div class="stat-card"><div class="stat-n" style="color:var(--blue)" id="inv-total">0</div><div class="stat-l">Productos</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--red)" id="inv-low">0</div><div class="stat-l">Stock bajo</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--green)" id="inv-val">$0</div><div class="stat-l">Valor inventario</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--amber)" id="inv-venta">$0</div><div class="stat-l">Valor venta</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle amb"><i class="ti ti-package"></i> Farmacia — Inventario de Medicamentos y Material</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="search-bar" id="inv-srch" placeholder="Buscar producto..." oninput="renderInv()" style="flex:1">
+      <select id="inv-cat" onchange="renderInv()" style="border:1px solid var(--gray-300);border-radius:var(--radius);padding:8px 10px;font-size:12.5px;font-family:inherit;background:#fff;color:var(--gray-700)">
+        <option value="">Todas las categorías</option>
+        <option>Medicamento</option><option>Material de curación</option><option>Material de oficina</option><option>Equipo médico</option><option>Otro</option>
+      </select>
+      <button class="btn btn-amb" onclick="openItemModal()"><i class="ti ti-plus"></i> Agregar producto</button>
+      <button class="btn" onclick="loadInv(true)"><i class="ti ti-refresh"></i></button>
+    </div>
+    <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Producto</th><th>Categoría</th><th>Presentación</th><th style="text-align:center">Stock</th><th style="text-align:right">Costo</th><th style="text-align:right">P. Venta</th><th>Caducidad</th><th>Estado</th><th></th></tr></thead><tbody id="inv-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- RECETA MÉDICA -->
+<div id="pnl-rx" class="pnl">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div>
+      <div class="card">
+        <div class="ctitle red"><i class="ti ti-prescription"></i> Nueva Receta Médica</div>
+        <div class="g3" style="margin-bottom:8px">
+          <div class="fld"><label>Fecha</label><input type="date" id="rx-fecha"></div>
+          <div class="fld"><label>Folio</label><input type="text" id="rx-folio" readonly></div>
+          <div class="fld"><label>Hora</label><input type="time" id="rx-hora"></div>
+        </div>
+        <div class="fld" style="margin-bottom:8px"><label>Nombre del paciente</label><input type="text" id="rx-pac" oninput="updateRxPreview()"></div>
+        <div class="g4" style="margin-bottom:8px">
+          <div class="fld"><label>Edad</label><input type="number" id="rx-edad" oninput="updateRxPreview()"></div>
+          <div class="fld"><label>Sexo</label><select id="rx-sexo" onchange="updateRxPreview()"><option>Masculino</option><option>Femenino</option></select></div>
+          <div class="fld"><label>Peso (kg)</label><input type="number" id="rx-peso" step="0.1" oninput="updateRxPreview()"></div>
+          <div class="fld"><label>Talla (m)</label><input type="number" id="rx-talla" step="0.01" oninput="updateRxPreview()"></div>
+        </div>
+        <div class="g3" style="margin-bottom:8px">
+          <div class="fld"><label>TA</label><input type="text" id="rx-ta" placeholder="120/80" oninput="updateRxPreview()"></div>
+          <div class="fld"><label>FC (lpm)</label><input type="number" id="rx-fc" oninput="updateRxPreview()"></div>
+          <div class="fld"><label>FR (rpm)</label><input type="number" id="rx-fr" oninput="updateRxPreview()"></div>
+          <div class="fld"><label>Temp (°C)</label><input type="number" id="rx-temp" step="0.1" oninput="updateRxPreview()"></div>
+          <div class="fld"><label>Alergias</label><input type="text" id="rx-alergias" oninput="updateRxPreview()"></div>
+        </div>
+        <div class="fld" style="margin-bottom:8px"><label>Diagnóstico (CIE-10)</label><textarea id="rx-diag" rows="2" oninput="updateRxPreview()"></textarea></div>
+        <div style="font-size:11.5px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 8px">Medicamentos prescritos</div>
+        <div id="rx-meds-list" style="margin-bottom:8px"></div>
+        <button class="btn btn-sm" onclick="openMedPicker()" style="border-color:var(--red);color:var(--red)"><i class="ti ti-plus"></i> Agregar medicamento del inventario</button>
+        <div class="fld" style="margin-top:10px"><label>Indicaciones generales</label><textarea id="rx-indica" rows="2" oninput="updateRxPreview()"></textarea></div>
+        <div class="acts">
+          <button class="btn btn-grn" onclick="saveRx()"><i class="ti ti-device-floppy"></i> Guardar receta</button>
+          <button class="btn btn-red" onclick="printRx()"><i class="ti ti-printer"></i> Imprimir</button>
+          <button class="btn" onclick="newRx()"><i class="ti ti-plus"></i> Nueva</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid var(--gray-200);font-size:12.5px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px"><i class="ti ti-eye"></i> Vista previa en tiempo real</div>
+        <div id="rx-preview-wrap" style="padding:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCLUSIÓN -->
+<div id="pnl-concl" class="pnl">
+  <div class="card">
+    <div class="ctitle cyan"><i class="ti ti-clipboard-check"></i> Conclusión de la evaluación médica</div>
+    <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Selecciona el resultado final para <strong id="concl-pac-nombre">el paciente</strong>.</div>
+    <div class="concl-grid">
+      <div class="concl-btn" id="cb-apto" onclick="selectConcl('Apto sin restricciones','ok')">
+        <div class="concl-icon">✅</div>
+        <div class="concl-label" style="color:var(--green)">Apto sin restricciones</div>
+        <div class="concl-desc">Condiciones óptimas para laborar</div>
+      </div>
+      <div class="concl-btn" id="cb-restricciones" onclick="selectConcl('Apto con restricciones','warn')">
+        <div class="concl-icon">⚠️</div>
+        <div class="concl-label" style="color:var(--amber)">Apto con restricciones</div>
+        <div class="concl-desc">Puede laborar con limitaciones específicas</div>
+      </div>
+      <div class="concl-btn" id="cb-hospital" onclick="selectConcl('Enviado a hospital','err')">
+        <div class="concl-icon">🏥</div>
+        <div class="concl-label" style="color:var(--red)">Enviado a hospital</div>
+        <div class="concl-desc">Requiere atención hospitalaria — genera incapacidad</div>
+      </div>
+      <div class="concl-btn" id="cb-noapto" onclick="selectConcl('No apto','err')">
+        <div class="concl-icon">🚫</div>
+        <div class="concl-label" style="color:var(--red)">No apto</div>
+        <div class="concl-desc">No está en condiciones de laborar — genera incapacidad</div>
+      </div>
+      <div class="concl-btn" id="cb-abandono" onclick="selectConcl('Abandono de consulta','info')" style="grid-column:span 1">
+        <div class="concl-icon">🚶</div>
+        <div class="concl-label" style="color:var(--cyan)">Abandono de consulta</div>
+        <div class="concl-desc">El paciente abandonó antes de concluir</div>
+      </div>
+    </div>
+    <div id="concl-obs-section" class="hidden" style="margin-top:12px">
+      <div class="fld"><label>Observaciones de conclusión</label><textarea id="concl-obs" rows="3" placeholder="Detalla restricciones, indicaciones o motivo..."></textarea></div>
+      <div id="incap-section" class="hidden">
+        <div style="background:var(--red-lt);border:1px solid #f5b7b1;border-radius:var(--radius-lg);padding:14px;margin-top:10px">
+          <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="ti ti-file-medical"></i> Datos para la Incapacidad Médica</div>
+          <div class="g3">
+            <div class="fld"><label>Fecha de atención</label><input type="date" id="inc-fecha-aten"></div>
+            <div class="fld"><label>Hora de atención</label><input type="time" id="inc-hora-aten"></div>
+            <div class="fld"><label>Fecha inicio incapacidad</label><input type="date" id="inc-fecha-ini" oninput="calcFechaFin()"></div>
+            <div class="fld"><label>Número de días</label><input type="number" id="inc-dias" min="1" value="1" oninput="calcFechaFin()"></div>
+            <div class="fld"><label>Fecha último día (auto)</label><input type="date" id="inc-fecha-fin" readonly></div>
+            <div class="fld"><label>Diagnóstico CIE-10</label><input type="text" id="inc-diag" placeholder="Código o descripción"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-grn" id="btn-guardar-concl" onclick="guardarConclusion()" disabled><i class="ti ti-device-floppy"></i> Guardar y finalizar evaluación</button>
+    <button class="btn btn-red" id="btn-print-incap" onclick="printIncap()" style="display:none"><i class="ti ti-printer"></i> Imprimir incapacidad</button>
+    <button class="btn" onclick="newEval()"><i class="ti ti-plus"></i> Nueva evaluación</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="pnl-admin" class="pnl">
+  <div class="card">
+    <div class="ctitle pur"><i class="ti ti-shield"></i> Panel de administrador — Control de accesos</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="search-bar" id="admin-srch" placeholder="Buscar usuario..." oninput="renderUsers()" style="flex:1">
+      <button class="btn" onclick="loadUsers(true)"><i class="ti ti-refresh"></i> Actualizar</button>
+    </div>
+    <div id="users-list"></div>
+  </div>
+</div>
+</div><!-- /main-app -->
+
+<!-- MODAL: PRODUCTO INVENTARIO -->
+<div class="modal-bg" id="modal-item">
+  <div class="modal">
+    <div class="modal-title"><span id="item-title">Agregar producto al inventario</span><button class="modal-close" onclick="closeModal('modal-item')">✕</button></div>
+    <div class="g2">
+      <div class="fld" style="grid-column:span 2"><label>Nombre del producto *</label><input type="text" id="it-nombre" placeholder="Ej. Paracetamol 500mg"></div>
+      <div class="fld"><label>Categoría *</label><select id="it-cat"><option>Medicamento</option><option>Material de curación</option><option>Material de oficina</option><option>Equipo médico</option><option>Otro</option></select></div>
+      <div class="fld"><label>Presentación</label><input type="text" id="it-pres" placeholder="Tableta, frasco, caja..."></div>
+      <div class="fld"><label>Unidad de medida</label><input type="text" id="it-uni" placeholder="pieza, ml, mg..."></div>
+      <div class="fld"><label>Stock inicial *</label><input type="number" id="it-stock" min="0" value="0"></div>
+      <div class="fld"><label>Stock mínimo (alerta)</label><input type="number" id="it-smin" min="0" value="5"></div>
+      <div class="fld"><label>Proveedor</label><input type="text" id="it-prov"></div>
+      <div class="fld"><label>Lote</label><input type="text" id="it-lote"></div>
+      <div class="fld"><label>Caducidad</label><input type="date" id="it-cad"></div>
+      <div class="fld"><label>Costo unitario ($)</label><input type="number" id="it-costo" step="0.01" min="0"></div>
+      <div class="fld"><label>Precio de venta al público ($)</label><input type="number" id="it-pvp" step="0.01" min="0"></div>
+    </div>
+    <div class="acts">
+      <button class="btn btn-amb" onclick="saveItem()"><i class="ti ti-device-floppy"></i> Guardar producto</button>
+      <button class="btn" onclick="closeModal('modal-item')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MOVIMIENTO -->
+<div class="modal-bg" id="modal-mov">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title"><span>Registrar movimiento de inventario</span><button class="modal-close" onclick="closeModal('modal-mov')">✕</button></div>
+    <div class="fld"><label>Producto</label><input type="text" id="mov-nombre" readonly style="background:var(--gray-100)"></div>
+    <div class="fld" style="margin-top:8px"><label>Tipo de movimiento</label><div class="tog"><label><input type="radio" name="mov-tipo" value="entrada" checked> Entrada</label><label><input type="radio" name="mov-tipo" value="salida"> Salida</label></div></div>
+    <div class="fld" style="margin-top:8px"><label>Cantidad</label><input type="number" id="mov-cant" min="1" value="1"></div>
+    <div class="fld" style="margin-top:8px"><label>Motivo</label><input type="text" id="mov-motivo" placeholder="Compra, consumo, venta, receta..."></div>
+    <div class="acts">
+      <button class="btn btn-pri" onclick="saveMovement()"><i class="ti ti-check"></i> Registrar</button>
+      <button class="btn" onclick="closeModal('modal-mov')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SELECTOR MEDICAMENTO -->
+<div class="modal-bg" id="modal-med">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-title"><span>Agregar medicamento a la receta</span><button class="modal-close" onclick="closeModal('modal-med')">✕</button></div>
+    <input class="search-bar" id="med-srch" placeholder="Buscar medicamento en inventario..." oninput="renderMedPicker()" style="margin-bottom:10px">
+    <div id="med-list" style="max-height:200px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:var(--radius-lg);margin-bottom:14px"></div>
+    <div style="background:var(--gray-100);border-radius:var(--radius-lg);padding:14px">
+      <div style="font-size:12.5px;font-weight:600;color:var(--red);margin-bottom:10px">Especificaciones de prescripción</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px">Medicamento seleccionado: <strong id="med-selected-name" style="color:var(--gray-900)">Ninguno</strong></div>
+      <div class="g2">
+        <div class="fld"><label>Denominación genérica *</label><input type="text" id="med-gen" placeholder="Nombre genérico del principio activo" readonly style="background:#fff"></div>
+        <div class="fld"><label>Nombre distintivo (opcional)</label><input type="text" id="med-dist" placeholder="Marca comercial"></div>
+        <div class="fld"><label>Forma farmacéutica</label><input type="text" id="med-forma" placeholder="Tableta, jarabe, pomada..."></div>
+        <div class="fld"><label>Dosis</label><input type="text" id="med-dosis" placeholder="500 mg, 10 mg/5ml..."></div>
+        <div class="fld"><label>Vía de administración</label><select id="med-via"><option>Oral</option><option>Tópica</option><option>Intravenosa</option><option>Intramuscular</option><option>Sublingual</option><option>Inhalada</option><option>Oftálmica</option><option>Ótica</option><option>Rectal</option><option>Subcutánea</option></select></div>
+        <div class="fld"><label>Frecuencia</label><input type="text" id="med-frec" placeholder="Cada 8 horas, cada 12 horas..."></div>
+        <div class="fld"><label>Duración del tratamiento</label><input type="text" id="med-duracion" placeholder="5 días, 2 semanas..."></div>
+        <div class="fld"><label>Cantidad a dispensar *</label><input type="number" id="med-cant" min="1" value="1"></div>
+      </div>
+      <div class="fld" style="margin-top:8px"><label>Indicaciones adicionales</label><input type="text" id="med-ind" placeholder="Tomar con alimento, evitar luz solar..."></div>
+    </div>
+    <div class="acts">
+      <button class="btn btn-red" onclick="addMedToRx()"><i class="ti ti-plus"></i> Agregar a la receta</button>
+      <button class="btn" onclick="closeModal('modal-med')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const GAS='https://script.google.com/macros/s/AKfycbzwIJzmfCbLb5fWHb1NBmnfYzlHXOK45_kEQdVmdQE20lUe22sprVU4S7ZVtN11z9M/exec';
+const HZ=[250,500,1000,2000,4000,8000];
+const ANTIDP=[{c:'COC',n:'Cocaína'},{c:'THC',n:'Marihuana'},{c:'AMP',n:'Anfetaminas'},{c:'MET',n:'Metanfetaminas'},{c:'OPI',n:'Opiaceos'},{c:'BAR',n:'Barbitúricos'},{c:'BZD',n:'Benzodiacepinas'},{c:'PCP',n:'Fenciclidina'},{c:'TCA',n:'Antidepresivos'},{c:'MTD',n:'Metadona'},{c:'PPX',n:'Propoxifeno'},{c:'MDMA',n:'Éxtasis'}];
+let DB=[],INV=[],cid=null,chD=null,chI=null,selItem=null,rxMeds=[],rxId=null,editItemId=null,movItemId=null,currentUser=null,allUsers=[],conclSelected=null,conclType=null;
+const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v??'';};
+const gr=n=>{const e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';};
+const sr=(n,v)=>{const e=document.querySelector('input[name="'+n+'"][value="'+v+'"]');if(e)e.checked=true;};
+const fmt$=n=>'$'+(parseFloat(n)||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>new Date().toISOString().split('T')[0];
+const nowTime=()=>new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+function setSyncStatus(s,t){var d=document.getElementById('sdot'),l=document.getElementById('stxt');if(!d)return;d.className='sdot'+(s==='s'?' s':s==='e'?' e':'');l.textContent=t;}
+function alert_(msg,type){type=type||'ok';var el=document.getElementById('alrt');if(!el)return;var ic=type==='ok'?'check':type==='err'?'alert-circle':type==='wrn'?'alert-triangle':'info-circle';el.innerHTML='<div class="alert al-'+type+'"><i class="ti ti-'+ic+'"></i>'+msg+'</div>';setTimeout(function(){el.innerHTML='';},4500);}
+function showErr(id,msg){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.classList.toggle('hidden',!msg);}
+function showAuthTab(t){document.getElementById('tab-login').classList.toggle('on',t==='login');document.getElementById('tab-reg').classList.toggle('on',t==='reg');document.getElementById('auth-login').classList.toggle('hidden',t!=='login');document.getElementById('auth-reg').classList.toggle('hidden',t!=='reg');}
+function saveSession(u){try{localStorage.setItem('bimass_u',JSON.stringify(u));}catch(e){}}
+function loadSession(){try{return JSON.parse(localStorage.getItem('bimass_u'));}catch(e){return null;}}
+function clearSession(){try{localStorage.removeItem('bimass_u');}catch(e){}}
+async function doLogin(){
+  var email=gv('l-email'),pass=gv('l-pass');
+  if(!email||!pass){showErr('l-err','Ingresa correo y contraseña');return;}
+  setSyncStatus('s','Autenticando...');
+  try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'login',email:email,password:pass})});var d=await r.json();
+    if(d.ok){currentUser=d.user;saveSession(d.user);initMainApp();}
+    else{showErr('l-err',d.error||'Credenciales incorrectas');setSyncStatus('e','Error');}
+  }catch(ex){showErr('l-err','Sin conexión con el servidor');setSyncStatus('e','Sin conexión');}
+}
+async function doRegister(){
+  var u={nombre:gv('r-nombre'),email:gv('r-email'),password:gv('r-pass'),cedula:gv('r-ced'),curp:gv('r-curp').toUpperCase(),rfc:gv('r-rfc').toUpperCase(),especialidad:gv('r-esp'),direccion:gv('r-dir'),telefono:gv('r-tel')};
+  if(!u.nombre||!u.email||!u.password||!u.cedula||!u.curp){showErr('r-err','Completa los campos obligatorios (*)');return;}
+  if(u.password.length<6){showErr('r-err','La contraseña debe tener mínimo 6 caracteres');return;}
+  setSyncStatus('s','Registrando...');
+  try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'register',user:u})});var d=await r.json();
+    if(d.ok){showErr('r-err','');if(d.pending){showAuthTab('login');document.getElementById('l-email').value=u.email;alert_('Solicitud enviada. Recibirás un correo cuando el administrador apruebe tu acceso.','inf');}else{alert_('Cuenta creada. Inicia sesión.');showAuthTab('login');}setSyncStatus('ok','Listo');}
+    else{showErr('r-err',d.error||'Error al registrar');setSyncStatus('e','Error');}
+  }catch(ex){showErr('r-err','Sin conexión');setSyncStatus('e','Sin conexión');}
+}
+function doLogout(){clearSession();currentUser=null;DB=[];INV=[];document.getElementById('auth-screen').classList.remove('hidden');document.getElementById('main-app').classList.add('hidden');}
+function initMainApp(){
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('main-app').classList.remove('hidden');
+  document.getElementById('user-name').textContent=(currentUser.nombre||'').split(' ')[0];
+  if(currentUser.esAdmin)document.getElementById('tab-admin').style.display='flex';
+  buildAnti();buildAudi();
+  var hoy=today();sv('h-fecha',hoy);sv('cl-fecha',hoy);sv('cg-fecha',hoy);
+  sv('cl-anti','COC, THC, AMP, MET, OPI — TODOS NEGATIVOS.');
+  newRx();loadEvals();loadInv();setSyncStatus('ok','Conectado · Google Sheets');
+}
+function goTab(t){document.querySelectorAll('.ntab').forEach(function(b){b.classList.remove('on');});document.querySelectorAll('.pnl').forEach(function(p){p.classList.remove('on');});var tab=document.querySelector('[data-t="'+t+'"]');if(tab)tab.classList.add('on');var pnl=document.getElementById('pnl-'+t);if(pnl)pnl.classList.add('on');if(t==='aud')setTimeout(calcHBC,120);if(t==='concl')syncConclPac();if(t==='admin')loadUsers();}
+function sc(cur,next){saveEval();goTab(next);}
+function calcEdad(){var v=gv('h-fnac');if(!v)return;var d=new Date(v),n=new Date();var a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;sv('h-edad',a+' años');}
+function calcIMC(){var p=parseFloat(gv('e-peso')),t=parseFloat(gv('e-talla'));if(!p||!t)return;var imc=p/(t*t);sv('e-imc',imc.toFixed(2));var cls=imc<18.5?'Bajo peso':imc<25?'Normal':imc<30?'Sobrepeso':imc<35?'Obesidad I':imc<40?'Obesidad II':'Obesidad III';sv('e-imcc',cls);}
+function syncRxPac(){sv('rx-pac',gv('h-nombre'));updateRxPreview();}
+function syncRxVitales(){sv('rx-peso',gv('e-peso'));sv('rx-ta',gv('e-ta'));sv('rx-fc',gv('e-fc'));sv('rx-fr',gv('e-fr'));sv('rx-temp',gv('e-temp'));sv('rx-alergias',gv('e-alergias'));updateRxPreview();}
+function collectEval(){return{id:cid||Date.now().toString(),ts:new Date().toISOString(),hc:{fecha:gv('h-fecha'),checkup:gv('h-checkup'),empresa:gv('h-empresa'),nomina:gv('h-nomina'),nombre:gv('h-nombre'),fnac:gv('h-fnac'),edad:gv('h-edad'),sexo:gv('h-sexo'),sangre:gv('h-sangre'),puesto:gv('h-puesto'),area:gv('h-area'),tel:gv('h-tel'),civil:gv('h-civil'),ciudad:gv('h-ciudad'),app_exa:gr('app-exa'),app_qui:gr('app-qui'),app_trau:gr('app-trau'),app_ale:gr('app-ale'),app_cro:gr('app-cro'),app_hos:gr('app-hos'),apnp_tab:gr('apnp-tab'),apnp_dro:gr('apnp-dro'),app_obs:gv('h-app-obs')},ef:{peso:gv('e-peso'),talla:gv('e-talla'),imc:gv('e-imc'),imcc:gv('e-imcc'),sao2:gv('e-sao2'),fc:gv('e-fc'),fr:gv('e-fr'),temp:gv('e-temp'),ta:gv('e-ta'),alergias:gv('e-alergias'),obs:gv('e-obs')},exm:{lentes:gr('av-len'),dal:gr('av-dal'),bc:gv('av-bc'),dc:gv('av-dc'),av_obs:gv('av-obs'),esp:gv('esp-res'),esp_obs:gv('esp-obs')},anti:{rows:ANTIDP.map(function(a){return{c:a.c,n:a.n,r:gr('anti-'+a.c)||'Negativo'};}),obs:gv('anti-obs')},aud:{rows:HZ.map(function(h){return{hz:h,der:parseFloat(gv('ad-d-'+h))||0,izq:parseFloat(gv('ad-i-'+h))||0};}),obs:gv('aud-obs')},clab:{empresa:gv('cl-empresa'),fecha:gv('cl-fecha'),puesto:gv('cl-puesto'),hc:gv('cl-hc'),lab:gv('cl-lab'),aud:gv('cl-aud'),esp:gv('cl-esp'),anti:gv('cl-anti'),res:gv('cl-res'),rest:gv('cl-rest'),com:gv('cl-com'),med:currentUser?currentUser.nombre:'',ced:currentUser?currentUser.cedula:''},cgen:{empresa:gv('cg-empresa'),fecha:gv('cg-fecha'),pac:gv('cg-pac'),sexo:gv('cg-sexo'),edad:gv('cg-edad'),tid:gv('cg-tid'),res:gv('cg-res'),obs:gv('cg-obs')},conclusion:{resultado:conclSelected,tipo:conclType,obs:gv('concl-obs'),ts:new Date().toISOString()}};}
+async function saveEval(){var ev=collectEval();cid=ev.id;setSyncStatus('s','Guardando...');try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'save',eval:ev})});var d=await r.json();if(d.ok){var idx=DB.findIndex(function(e){return e.id===ev.id;});if(idx>=0)DB[idx]=ev;else DB.unshift(ev);renderDB();setSyncStatus('ok','Guardado');alert_('<strong>'+(ev.hc.nombre||'Evaluación')+'</strong> guardada correctamente');}else{setSyncStatus('e','Error');alert_('Error: '+(d.error||''),'err');}}catch(ex){setSyncStatus('e','Sin conexión');alert_('Sin conexión con Google Sheets','err');}}
+async function loadEvals(manual){setSyncStatus('s','Cargando...');document.getElementById('db-list').innerHTML='<div class="loader"><div class="spin"></div> Cargando evaluaciones desde Google Sheets...</div>';try{var r=await fetch(GAS);var d=await r.json();if(d.ok){DB=d.items||[];renderDB();setSyncStatus('ok','Conectado · '+DB.length+' eval.');if(manual)alert_(DB.length+' evaluaciones cargadas','inf');}else{setSyncStatus('e','Error');document.getElementById('db-list').innerHTML='<div class="loader">Error al cargar</div>';}}catch(ex){setSyncStatus('e','Sin conexión');document.getElementById('db-list').innerHTML='<div class="loader">Sin conexión con Google Sheets</div>';}}
+async function delEval(id,name,ev){ev.stopPropagation();if(!confirm('¿Eliminar evaluación de '+name+'?'))return;try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'delete',id:id})});var d=await r.json();if(d.ok){DB=DB.filter(function(e){return e.id!==id;});if(cid===id)cid=null;renderDB();alert_('Evaluación eliminada');}}catch(ex){}}
+function loadEv(id){var ev=DB.find(function(e){return e.id===id;});if(!ev)return;cid=ev.id;var h=ev.hc||{};sv('h-fecha',h.fecha);sv('h-checkup',h.checkup);sv('h-empresa',h.empresa);sv('h-nomina',h.nomina);sv('h-nombre',h.nombre);sv('h-fnac',h.fnac);sv('h-edad',h.edad);sv('h-sexo',h.sexo);sv('h-sangre',h.sangre);sv('h-puesto',h.puesto);sv('h-area',h.area);sv('h-tel',h.tel);sv('h-civil',h.civil);sv('h-ciudad',h.ciudad);['exa','qui','trau','ale','cro','hos'].forEach(function(k){sr('app-'+k,h['app_'+k]||'No');});['tab','dro'].forEach(function(k){sr('apnp-'+k,h['apnp_'+k]||'Negativo');});sv('h-app-obs',h.app_obs);var ef=ev.ef||{};sv('e-peso',ef.peso);sv('e-talla',ef.talla);sv('e-imc',ef.imc);sv('e-imcc',ef.imcc);sv('e-sao2',ef.sao2);sv('e-fc',ef.fc);sv('e-fr',ef.fr);sv('e-temp',ef.temp);sv('e-ta',ef.ta);sv('e-alergias',ef.alergias);sv('e-obs',ef.obs);var x=ev.exm||{};sr('av-len',x.lentes||'No');sr('av-dal',x.dal||'No');sv('av-bc',x.bc);sv('av-dc',x.dc);sv('av-obs',x.av_obs);sv('esp-res',x.esp);sv('esp-obs',x.esp_obs);var an=ev.anti||{};(an.rows||[]).forEach(function(r){sr('anti-'+r.c,r.r||'Negativo');});sv('anti-obs',an.obs);var au=ev.aud||{};(au.rows||[]).forEach(function(r){sv('ad-d-'+r.hz,r.der);sv('ad-i-'+r.hz,r.izq);});sv('aud-obs',au.obs);var cl=ev.clab||{};sv('cl-empresa',cl.empresa);sv('cl-fecha',cl.fecha);sv('cl-puesto',cl.puesto);sv('cl-hc',cl.hc);sv('cl-lab',cl.lab);sv('cl-aud',cl.aud);sv('cl-esp',cl.esp);sv('cl-anti',cl.anti);sv('cl-res',cl.res);sv('cl-rest',cl.rest);sv('cl-com',cl.com);var cg=ev.cgen||{};sv('cg-empresa',cg.empresa||h.empresa);sv('cg-fecha',cg.fecha||h.fecha);sv('cg-pac',cg.pac||h.nombre);sv('cg-sexo',cg.sexo||h.sexo);sv('cg-edad',cg.edad||(h.edad||'').replace(' años',''));sv('cg-res',cg.res);sv('cg-obs',cg.obs);if(ev.conclusion&&ev.conclusion.resultado){selectConcl(ev.conclusion.resultado,ev.conclusion.tipo);sv('concl-obs',ev.conclusion.obs);}setTimeout(calcHBC,200);goTab('hc');alert_('Cargando: <strong>'+h.nombre+'</strong>','inf');}
+function newEval(){cid=null;conclSelected=null;conclType=null;document.querySelectorAll('.pnl input:not([readonly]),.pnl select,.pnl textarea').forEach(function(el){if(el.type!=='radio'&&el.type!=='checkbox')el.value='';});document.querySelectorAll('input[type=radio][value="No"]').forEach(function(e){e.checked=true;});document.querySelectorAll('input[type=radio][value="Negativo"]').forEach(function(e){e.checked=true;});HZ.forEach(function(h){sv('ad-d-'+h,0);sv('ad-i-'+h,0);});var hoy=today();sv('h-fecha',hoy);sv('cl-fecha',hoy);sv('cg-fecha',hoy);sv('cl-anti','COC, THC, AMP, MET, OPI — TODOS NEGATIVOS.');document.querySelectorAll('.concl-btn').forEach(function(b){b.className='concl-btn';});document.getElementById('concl-obs-section').classList.add('hidden');document.getElementById('incap-section').classList.add('hidden');document.getElementById('btn-guardar-concl').disabled=true;document.getElementById('btn-print-incap').style.display='none';newRx();setTimeout(calcHBC,150);goTab('hc');alert_('Nueva evaluación iniciada','inf');}
+function clearAll(){if(confirm('¿Limpiar todo el formulario?'))newEval();}
+function syncCG(){sv('cg-pac',gv('h-nombre'));sv('cg-sexo',gv('h-sexo'));sv('cg-edad',gv('h-edad').replace(' años',''));sv('cg-empresa',gv('h-empresa'));sv('cg-fecha',gv('h-fecha'));alert_('Datos sincronizados','inf');}
+function renderDB(){var q=(gv('srch')||'').toLowerCase();var list=document.getElementById('db-list');var f=DB.filter(function(e){return!q||(e.hc&&e.hc.nombre||'').toLowerCase().includes(q)||(e.hc&&e.hc.nomina||'').toLowerCase().includes(q)||(e.hc&&e.hc.empresa||'').toLowerCase().includes(q);});if(!f.length){list.innerHTML='<div class="loader">Sin evaluaciones guardadas.<br><br><button class="btn btn-pri" onclick="newEval()"><i class="ti ti-plus"></i> Crear primera evaluación</button></div>';return;}list.innerHTML='';f.forEach(function(ev){var d=new Date(ev.ts);var df=d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});var tf=d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});var concl=ev.conclusion&&ev.conclusion.resultado?ev.conclusion.resultado:'';var res=ev.clab&&ev.clab.res?ev.clab.res:'';var clsMap={'Apto sin restricciones':'b-ok','Apto con restricciones':'b-warn','No apto':'b-err','Enviado a hospital':'b-err','Abandono de consulta':'b-info','Recomendado':'b-ok','No recomendado':'b-err'};var cls=clsMap[concl]||clsMap[res]||'';var item=document.createElement('div');item.style.cssText='background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:6px;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.06)';item.onmouseover=function(){this.style.borderColor='#1a5fa8';this.style.boxShadow='0 4px 12px rgba(26,95,168,.12)';};item.onmouseout=function(){this.style.borderColor='#e2e8f0';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06)';};item.onclick=function(){loadEv(ev.id);};var nombre=(ev.hc&&ev.hc.nombre)||'Sin nombre';item.innerHTML='<div style="flex:1"><div style="font-weight:600;font-size:13px;color:#0f172a"><i class="ti ti-user-circle" style="font-size:15px;vertical-align:-2px;margin-right:5px;color:#1a5fa8"></i>'+nombre+' '+(concl?'<span class="badge '+cls+'">'+concl+'</span>':(res?'<span class="badge '+cls+'">'+res+'</span>':''))+'</div><div style="font-size:11.5px;color:#64748b;margin-top:3px">'+((ev.hc&&ev.hc.nomina)||'—')+' · '+((ev.hc&&ev.hc.puesto)||'—')+' · '+((ev.hc&&ev.hc.empresa)||'—')+' · '+((ev.hc&&ev.hc.checkup)||'—')+' · '+df+' '+tf+'</div></div><div style="display:flex;gap:6px"><button class="btn btn-sm" style="background:#1a5fa8;color:#fff;border-color:#1a5fa8" onclick="event.stopPropagation();loadEv(\''+ev.id+'\')"><i class="ti ti-edit"></i> Editar</button><button class="btn btn-sm btn-red" onclick="delEval(\''+ev.id+'\',\''+nombre.replace(/'/g,'')+'\',event)"><i class="ti ti-trash"></i></button></div>';list.appendChild(item);});}
+function calcHBC(){var rows=HZ.map(function(h){return{der:parseFloat(gv('ad-d-'+h))||0,izq:parseFloat(gv('ad-i-'+h))||0};});var pd=rows.reduce(function(s,r){return s+r.der;},0)/6;var pi=rows.reduce(function(s,r){return s+r.izq;},0)/6;var ld=pd*.8,li=pi*.8,ms=Math.min(ld,li),mas=Math.max(ld,li),tot=(ms*7+mas)/8;var concl=tot<15?'Normal':tot<30?'Hipoacusia leve':tot<60?'Hipoacusia moderada':'Hipoacusia severa';document.getElementById('ap-d').textContent=pd.toFixed(1)+' dB';document.getElementById('ap-i').textContent=pi.toFixed(1)+' dB';document.getElementById('hbc-tot').textContent=tot.toFixed(2)+'%';document.getElementById('hbc-ld').textContent=ld.toFixed(2)+'%';document.getElementById('hbc-li').textContent=li.toFixed(2)+'%';var cel=document.getElementById('hbc-concl');cel.textContent=concl;cel.className='badge '+(concl==='Normal'?'b-ok':concl.includes('leve')?'b-warn':'b-err');var lbl=HZ.map(function(h){return h>=1000?h/1000+'k':h+'';});var od=rows.map(function(r){return r.der;}),oi=rows.map(function(r){return r.izq;});var opts={responsive:true,maintainAspectRatio:false,scales:{y:{reverse:true,min:-10,max:120,ticks:{stepSize:20,font:{size:9}},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{font:{size:9}},grid:{color:'rgba(0,0,0,.06)'}}},plugins:{legend:{display:false}},elements:{point:{radius:5},line:{tension:0.1}}};if(chD)chD.destroy();chD=new Chart(document.getElementById('ch-d'),{type:'line',data:{labels:lbl,datasets:[{data:od,borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,.08)',pointBackgroundColor:'#1a5fa8',borderWidth:2,fill:false}]},options:opts});if(chI)chI.destroy();chI=new Chart(document.getElementById('ch-i'),{type:'line',data:{labels:lbl,datasets:[{data:oi,borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,.08)',pointStyle:'crossRot',pointRadius:6,pointBackgroundColor:'#c0392b',borderWidth:2,borderDash:[5,3],fill:false}]},options:opts});}
+async function loadInv(manual){try{var r=await fetch(GAS+'?action=inventory');var d=await r.json();if(d.ok){INV=d.items||[];renderInv();updateInvStats();if(manual)alert_(INV.length+' productos cargados','inf');}}catch(ex){}}
+function renderInv(){var q=(gv('inv-srch')||'').toLowerCase(),cat=gv('inv-cat');var f=INV.filter(function(it){return(!q||(it.nombre||'').toLowerCase().includes(q))&&(!cat||it.categoria===cat);});var tb=document.getElementById('inv-body');if(!f.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:#64748b">Sin productos. Agrega uno con el botón +</td></tr>';return;}tb.innerHTML=f.map(function(it){var pct=it.stock_min>0?Math.min(100,(it.stock/it.stock_min)*100):100;var cls=pct<50?'low':pct<100?'warn':'';var state=it.stock<=0?'<span class="badge b-err">Agotado</span>':it.stock<=it.stock_min?'<span class="badge b-warn">Stock bajo</span>':'<span class="badge b-ok">OK</span>';return'<tr><td><strong>'+it.nombre+'</strong>'+(it.lote?'<br><span style="font-size:10px;color:#94a3b8">Lote: '+it.lote+'</span>':'')+'</td><td>'+it.categoria+'</td><td>'+(it.presentacion||'—')+'</td><td style="text-align:center"><strong>'+it.stock+'</strong> '+(it.unidad||'')+'<div class="stock-bar"><div class="stock-fill '+cls+'" style="width:'+Math.min(100,pct)+'%"></div></div></td><td style="text-align:right">'+fmt$(it.costo)+'</td><td style="text-align:right">'+fmt$(it.precio_venta)+'</td><td style="font-size:11px">'+(it.caducidad||'—')+'</td><td>'+state+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="openMovModal(\''+it.id+'\',\''+it.nombre.replace(/'/g,'')+'\')"><i class="ti ti-arrows-exchange"></i></button> <button class="btn btn-sm btn-amb" onclick="openItemModal(\''+it.id+'\')"><i class="ti ti-edit"></i></button> <button class="btn btn-sm btn-red" onclick="deleteItem(\''+it.id+'\',\''+it.nombre.replace(/'/g,'')+'\')"><i class="ti ti-trash"></i></button></td></tr>';}).join('');}
+function updateInvStats(){var total=INV.length;var low=INV.filter(function(it){return it.stock<=it.stock_min;}).length;var val=INV.reduce(function(s,it){return s+(parseFloat(it.costo)||0)*(parseFloat(it.stock)||0);},0);var venta=INV.reduce(function(s,it){return s+(parseFloat(it.precio_venta)||0)*(parseFloat(it.stock)||0);},0);document.getElementById('inv-total').textContent=total;document.getElementById('inv-low').textContent=low;document.getElementById('inv-val').textContent=fmt$(val);document.getElementById('inv-venta').textContent=fmt$(venta);}
+function openItemModal(id){editItemId=id||null;document.getElementById('item-title').textContent=id?'Editar producto':'Agregar producto al inventario';if(id){var it=INV.find(function(i){return i.id===id;});if(!it)return;sv('it-nombre',it.nombre);sv('it-cat',it.categoria);sv('it-pres',it.presentacion);sv('it-uni',it.unidad);sv('it-stock',it.stock);sv('it-smin',it.stock_min);sv('it-prov',it.proveedor);sv('it-lote',it.lote);sv('it-cad',it.caducidad);sv('it-costo',it.costo);sv('it-pvp',it.precio_venta);}else{['it-nombre','it-pres','it-uni','it-stock','it-prov','it-lote','it-cad','it-costo','it-pvp'].forEach(function(id){sv(id,'');});sv('it-smin','5');sv('it-stock','0');}document.getElementById('modal-item').classList.add('open');}
+async function saveItem(){var nombre=gv('it-nombre');if(!nombre){alert_('Ingresa el nombre del producto','err');return;}var item={id:editItemId||undefined,nombre:nombre,categoria:gv('it-cat'),presentacion:gv('it-pres'),unidad:gv('it-uni'),stock:parseFloat(gv('it-stock'))||0,stock_min:parseFloat(gv('it-smin'))||0,proveedor:gv('it-prov'),lote:gv('it-lote'),caducidad:gv('it-cad'),costo:parseFloat(gv('it-costo'))||0,precio_venta:parseFloat(gv('it-pvp'))||0};try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'saveItem',item:item})});var d=await r.json();if(d.ok){item.id=d.id;var idx=INV.findIndex(function(i){return i.id===item.id;});if(idx>=0)INV[idx]=item;else INV.unshift(item);renderInv();updateInvStats();closeModal('modal-item');alert_('Producto guardado en inventario');}}catch(ex){alert_('Error al guardar','err');}}
+async function deleteItem(id,nombre){if(!confirm('¿Eliminar '+nombre+'?'))return;try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'deleteItem',id:id})});var d=await r.json();if(d.ok){INV=INV.filter(function(i){return i.id!==id;});renderInv();updateInvStats();alert_('Producto eliminado');}}catch(ex){}}
+function openMovModal(id,nombre){movItemId=id;sv('mov-nombre',nombre);sv('mov-cant','1');sv('mov-motivo','');document.getElementById('modal-mov').classList.add('open');}
+async function saveMovement(){var cant=parseFloat(gv('mov-cant'));if(!cant||cant<=0){alert_('Cantidad inválida','err');return;}var tipo=gr('mov-tipo');var it=INV.find(function(i){return i.id===movItemId;});if(tipo==='salida'&&it&&cant>it.stock){alert_('Stock insuficiente (disponible: '+it.stock+')','wrn');return;}try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'movement',mov:{itemId:movItemId,tipo:tipo,cantidad:cant,motivo:gv('mov-motivo')}})});var d=await r.json();if(d.ok){var idx=INV.findIndex(function(i){return i.id===movItemId;});if(idx>=0)INV[idx].stock=d.newStock;renderInv();updateInvStats();closeModal('modal-mov');alert_('Movimiento registrado. Nuevo stock: '+d.newStock);}}catch(ex){alert_('Error','err');}}
+function newRx(){rxId=null;rxMeds=[];sv('rx-pac',gv('h-nombre')||'');sv('rx-fecha',today());sv('rx-hora',nowTime());sv('rx-folio','RX-'+Date.now().toString().slice(-6));sv('rx-edad','');sv('rx-diag','');sv('rx-indica','');sv('rx-peso',gv('e-peso')||'');sv('rx-ta',gv('e-ta')||'');sv('rx-fc',gv('e-fc')||'');sv('rx-fr',gv('e-fr')||'');sv('rx-temp',gv('e-temp')||'');sv('rx-alergias',gv('e-alergias')||'');renderRxMeds();updateRxPreview();}
+function updateRxPreview(){var u=currentUser||{nombre:'—',especialidad:'—',cedula:'—',direccion:'—'};var pac=gv('rx-pac')||'—';var edad=gv('rx-edad')||'—';var sexo=gv('rx-sexo')||'—';var peso=gv('rx-peso')||'—';var talla=gv('rx-talla')||'—';var ta=gv('rx-ta')||'—';var fc=gv('rx-fc')||'—';var fr=gv('rx-fr')||'—';var temp=gv('rx-temp')||'—';var alergias=gv('rx-alergias')||'Ninguna';var diag=gv('rx-diag')||'—';var indica=gv('rx-indica')||'';var folio=gv('rx-folio')||'RX-000000';var fecha=gv('rx-fecha')||today();var medsHtml=rxMeds.length?rxMeds.map(function(m,i){return'<div class="rx-med-item"><div class="rx-med-name">'+(i+1)+'. '+m.nombre+(m.dist?' ('+m.dist+')':'')+'</div><div class="rx-med-detail"><strong>Forma:</strong> '+(m.forma||'—')+' &nbsp;|&nbsp; <strong>Dosis:</strong> '+(m.dosis||'—')+' &nbsp;|&nbsp; <strong>Vía:</strong> '+(m.via||'—')+'</div><div class="rx-med-detail"><strong>Frecuencia:</strong> '+(m.frec||'—')+' &nbsp;|&nbsp; <strong>Duración:</strong> '+(m.duracion||'—')+' &nbsp;|&nbsp; <strong>Cantidad:</strong> '+m.cantidad+(m.unidad?' '+m.unidad:'')+'</div>'+(m.ind?'<div class="rx-med-detail" style="color:#c0392b;font-style:italic">Indicaciones: '+m.ind+'</div>':'')+'</div>';}).join(''):'<div style="color:#aaa;font-style:italic;padding:8px 0;font-size:12px">Sin medicamentos prescritos</div>';var el=document.getElementById('rx-preview-wrap');if(!el)return;el.innerHTML='<div class="rx-wrap"><div class="rx-top"><div class="rx-brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#1a5fa8"/><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span class="rx-brand-name">BiMASS</span></div><div class="rx-title">Receta médica</div><div class="rx-title-line"></div><div class="rx-fields-row"><div class="rx-field">Nombre del Paciente <span class="rx-field-val wide">'+pac+'</span></div><div class="rx-field">Edad <span class="rx-field-val" style="min-width:50px">'+edad+'</span></div><div class="rx-field">Sexo <span class="rx-field-val" style="min-width:70px">'+sexo+'</span></div><div class="rx-field">Fecha <span class="rx-field-val" style="min-width:80px">'+fecha+'</span></div></div><div class="rx-fields-row"><div class="rx-field">Peso <span class="rx-field-val" style="min-width:55px">'+peso+' kg</span></div><div class="rx-field">Talla <span class="rx-field-val" style="min-width:55px">'+talla+' m</span></div><div class="rx-field">TA <span class="rx-field-val" style="min-width:65px">'+ta+'</span></div><div class="rx-field">FC <span class="rx-field-val" style="min-width:50px">'+fc+'</span></div><div class="rx-field">FR <span class="rx-field-val" style="min-width:50px">'+fr+'</span></div><div class="rx-field">Temp. <span class="rx-field-val" style="min-width:50px">'+temp+'°C</span></div><div class="rx-field">Alergias <span class="rx-field-val" style="min-width:80px">'+alergias+'</span></div></div></div><div class="rx-body"><div style="font-size:11px;font-weight:700;color:#1a5fa8;margin-bottom:8px">Diagnóstico: <span style="font-weight:400;color:#333">'+diag+'</span></div>'+medsHtml+(indica?'<div style="margin-top:10px;font-size:11px;color:#555"><strong>Indicaciones generales:</strong> '+indica+'</div>':'')+'</div><div class="rx-sig-zone"><div style="font-size:10px;color:#94a3b8">Folio: '+folio+'</div><div class="rx-sig-box"><div class="rx-sig-line"></div><div class="rx-sig-name">Dr./Dra. '+u.nombre+'</div><div class="rx-sig-sub">'+(u.especialidad||'Medicina General')+'</div><div class="rx-sig-sub">Cédula Prof. '+u.cedula+'</div></div></div><div class="rx-footer-bar"><div class="rx-footer-item"><div class="rx-footer-icon"><i class="ti ti-phone" style="font-size:13px;color:#fff"></i></div><span>662 426 5969</span></div><div style="width:1px;height:28px;background:rgba(255,255,255,.2)"></div><div class="rx-footer-item"><div class="rx-footer-icon"><i class="ti ti-map-pin" style="font-size:13px;color:#fff"></i></div><span>Agustín de Vildósola #335, Local #13<br>Plaza Y. Col. Y Griega, C.P. 83290 Hermosillo, Son.</span></div><div style="width:1px;height:28px;background:rgba(255,255,255,.2)"></div><div class="rx-footer-item"><div class="rx-footer-icon"><i class="ti ti-heart" style="font-size:13px;color:#fff"></i></div><span style="color:#7dd3fc;font-weight:700">Construimos Bienestar</span></div></div></div>';}
+function renderRxMeds(){var el=document.getElementById('rx-meds-list');if(!rxMeds.length){el.innerHTML='<div style="font-size:12px;color:#94a3b8;font-style:italic;padding:6px 0">Sin medicamentos. Agrega desde el inventario.</div>';return;}el.innerHTML=rxMeds.map(function(m,i){return'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 11px;margin-bottom:6px;font-size:12px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><strong style="color:#c0392b">'+(i+1)+'. '+m.nombre+'</strong> — '+m.cantidad+(m.unidad?' '+m.unidad:'')+'<br><span style="color:#64748b">'+m.forma+' · '+m.dosis+' '+m.via+' · '+m.frec+' · '+m.duracion+'</span>'+(m.ind?'<br><span style="color:#94a3b8;font-style:italic">'+m.ind+'</span>':'')+'</div><button class="btn btn-sm btn-red" onclick="removeMed('+i+')" style="margin-left:8px;flex-shrink:0"><i class="ti ti-x"></i></button></div></div>';}).join('');}
+function removeMed(i){rxMeds.splice(i,1);renderRxMeds();updateRxPreview();}
+function openMedPicker(){sv('med-srch','');sv('med-cant',1);sv('med-dosis','');sv('med-ind','');sv('med-forma','');sv('med-frec','');sv('med-duracion','');sv('med-gen','');sv('med-dist','');selItem=null;document.getElementById('med-selected-name').textContent='Ninguno';renderMedPicker();document.getElementById('modal-med').classList.add('open');}
+function renderMedPicker(){var q=(gv('med-srch')||'').toLowerCase();var meds=INV.filter(function(it){return it.stock>0&&(!q||(it.nombre||'').toLowerCase().includes(q));});var el=document.getElementById('med-list');if(!meds.length){el.innerHTML='<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12.5px">Sin medicamentos con stock disponible</div>';return;}el.innerHTML=meds.map(function(it){var sel=selItem&&selItem.id===it.id;return'<div onclick="selectMed(\''+it.id+'\')" style="padding:10px 13px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:'+(sel?'#fef2f2':'#fff')+'"><div style="font-weight:600;font-size:12.5px;color:#c0392b">'+it.nombre+'</div><div style="font-size:11px;color:#64748b">'+(it.presentacion||'')+(it.unidad?' · '+it.unidad:'')+' · Stock: <strong>'+it.stock+'</strong> · '+fmt$(it.precio_venta)+'</div></div>';}).join('');}
+function selectMed(id){selItem=INV.find(function(i){return i.id===id;});if(!selItem)return;document.getElementById('med-selected-name').textContent=selItem.nombre;sv('med-gen',selItem.nombre);sv('med-forma',selItem.presentacion||'');renderMedPicker();}
+function addMedToRx(){if(!selItem){alert_('Selecciona un medicamento primero','err');return;}var cant=parseInt(gv('med-cant'))||1;if(cant>selItem.stock){alert_('Stock insuficiente (disponible: '+selItem.stock+')','wrn');return;}rxMeds.push({itemId:selItem.id,nombre:gv('med-gen')||selItem.nombre,dist:gv('med-dist'),forma:gv('med-forma'),dosis:gv('med-dosis'),via:gv('med-via'),frec:gv('med-frec'),duracion:gv('med-duracion'),cantidad:cant,unidad:selItem.unidad||'',ind:gv('med-ind')});renderRxMeds();updateRxPreview();closeModal('modal-med');}
+async function saveRx(){if(!rxMeds.length&&!gv('rx-diag')){alert_('Agrega al menos un medicamento o diagnóstico','wrn');return;}var u=currentUser||{nombre:'—',cedula:'—'};var rx={id:rxId||undefined,folio:gv('rx-folio'),fecha:gv('rx-fecha'),hora:gv('rx-hora'),paciente:gv('rx-pac'),edad:gv('rx-edad'),sexo:gv('rx-sexo'),peso:gv('rx-peso'),talla:gv('rx-talla'),ta:gv('rx-ta'),fc:gv('rx-fc'),fr:gv('rx-fr'),temp:gv('rx-temp'),alergias:gv('rx-alergias'),diagnostico:gv('rx-diag'),indica:gv('rx-indica'),medicamentos:rxMeds,medico:u.nombre,cedula:u.cedula,especialidad:u.especialidad||''};try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'saveRx',rx:rx})});var d=await r.json();if(d.ok){rxId=d.id;rxMeds.forEach(function(m){var idx=INV.findIndex(function(i){return i.id===m.itemId;});if(idx>=0)INV[idx].stock=Math.max(0,INV[idx].stock-m.cantidad);});renderInv();updateInvStats();alert_('Receta guardada. Stock actualizado automáticamente.');}}catch(ex){alert_('Error al guardar receta','err');}}
+function printRx(){var previewEl=document.getElementById('rx-preview-wrap');if(!previewEl)return;var content=previewEl.innerHTML;var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receta Médica BiMASS</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:0;background:#fff}.rx-wrap{max-width:800px;margin:0 auto;border:1px solid #ddd;font-size:12px;color:#1a3a5c}.rx-top{padding:16px 20px 10px;border-bottom:3px solid #1a5fa8}.rx-brand{display:flex;align-items:center;gap:8px;margin-bottom:6px}.rx-brand-name{font-size:20px;font-weight:800;color:#1a3a5c}.rx-title{font-size:22px;font-weight:800;color:#1a3a5c;margin-bottom:2px}.rx-title-line{width:56px;height:3px;background:#1a5fa8;margin-bottom:12px}.rx-fields-row{display:flex;gap:12px;align-items:flex-end;margin-bottom:8px;flex-wrap:wrap}.rx-field{display:flex;align-items:flex-end;gap:4px;font-weight:700;font-size:11px}.rx-field-val{border-bottom:1.5px solid #1a3a5c;min-width:90px;padding-bottom:1px;font-weight:400;font-size:11px;color:#333}.rx-field-val.wide{min-width:200px}.rx-body{padding:14px 20px;min-height:200px}.rx-med-item{padding:9px 0;border-bottom:0.5px dashed #ccc}.rx-med-name{font-weight:700;color:#1a3a5c;font-size:13px;margin-bottom:3px}.rx-med-detail{color:#555;font-size:11px;line-height:1.6}.rx-footer-bar{background:linear-gradient(135deg,#1a3a5c 0%,#1a5fa8 100%);padding:14px 20px;display:flex;justify-content:space-around;align-items:center;gap:10px}.rx-footer-item{display:flex;align-items:center;gap:8px;color:#fff;font-size:11px}.rx-footer-icon{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}.rx-sig-zone{padding:12px 20px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid #eee}.rx-sig-box{text-align:center}.rx-sig-line{width:160px;border-bottom:1.5px solid #1a3a5c;margin:0 auto 5px}.rx-sig-name{font-weight:700;font-size:11px;color:#1a3a5c}.rx-sig-sub{font-size:10px;color:#555}@media print{@page{size:letter;margin:0.5cm}button{display:none}}</style></head><body><button onclick="window.print()" style="margin:10px;background:#1a5fa8;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px">🖨️ Imprimir receta</button>'+content+'</body></html>');w.document.close();}
+function syncConclPac(){var nombre=gv('h-nombre');document.getElementById('concl-pac-nombre').textContent=nombre?nombre:'el paciente';}
+function selectConcl(resultado,tipo){conclSelected=resultado;conclType=tipo;document.querySelectorAll('.concl-btn').forEach(function(b){b.className='concl-btn';});var map={'Apto sin restricciones':'cb-apto','Apto con restricciones':'cb-restricciones','Enviado a hospital':'cb-hospital','No apto':'cb-noapto','Abandono de consulta':'cb-abandono'};var btnId=map[resultado];if(btnId){var b=document.getElementById(btnId);if(b)b.className='concl-btn sel-'+(tipo==='ok'?'ok':tipo==='warn'?'warn':tipo==='err'?'err':'info');}document.getElementById('concl-obs-section').classList.remove('hidden');var needsIncap=(resultado==='No apto'||resultado==='Enviado a hospital');document.getElementById('incap-section').classList.toggle('hidden',!needsIncap);document.getElementById('btn-print-incap').style.display=needsIncap?'inline-flex':'none';if(needsIncap){sv('inc-fecha-aten',today());sv('inc-hora-aten',nowTime());sv('inc-fecha-ini',today());sv('inc-dias','1');calcFechaFin();}document.getElementById('btn-guardar-concl').disabled=false;}
+function calcFechaFin(){var ini=gv('inc-fecha-ini'),dias=parseInt(gv('inc-dias'))||0;if(!ini||!dias)return;var d=new Date(ini);d.setDate(d.getDate()+dias-1);sv('inc-fecha-fin',d.toISOString().split('T')[0]);}
+async function guardarConclusion(){if(!conclSelected){alert_('Selecciona una conclusión','wrn');return;}var needsIncap=(conclSelected==='No apto'||conclSelected==='Enviado a hospital');if(needsIncap){var u=currentUser||{nombre:'—',cedula:'—'};var incap={folio:'INC-'+Date.now().toString().slice(-6),paciente:gv('h-nombre'),medico:u.nombre,cedula:u.cedula,fechaAtencion:gv('inc-fecha-aten'),horaAtencion:gv('inc-hora-aten'),fechaInicio:gv('inc-fecha-ini'),dias:parseInt(gv('inc-dias'))||0,fechaFin:gv('inc-fecha-fin'),diagnostico:gv('inc-diag'),motivo:conclSelected,obs:gv('concl-obs')};try{await fetch(GAS,{method:'POST',body:JSON.stringify({action:'saveIncap',incap:incap})});}catch(ex){}}await saveEval();alert_('Evaluación finalizada: <strong>'+conclSelected+'</strong>');if(needsIncap)setTimeout(printIncap,800);}
+function printIncap(){var u=currentUser||{nombre:'—',cedula:'—',especialidad:'—'};var pac=gv('h-nombre')||'—';var fechaAten=gv('inc-fecha-aten')||today();var horaAten=gv('inc-hora-aten')||nowTime();var fechaIni=gv('inc-fecha-ini')||today();var dias=gv('inc-dias')||'1';var fechaFin=gv('inc-fecha-fin')||today();var diag=gv('inc-diag')||'—';var motivo=conclSelected||'—';var folio='INC-'+Date.now().toString().slice(-6);var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Incapacidad Médica BiMASS</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#fff}.wrap{max-width:750px;margin:0 auto;border:1px solid #ddd}.header{padding:16px 20px;border-bottom:3px solid #1a5fa8}.brand{display:flex;align-items:center;gap:8px;margin-bottom:6px}.brand-name{font-size:20px;font-weight:800;color:#1a3a5c}.doc-title{font-size:22px;font-weight:800;color:#1a3a5c;margin-bottom:2px}.doc-line{width:56px;height:3px;background:#1a5fa8;margin-bottom:8px}.body{padding:20px}.row{display:flex;align-items:flex-end;gap:10px;margin-bottom:12px;flex-wrap:wrap}.lbl{font-weight:700;font-size:11px;color:#1a3a5c;white-space:nowrap}.val{border-bottom:1.5px solid #1a3a5c;flex:1;min-width:100px;padding-bottom:2px;font-size:12px;color:#333}.section-title{font-size:11px;font-weight:700;color:#1a5fa8;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;border-bottom:1px solid #e2e8f0;padding-bottom:4px}.dias-box{text-align:center;border:2px solid #1a5fa8;border-radius:10px;padding:12px 24px;display:inline-block;margin:10px 0}.dias-num{font-size:40px;font-weight:800;color:#1a5fa8;line-height:1}.dias-lbl{font-size:12px;color:#64748b;margin-top:2px}.footer-bar{background:#1a3a5c;padding:14px 20px;display:flex;justify-content:space-around;align-items:center;color:#fff;font-size:11px;gap:10px}.sig-section{padding:16px 20px;display:flex;justify-content:flex-end}.sig-box{text-align:center}.sig-line{width:180px;border-bottom:1.5px solid #1a3a5c;margin:0 auto 5px}.sig-name{font-weight:700;font-size:12px;color:#1a3a5c}.sig-sub{font-size:10px;color:#64748b}@media print{@page{size:letter;margin:0.5cm}button{display:none}}</style></head><body><button onclick="window.print()" style="margin:10px;background:#1a5fa8;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px">🖨️ Imprimir incapacidad</button><div class="wrap"><div class="header"><div class="brand"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect width="26" height="26" rx="7" fill="#1a5fa8"/><path d="M13 5v16M5 13h16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-name">BiMASS</span></div><div class="doc-title">Incapacidad Médica</div><div class="doc-line"></div><div style="font-size:11px;color:#64748b">Folio: <strong>'+folio+'</strong> &nbsp;|&nbsp; Motivo: <strong>'+motivo+'</strong></div></div><div class="body"><div class="section-title">Datos del paciente</div><div class="row"><span class="lbl">Nombre del paciente:</span><span class="val">'+pac+'</span></div><div class="row"><span class="lbl">Fecha de atención:</span><span class="val">'+fechaAten+'</span><span class="lbl">Hora de atención:</span><span class="val">'+horaAten+'</span></div><div class="row"><span class="lbl">Diagnóstico / CIE-10:</span><span class="val">'+diag+'</span></div><div class="section-title">Período de incapacidad</div><div style="display:flex;align-items:center;gap:24px;margin-bottom:14px"><div class="dias-box"><div class="dias-num">'+dias+'</div><div class="dias-lbl">día'+(parseInt(dias)===1?'':'s')+' de incapacidad</div></div><div><div class="row" style="margin-bottom:8px"><span class="lbl">Fecha de inicio:</span><span class="val" style="min-width:140px">'+fechaIni+'</span></div><div class="row"><span class="lbl">Fecha de último día:</span><span class="val" style="min-width:140px">'+fechaFin+'</span></div></div></div><div class="section-title">Médico que otorga la incapacidad</div><div class="row"><span class="lbl">Nombre completo:</span><span class="val">Dr./Dra. '+u.nombre+'</span></div><div class="row"><span class="lbl">Cédula profesional:</span><span class="val">'+u.cedula+'</span><span class="lbl">Especialidad:</span><span class="val">'+(u.especialidad||'Medicina General')+'</span></div><div class="row"><span class="lbl">Fecha de expedición:</span><span class="val">'+fechaAten+'</span><span class="lbl">Hora:</span><span class="val">'+horaAten+'</span></div></div><div class="sig-section"><div class="sig-box"><div class="sig-line"></div><div class="sig-name">Dr./Dra. '+u.nombre+'</div><div class="sig-sub">'+(u.especialidad||'Medicina General')+'</div><div class="sig-sub">Cédula Prof. '+u.cedula+'</div></div></div><div class="footer-bar"><span>📞 662 426 5969</span><span>|</span><span>📍 Agustín de Vildósola #335, Local #13, Plaza Y. Col. Y Griega, C.P. 83290 Hermosillo, Sonora.</span><span>|</span><span style="color:#7dd3fc;font-weight:700">Construimos Bienestar</span></div></div></body></html>');w.document.close();}
+function printCert(tipo){var u=currentUser||{nombre:'—',cedula:'—',especialidad:'—',direccion:'—'};var n=gv('h-nombre')||'[Paciente]',p=gv('cl-puesto')||gv('h-puesto');var f=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});var body='';if(tipo==='laboral'){body='<h2 style="color:#0f5132;border-bottom:2px solid #0f5132;padding-bottom:8px">Certificado Médico Laboral</h2><p><strong>Atención:</strong> '+gv('cl-empresa')+'&nbsp;&nbsp;<strong>Fecha:</strong> '+f+'</p><p><strong>Puesto:</strong> '+p+'</p><hr><p>El que suscribe certifica haber realizado el examen médico de admisión al puesto de <strong>"'+p+'"</strong> a:</p><p style="text-align:center;font-size:16px;font-weight:bold;padding:12px;background:#d1e7dd;border-radius:8px">'+n+'</p><h3 style="margin:14px 0 8px">Encontrando lo siguiente:</h3><table style="width:100%;border-collapse:collapse;font-size:12px">'+[['Historia clínica',gv('cl-hc')],['Laboratorios',gv('cl-lab')],['Audiometría',gv('cl-aud')],['Espirometría',gv('cl-esp')],['Antidoping',gv('cl-anti')]].map(function(row){return'<tr><td style="padding:7px;background:#f8f9fa;font-weight:bold;width:130px">'+row[0]+'</td><td style="padding:7px;border-bottom:1px solid #dee2e6">'+row[1]+'</td></tr>';}).join('')+'</table><div style="margin:14px 0;padding:12px;background:#d1e7dd;border-radius:8px"><strong>Resultado:</strong> '+gv('cl-res')+'&nbsp;&nbsp;<strong>Restricciones:</strong> '+gv('cl-rest')+(gv('cl-com')?'<br><strong>Comentarios:</strong> '+gv('cl-com'):'')+'</div>';}else{body='<h2 style="color:#4a1e8c;border-bottom:2px solid #4a1e8c;padding-bottom:8px">Certificado Médico General</h2><p><strong>Atención:</strong> '+gv('cg-empresa')+'&nbsp;&nbsp;<strong>Fecha:</strong> '+f+'&nbsp;&nbsp;PRESENTE</p><hr><p>El que suscribe de nombre <strong>'+u.nombre+'</strong> de profesión <strong>Médico Cirujano / '+(u.especialidad||'')+'</strong>, con cédula profesional N. <strong>'+u.cedula+'</strong>, con domicilio en '+(u.direccion||'Hermosillo, Sonora')+'.</p><p>Hago constar que atendí al C. <strong>'+gv('cg-pac')+'</strong>, <strong>'+gv('cg-sexo')+'</strong> de <strong>'+gv('cg-edad')+'</strong> de edad, identificado con <strong>'+gv('cg-tid')+'</strong>, a quien encuentro <strong>'+gv('cg-res')+'</strong>.</p>'+(gv('cg-obs')?'<p>'+gv('cg-obs')+'</p>':'<p>Lo anterior para los fines legales que le interesen al paciente.</p>');}var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Certificado BiMASS</title><style>body{font-family:Arial,sans-serif;font-size:13px;max-width:720px;margin:40px auto;color:#222;line-height:1.7}hr{margin:14px 0}.sig{text-align:center;margin-top:50px;border-top:1px solid #ccc;padding-top:14px}@media print{.btn{display:none}}</style></head><body><button class="btn" onclick="window.print()" style="background:#1a5fa8;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;margin-bottom:18px">Imprimir</button>'+body+'<div class="sig"><br><hr style="width:200px;margin:0 auto 6px"><p style="font-weight:bold">'+u.nombre+'</p><p style="font-size:11px;color:#666">Cédula Prof. '+u.cedula+'</p></div></body></html>');w.document.close();}
+async function loadUsers(manual){try{var r=await fetch(GAS+'?action=users');var d=await r.json();if(d.ok){allUsers=d.users||[];renderUsers();if(manual)alert_(allUsers.length+' usuarios cargados','inf');}}catch(ex){}}
+function renderUsers(){var q=(gv('admin-srch')||'').toLowerCase();var el=document.getElementById('users-list');var f=allUsers.filter(function(u){return!q||(u.nombre||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q);});if(!f.length){el.innerHTML='<div class="loader">Sin usuarios registrados</div>';return;}el.innerHTML='';f.forEach(function(u){var card=document.createElement('div');card.className='user-card';var estado=u.aprobado?'<span class="badge b-ok">Aprobado</span>':'<span class="badge b-warn">Pendiente de aprobación</span>';var esAdmin=u.esAdmin?'<span class="badge b-info" style="margin-left:4px">Administrador</span>':'';card.innerHTML='<div style="flex:1"><div class="user-name">'+u.nombre+' '+estado+esAdmin+'</div><div class="user-meta">'+u.email+' · Cédula: '+u.cedula+' · '+u.especialidad+'</div><div class="user-meta">CURP: '+u.curp+' · RFC: '+u.rfc+'</div></div><div style="display:flex;gap:6px;flex-shrink:0">'+(!u.aprobado?'<button class="btn btn-sm btn-grn" onclick="approveUser(\''+u.id+'\',true)"><i class="ti ti-check"></i> Aprobar</button>':'<button class="btn btn-sm btn-red" onclick="approveUser(\''+u.id+'\',false)"><i class="ti ti-ban"></i> Revocar acceso</button>')+'</div>';el.appendChild(card);});}
+async function approveUser(userId,approved){if(!confirm(approved?'¿Aprobar acceso a este usuario?':'¿Revocar el acceso de este usuario?'))return;try{var r=await fetch(GAS,{method:'POST',body:JSON.stringify({action:'approveUser',userId:userId,approved:approved})});var d=await r.json();if(d.ok){alert_(approved?'Acceso aprobado. El usuario recibirá un correo de confirmación.':'Acceso revocado.');loadUsers();}}catch(ex){alert_('Error al actualizar','err');}}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function buildAnti(){var g=document.getElementById('anti-grid');g.innerHTML='';ANTIDP.forEach(function(a){var d=document.createElement('div');d.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12.5px;background:#fff';d.innerHTML='<span style="font-weight:500;color:#334155">'+a.n+' ('+a.c+')</span><div class="tog"><label><input type="radio" name="anti-'+a.c+'" value="Negativo" checked> Neg</label><label><input type="radio" name="anti-'+a.c+'" value="Positivo"> Pos</label><label><input type="radio" name="anti-'+a.c+'" value="No solicitado"> N/S</label></div>';g.appendChild(d);});}
+function buildAudi(){var t=document.getElementById('aud-body');t.innerHTML='';HZ.forEach(function(h){var tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:600;padding:7px 10px;color:#334155">'+(h>=1000?h/1000+'k':h)+' Hz</td><td style="text-align:center;padding:5px"><input type="number" id="ad-d-'+h+'" value="0" min="0" max="120" step="5" oninput="calcHBC()" style="width:78px;border:1px solid #e2e8f0;border-radius:7px;padding:5px;text-align:center;font-family:inherit;font-size:13px"></td><td style="text-align:center;padding:5px"><input type="number" id="ad-i-'+h+'" value="0" min="0" max="120" step="5" oninput="calcHBC()" style="width:78px;border:1px solid #e2e8f0;border-radius:7px;padding:5px;text-align:center;font-family:inherit;font-size:13px"></td>';t.appendChild(tr);});}
+(function(){var sess=loadSession();if(sess&&sess.id){currentUser=sess;initMainApp();}})();
+
+</script>
+</body>
+</html>
