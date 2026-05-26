@@ -700,7 +700,8 @@ let DB=[],INV=[],cid=null,chD=null,chI=null,selItem=null,rxMeds=[],rxId=null,edi
 var GAS=(function(){return window.location.href.split('?')[0];})();
 async function gasPost(data){
   try{
-    var r=await fetch(GAS,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    var payload=encodeURIComponent(JSON.stringify(data));
+    var r=await fetch(GAS+'?payload='+payload);
     return await r.json();
   }catch(ex){throw new Error('Error de conexión: '+ex.message);}
 }
