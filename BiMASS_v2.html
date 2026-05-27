@@ -157,8 +157,15 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Especialidad</label><input id="r-esp" type="text"></div>
     </div>
     <div class="form-row">
+      <div class="fg"><label>CURP</label><input id="r-curp" type="text" style="text-transform:uppercase"></div>
+      <div class="fg"><label>RFC</label><input id="r-rfc" type="text" style="text-transform:uppercase"></div>
+    </div>
+    <div class="form-row">
       <div class="fg"><label>Teléfono</label><input id="r-tel" type="tel"></div>
-      <div class="fg"><label>CURP</label><input id="r-curp" type="text"></div>
+      <div class="fg"><label>Ciudad</label><input id="r-ciudad" type="text" placeholder="Hermosillo"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg w100"><label>Dirección</label><input id="r-direccion" type="text" placeholder="Calle, número, colonia..."></div>
     </div>
     <button class="btn btn-s w100 btn-lg mt16" onclick="doRegister()">Solicitar acceso</button>
   </div>
@@ -285,6 +292,7 @@ tr:hover td{background:#f0faf9}
 
 <!-- HC TAB -->
 <div id="ctab-hc" class="ctab active">
+  <div id="prefill-banner" class="alert alert-i" style="display:none;margin-bottom:10px"></div>
   <div class="card">
     <div class="card-title">📋 Ficha de identificación</div>
     <div class="form-row">
@@ -323,7 +331,7 @@ tr:hover td{background:#f0faf9}
     <div class="form-row"><div class="fg w100"><label>Otros antecedentes</label><input id="ahf-otros" type="text"></div></div>
   </div>
   <div class="card">
-    <div class="card-title">🧍 Historia personal no patológica</div>
+    <div class="card-title">🧍 Antecedentes personales no patológicos</div>
     <div class="form-row">
       <div class="fg"><label>Tabaquismo</label><select id="hnp-tab" onchange="toggleTab()"><option>Niega</option><option>Ex-fumador</option><option>Activo</option></select></div>
       <div class="fg" id="tab-det" style="display:none"><label>Cigarros/día</label><input id="hnp-tab-n" type="number" min="0"></div>
@@ -334,6 +342,27 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Actividad física</label><select id="hnp-af"><option>Sedentario</option><option>Ligera</option><option>Moderada</option><option>Intensa</option></select></div>
       <div class="fg"><label>Alimentación</label><select id="hnp-alim"><option>Adecuada</option><option>Hipercalórica</option><option>Hipocalórica</option><option>Irregular</option></select></div>
       <div class="fg"><label>Horas sueño/noche</label><input id="hnp-sue" type="number" min="0" max="24" placeholder="7"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🩺 Antecedentes personales patológicos</div>
+    <div class="form-row">
+      <div class="fg"><label>Exantemáticas</label><input id="app-exant" type="text" placeholder="Niega"></div>
+      <div class="fg"><label>Quirúrgicos</label><input id="app-quirurgs" type="text" placeholder="Niega"></div>
+      <div class="fg"><label>Traumáticos</label><input id="app-traum" type="text" placeholder="Niega"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Transfusionales</label><input id="app-transf" type="text" placeholder="Niega"></div>
+      <div class="fg"><label>Crónicos degenerativos</label><input id="app-cronicos" type="text" placeholder="Niega / DM, HTA..."></div>
+      <div class="fg"><label>Hospitalizaciones</label><input id="app-hosp" type="text" placeholder="Niega"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Infectocontagiosos</label><input id="app-infect" type="text" placeholder="Niega"></div>
+      <div class="fg"><label>Alergias</label><input id="app-alrgias" type="text" placeholder="Niega"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Adicciones</label><input id="app-adic" type="text" placeholder="Niega"></div>
+      <div class="fg"><label>Discapacidad</label><input id="app-discap" type="text" placeholder="Ninguna"></div>
     </div>
   </div>
   <div class="card" id="hc-laboral-wrap">
@@ -350,7 +379,7 @@ tr:hover td{background:#f0faf9}
     <div class="form-row"><div class="fg w100"><label>Exposición a riesgos</label><input id="hl-riesgos" type="text" placeholder="Químicos, ruido, vibración..."></div></div>
   </div>
   <div class="card" id="hc-gine-wrap" style="display:none">
-    <div class="card-title">♀ Historia ginecológica</div>
+    <div class="card-title">♀ Antecedentes ginecoobstétricos</div>
     <div class="form-row">
       <div class="fg"><label>FUM</label><input id="gine-fum" type="date"></div>
       <div class="fg"><label>Menarca (edad)</label><input id="gine-menarq" type="text"></div>
@@ -636,6 +665,7 @@ tr:hover td{background:#f0faf9}
       </select>
     </div>
     <div class="fg" style="flex:2"><label>Buscar</label><input id="inv-q" type="text" placeholder="Nombre del artículo..." oninput="renderInv()"></div>
+    <div class="fg" style="flex:0;align-self:flex-end"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inv-show-inactive" onchange="renderInv()"> Mostrar dados de baja</label></div>
   </div>
 </div>
 <div id="inv-table-wrap"></div>
@@ -693,6 +723,7 @@ tr:hover td{background:#f0faf9}
 <div class="sec-hdr no-print">
   <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
   <h2>🛒 Punto de Venta</h2>
+  <button class="btn btn-o btn-sm" onclick="showScreen('dev');clearDev()">↩ Devoluciones</button>
 </div>
 <div style="display:grid;grid-template-columns:1fr 330px;gap:16px">
   <div>
@@ -721,6 +752,38 @@ tr:hover td{background:#f0faf9}
       </div>
       <button class="btn btn-p w100 btn-lg mt16" onclick="processSale()">💳 Cobrar</button>
     </div>
+  </div>
+</div>
+</div>
+
+<!-- DEVOLUCIONES (dentro de POS, pero separadas del carrito) -->
+<div id="screen-dev" class="screen">
+<div class="sec-hdr no-print">
+  <button class="btn btn-o btn-sm" onclick="showScreen('pos')">← Punto de Venta</button>
+  <h2>↩ Devoluciones</h2>
+</div>
+<div class="card">
+  <div class="card-title">Buscar artículo a devolver</div>
+  <div class="form-row">
+    <div class="fg" style="flex:3"><input id="dev-q" type="text" placeholder="Nombre del artículo..." oninput="renderDevItems()"></div>
+    <div class="fg"><button class="btn btn-o w100" onclick="renderDevItems()">Buscar</button></div>
+  </div>
+  <div id="dev-items" class="mt8"></div>
+</div>
+<div id="dev-selected-card" class="card" style="display:none">
+  <div class="card-title">Registrar devolución</div>
+  <div class="form-row">
+    <div class="fg" style="flex:2"><label>Artículo</label><input id="dev-nombre" type="text" readonly style="background:#f0f0f0"></div>
+    <div class="fg"><label>Cantidad a devolver</label><input id="dev-cant" type="number" min="1" value="1"></div>
+  </div>
+  <div class="form-row">
+    <div class="fg"><label>Paciente (opcional)</label><input id="dev-paciente" type="text" placeholder="Nombre del paciente"></div>
+    <div class="fg"><label>Motivo</label><input id="dev-motivo" type="text" placeholder="Compra incorrecta, defecto..."></div>
+  </div>
+  <div id="err-dev" class="alert alert-d" style="display:none"></div>
+  <div class="flex gap8 mt8">
+    <button class="btn btn-p" onclick="processReturn()">✅ Confirmar devolución</button>
+    <button class="btn btn-o" onclick="clearDev()">Cancelar</button>
   </div>
 </div>
 </div>
@@ -919,6 +982,12 @@ let cart = [];
 let editItemId = null;
 let lastRepData = [];
 let lastRepType = '';
+let patSearchResults = [];
+let prevVisitsData = [];
+let posItemsList = [];
+let invItemsRendered = [];
+let devItemsList = [];
+let devItem = null;
 
 // ── LOADER ───────────────────────────────────────────────
 function showLoader(v){
@@ -950,7 +1019,7 @@ function showScreen(id) {
   document.getElementById('nav-mod').textContent = {
     home:'Inicio', patient:'Atención Clínica', vtype:'Tipo de visita',
     clinical:'Atención Clínica', inv:'Inventario', pos:'Punto de Venta',
-    agenda:'Agenda', reportes:'Reportes', usuarios:'Usuarios'
+    dev:'Devoluciones', agenda:'Agenda', reportes:'Reportes', usuarios:'Usuarios'
   }[id] || '';
 }
 
@@ -1022,16 +1091,21 @@ function doRegister() {
   const ok = document.getElementById('ok-reg');
   err.style.display = 'none'; ok.style.display = 'none';
   if(!nombre||!email||!pass) { err.textContent = 'Nombre, correo y contraseña son obligatorios'; err.style.display='block'; return; }
+  const ciudad = document.getElementById('r-ciudad').value.trim();
+  const dir = document.getElementById('r-direccion').value.trim();
   gasPost({action:'register', user:{
     nombre: nombre, email: email, password: pass,
     cedula: document.getElementById('r-cedula').value.trim(),
     especialidad: document.getElementById('r-esp').value.trim(),
     telefono: document.getElementById('r-tel').value.trim(),
-    curp: document.getElementById('r-curp').value.trim()
+    curp: document.getElementById('r-curp').value.trim().toUpperCase(),
+    rfc: document.getElementById('r-rfc').value.trim().toUpperCase(),
+    ciudad: ciudad,
+    direccion: (ciudad && dir) ? ciudad + ', ' + dir : (ciudad || dir)
   }}, function(r) {
     if(!r.ok) { err.textContent = r.error||'Error al registrar'; err.style.display='block'; return; }
     if(r.pending) {
-      ok.textContent = 'Solicitud enviada. El administrador recibirá un correo para aprobar tu acceso.';
+      ok.innerHTML = '✅ Solicitud enviada correctamente.<br><span style="font-size:.9em">El Director recibirá un correo con un enlace para revisar tu solicitud. Te notificaremos por correo cuando sea aprobada.</span>';
       ok.style.display = 'block';
     } else {
       ok.textContent = 'Registro exitoso. Ya puedes iniciar sesión.';
@@ -1052,14 +1126,19 @@ function doLogout() {
 // ── PATIENTS ─────────────────────────────────────────────
 function searchPatUI() {
   const q = document.getElementById('pat-q').value.trim();
-  if(q.length < 1) { document.getElementById('pat-results').innerHTML = ''; return; }
+  if(q.length < 1) { document.getElementById('pat-results').innerHTML = ''; patSearchResults = []; return; }
   gasPost({action:'searchPatients', q:q}, function(r) {
     const div = document.getElementById('pat-results');
-    if(!r.ok || !r.items.length) { div.innerHTML = '<div class="muted mt8">Sin resultados para "'+q+'"</div>'; return; }
-    div.innerHTML = r.items.slice(0,10).map(p => {
+    if(!r.ok || !r.items.length) {
+      patSearchResults = [];
+      div.innerHTML = '<div class="muted mt8">Sin resultados para "'+q+'"</div>';
+      return;
+    }
+    patSearchResults = r.items.slice(0,10);
+    div.innerHTML = patSearchResults.map((p, idx) => {
       const edad = p.fechaNac ? calcEdad(p.fechaNac) : '';
       const alrgBadge = p.alergias && p.alergias !== 'Ninguna conocida' ? '<span class="badge b-d" style="margin-left:6px">⚠ Alergias</span>' : '';
-      return '<div class="pat-res" onclick="selectPatient('+JSON.stringify(JSON.stringify(p))+')">'
+      return '<div class="pat-res" onclick="selectPatient('+idx+')">'
         +'<div><strong>'+p.nombre+'</strong>'+alrgBadge+'<div class="muted">'+edad+(p.curp?' · '+p.curp:'')+'</div></div>'
         +'<span class="badge b-teal">Seleccionar</span></div>';
     }).join('');
@@ -1076,8 +1155,9 @@ function calcEdad(fnac) {
   return edad + ' años';
 }
 
-function selectPatient(pJson) {
-  const p = JSON.parse(pJson);
+function selectPatient(idx) {
+  const p = patSearchResults[idx];
+  if(!p) return;
   currentPatient = p;
   showVTypeScreen();
 }
@@ -1124,11 +1204,13 @@ function showVTypeScreen() {
   grid.innerHTML = VISIT_TYPES.map(t =>
     '<div class="vtype-card'+(currentVisitType===t?' sel':'')+'" onclick="selectVType(\''+t+'\')">'+t+'</div>'
   ).join('');
-  // Load previous visits for subsecuente
+  // Load previous visits for subsecuente + pre-fill
   gasPost({action:'getPatientVisits', patientId:p.id||''}, function(r) {
+    prevVisitsData = [];
     const sel = document.getElementById('vtype-prev-sel');
     sel.innerHTML = '<option value="">— sin previa —</option>';
     if(r.ok && r.items.length) {
+      prevVisitsData = r.items;
       r.items.forEach(v => {
         const d = v.ts ? v.ts.slice(0,10) : '';
         const t = (v.hc&&v.hc.tipoVisita) ? v.hc.tipoVisita : '';
@@ -1155,12 +1237,21 @@ function startVisit() {
   if(!currentVisitType) { alert('Selecciona el tipo de visita'); return; }
   currentVisitSeq = document.getElementById('vtype-seq').value;
   prevVisitRef = document.getElementById('vtype-prev-sel').value || null;
-  initClinical();
+  // Find previous visit data for auto-fill
+  let prevData = null;
+  if(prevVisitsData.length) {
+    if(prevVisitRef) {
+      prevData = prevVisitsData.find(v => v.id === prevVisitRef) || prevVisitsData[0];
+    } else {
+      prevData = prevVisitsData[0]; // more recent
+    }
+  }
+  initClinical(prevData);
   showScreen('clinical');
 }
 
 // ── CLINICAL INIT ────────────────────────────────────────
-function initClinical() {
+function initClinical(prevData) {
   const p = currentPatient;
   document.getElementById('clin-title').textContent = p ? p.nombre + ' — ' + currentVisitType : currentVisitType;
   // Allergy banner 2
@@ -1203,6 +1294,45 @@ function initClinical() {
   buildBerlin();
   // Build Nordic
   buildNordic();
+  // Pre-fill antecedentes from previous visit
+  const prefillBanner = document.getElementById('prefill-banner');
+  if(prevData && prevData.hc) {
+    const hc = prevData.hc;
+    const prevDate = prevData.ts ? prevData.ts.slice(0,10) : '';
+    if(prefillBanner) {
+      prefillBanner.innerHTML = '📋 Antecedentes pre-cargados de la visita del <strong>'+prevDate+'</strong>. Revisa y actualiza si es necesario.';
+      prefillBanner.style.display = 'block';
+    }
+    // AHF
+    if(hc.ahf) {
+      const s = (id, val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+      s('ahf-dm',hc.ahf.dm); s('ahf-hta',hc.ahf.hta); s('ahf-card',hc.ahf.cardio);
+      s('ahf-ca',hc.ahf.cancer); s('ahf-otros',hc.ahf.otros);
+    }
+    // ANP (Antecedentes personales no patológicos)
+    if(hc.hnp) {
+      const s = (id, val) => { const el=document.getElementById(id); if(el&&val!==undefined) el.value=val; };
+      s('hnp-tab',hc.hnp.tabaquismo); s('hnp-tab-n',hc.hnp.tabN);
+      s('hnp-alc',hc.hnp.alcoholismo); s('hnp-tox',hc.hnp.toxicomanias);
+      s('hnp-af',hc.hnp.af); s('hnp-alim',hc.hnp.alimentacion); s('hnp-sue',hc.hnp.sueño);
+      toggleTab();
+    }
+    // APP (Antecedentes personales patológicos)
+    if(hc.app) {
+      ['exant','quirurgs','traum','transf','cronicos','hosp','infect','alrgias','adic','discap'].forEach(f => {
+        const el = document.getElementById('app-'+f);
+        if(el && hc.app[f]) el.value = hc.app[f];
+      });
+    }
+    // AGO (Antecedentes ginecoobstétricos)
+    if(hc.gine) {
+      const gm = {fum:'gine-fum',menarq:'gine-menarq',ritmo:'gine-ritmo',g:'gine-g',p:'gine-p',c:'gine-c',a:'gine-a',mac:'gine-mac',embarazo:'gine-emb',sdg:'gine-sdg'};
+      Object.entries(gm).forEach(([k,id]) => { const el=document.getElementById(id); if(el&&hc.gine[k]) el.value=hc.gine[k]; });
+      toggleSDG();
+    }
+  } else {
+    if(prefillBanner) prefillBanner.style.display = 'none';
+  }
   // Show first tab
   showClinTab('hc', null);
 }
@@ -1426,6 +1556,7 @@ function collectVisit() {
       alergias:v('hc-alrg'), grupoSanguineo:v('hc-gs'),
       ahf:{dm:v('ahf-dm'),hta:v('ahf-hta'),cardio:v('ahf-card'),cancer:v('ahf-ca'),otros:v('ahf-otros')},
       hnp:{tabaquismo:v('hnp-tab'),tabN:v('hnp-tab-n'),alcoholismo:v('hnp-alc'),toxicomanias:v('hnp-tox'),af:v('hnp-af'),alimentacion:v('hnp-alim'),sueño:v('hnp-sue')},
+      app:{exant:v('app-exant'),quirurgs:v('app-quirurgs'),traum:v('app-traum'),transf:v('app-transf'),cronicos:v('app-cronicos'),hosp:v('app-hosp'),infect:v('app-infect'),alrgias:v('app-alrgias'),adic:v('app-adic'),discap:v('app-discap')},
       laboral:OCC_TYPES.includes(currentVisitType)?{antiguedad:v('hl-antig'),turno:v('hl-turno'),hrs:v('hl-hrs'),actividades:v('hl-act'),epp:v('hl-epp'),riesgos:v('hl-riesgos')}:null,
       gine:v('hc-sexo')==='Femenino'?{fum:v('gine-fum'),menarq:v('gine-menarq'),ritmo:v('gine-ritmo'),g:v('gine-g'),p:v('gine-p'),c:v('gine-c'),a:v('gine-a'),mac:v('gine-mac'),embarazo:v('gine-emb'),sdg:v('gine-sdg')}:null,
       laboratorios:labItems, padecimiento:v('hc-pad'),
@@ -1484,31 +1615,40 @@ function loadInv() {
 function renderInv() {
   const cat = document.getElementById('inv-cat-filter').value;
   const q = document.getElementById('inv-q').value.toLowerCase();
+  const showInactive = document.getElementById('inv-show-inactive') && document.getElementById('inv-show-inactive').checked;
   const items = invCache.filter(i => {
     const catOk = !cat || i.categoria === cat;
     const qOk = !q || (i.nombre||'').toLowerCase().includes(q);
-    return catOk && qOk;
+    const activeOk = showInactive || i.activo !== false;
+    return catOk && qOk && activeOk;
   });
+  invItemsRendered = items; // store for index-based access
   const canCost = canAccess('costos');
+  const canBaja = canAccess('inventario') && (currentUser && (currentUser.perfil==='Director'||currentUser.perfil==='Admin médico'));
   const wrap = document.getElementById('inv-table-wrap');
   if(!items.length){ wrap.innerHTML = '<div class="card muted tc">Sin artículos</div>'; return; }
   wrap.innerHTML = '<div class="card tw"><table><thead><tr><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Stock</th><th>Mín</th>'+(canCost?'<th>Precio</th>':'')+'<th>Caducidad</th><th>Acciones</th></tr></thead><tbody>'
-    + items.map(i => {
+    + items.map((i, idx) => {
       const lowStock = i.categoria !== 'Servicio' && (parseInt(i.stock)||0) <= (parseInt(i.stock_min)||0);
       const isServ = i.categoria === 'Servicio';
+      const isBaja = i.activo === false;
       const cad = i.caducidad ? i.caducidad.slice(0,10) : '';
       const expired = cad && new Date(cad) < new Date();
-      return '<tr'+(lowStock?' style="background:#fff3e0"':'')+'>'
-        +'<td><strong>'+i.nombre+'</strong>'+(lowStock&&!isServ?'<span class="badge b-w" style="margin-left:4px">⚠ Stock bajo</span>':'')+(expired?'<span class="badge b-d" style="margin-left:4px">Caducado</span>':'')+'</td>'
+      return '<tr'+(isBaja?' style="opacity:.55;background:#f5f5f5"':(lowStock?' style="background:#fff3e0"':''))+'>'
+        +'<td><strong>'+i.nombre+'</strong>'
+        +(isBaja?'<span class="badge b-d" style="margin-left:4px">Baja</span>':'')
+        +(lowStock&&!isServ&&!isBaja?'<span class="badge b-w" style="margin-left:4px">⚠ Stock bajo</span>':'')
+        +(expired&&!isBaja?'<span class="badge b-d" style="margin-left:4px">Caducado</span>':'')+'</td>'
         +'<td><span class="badge b-azul">'+i.categoria+'</span></td>'
-        +'<td>'+( isServ ? '—' : (i.unidad||''))+'</td>'
-        +'<td>'+(isServ ? '—' : (i.stock||0))+'</td>'
-        +'<td>'+(isServ ? '—' : (i.stock_min||0))+'</td>'
+        +'<td>'+(isServ?'—':(i.unidad||''))+'</td>'
+        +'<td>'+(isServ?'—':(i.stock||0))+'</td>'
+        +'<td>'+(isServ?'—':(i.stock_min||0))+'</td>'
         +(canCost?'<td>$'+parseFloat(i.precio_venta||0).toFixed(2)+'</td>':'')
-        +'<td>'+(isServ ? '—' : cad)+'</td>'
+        +'<td>'+(isServ?'—':cad)+'</td>'
         +'<td><div class="flex gap8">'
-        +(isServ ? '' : '<button class="btn btn-o btn-sm" onclick="showMovForm(\''+i.id+'\',\''+i.nombre.replace(/'/g,'')+'\')"  >± Mov</button>')
-        +'<button class="btn btn-s btn-sm" onclick="editItem('+JSON.stringify(JSON.stringify(i))+')">Editar</button>'
+        +(!isBaja&&!isServ?'<button class="btn btn-o btn-sm" onclick="showMovForm(\''+i.id+'\',\''+i.nombre.replace(/'/g,'').replace(/"/g,'')+'\')" >± Mov</button>':'')
+        +(!isBaja?'<button class="btn btn-s btn-sm" onclick="editItem('+idx+')">Editar</button>':'')
+        +(canBaja&&!isBaja?'<button class="btn btn-d btn-sm" onclick="confirmBaja('+idx+')">Dar de baja</button>':'')
         +'</div></td></tr>';
     }).join('')
     +'</tbody></table></div>';
@@ -1524,8 +1664,8 @@ function showAddItem() {
   document.getElementById('inv-mov-wrap').style.display='none';
   document.getElementById('inv-form-wrap').scrollIntoView({behavior:'smooth'});
 }
-function editItem(iJson) {
-  const i = JSON.parse(iJson); editItemId = i.id;
+function editItem(idx) {
+  const i = invItemsRendered[idx]; if(!i) return; editItemId = i.id;
   document.getElementById('inv-form-title').textContent = 'Editar artículo';
   document.getElementById('if-nombre').value=i.nombre||'';
   document.getElementById('if-cat').value=i.categoria||'Medicamento';
@@ -1540,6 +1680,14 @@ function editItem(iJson) {
   document.getElementById('if-precio').value=i.precio_venta||'';
   toggleInvFields(); document.getElementById('inv-form-wrap').style.display='';
   document.getElementById('inv-form-wrap').scrollIntoView({behavior:'smooth'});
+}
+function confirmBaja(idx) {
+  const i = invItemsRendered[idx]; if(!i) return;
+  if(!confirm('¿Dar de baja "'+i.nombre+'"?\n\nEl artículo dejará de aparecer en el listado pero se conserva todo su historial.')) return;
+  gasPost({action:'deactivateItem', itemId:i.id}, function(r) {
+    if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+    loadInv();
+  });
 }
 function toggleInvFields() {
   const isServ = document.getElementById('if-cat').value === 'Servicio';
@@ -1605,20 +1753,23 @@ function renderPOSItems() {
     const catOk = !cat || i.categoria === cat;
     const qOk = !q || (i.nombre||'').toLowerCase().includes(q);
     const inStock = i.categoria === 'Servicio' || (parseInt(i.stock)||0) > 0;
-    return catOk && qOk && inStock;
+    const isActive = i.activo !== false;
+    return catOk && qOk && inStock && isActive;
   });
+  posItemsList = items; // store for index-based access
   const div = document.getElementById('pos-items');
   if(!items.length){ div.innerHTML='<div class="muted tc">Sin artículos disponibles</div>'; return; }
   div.innerHTML = '<table><thead><tr><th>Artículo</th><th>Categoría</th><th>Stock</th><th>Precio</th><th></th></tr></thead><tbody>'
-    + items.map(i =>
+    + items.map((i, idx) =>
       '<tr><td>'+i.nombre+'</td><td>'+i.categoria+'</td>'
       +'<td>'+(i.categoria==='Servicio'?'∞':(i.stock||0))+'</td>'
       +'<td>$'+parseFloat(i.precio_venta||0).toFixed(2)+'</td>'
-      +'<td><button class="btn btn-p btn-sm" onclick="addToCart('+JSON.stringify(JSON.stringify(i))+')">+ Agregar</button></td></tr>'
+      +'<td><button class="btn btn-p btn-sm" onclick="addToCart('+idx+')">+ Agregar</button></td></tr>'
     ).join('')+'</tbody></table>';
 }
-function addToCart(iJson) {
-  const i = JSON.parse(iJson);
+function addToCart(idx) {
+  const i = posItemsList[idx];
+  if(!i) return;
   const existing = cart.find(c => c.id === i.id);
   if(existing) { existing.qty++; }
   else { cart.push({id:i.id, nombre:i.nombre, precio:parseFloat(i.precio_venta||0), qty:1, tipo:i.categoria==='Servicio'?'servicio':'farmacia', itemId:i.id}); }
@@ -1646,6 +1797,8 @@ function cartQty(i, delta) {
 function processSale() {
   if(!cart.length){ alert('El carrito está vacío'); return; }
   const total = cart.reduce((s,c) => s + c.precio*c.qty, 0);
+  const resumen = cart.map(c => '• '+c.nombre+' x'+c.qty+' = $'+(c.precio*c.qty).toFixed(2)).join('\n');
+  if(!confirm('Confirmar cobro:\n\n'+resumen+'\n\nTOTAL: $'+total.toFixed(2)+'\n\n¿Proceder con el cobro y expedir ticket?')) return;
   const sale = {
     paciente: document.getElementById('pos-paciente').value.trim(),
     cajero: currentUser ? currentUser.nombre : '',
@@ -1674,6 +1827,58 @@ function printTicket(sale) {
     + '</table><hr style="margin:8px 0">'
     + '<p style="font-size:.75em;text-align:center">RFC: CBI260129AM4 · Tel: 662 4265969<br>BiMASS Hermosillo, Sonora</p>';
   printWin(html, 'Ticket '+folio);
+}
+
+// ── DEVOLUCIONES ─────────────────────────────────────────
+function renderDevItems() {
+  const q = document.getElementById('dev-q').value.toLowerCase().trim();
+  const div = document.getElementById('dev-items');
+  if(!q){ div.innerHTML=''; return; }
+  devItemsList = invCache.filter(i =>
+    (i.nombre||'').toLowerCase().includes(q) && i.categoria !== 'Servicio' && i.activo !== false
+  );
+  if(!devItemsList.length){ div.innerHTML='<div class="muted">Sin artículos que coincidan</div>'; return; }
+  div.innerHTML = '<div class="tw"><table><thead><tr><th>Artículo</th><th>Categoría</th><th>Stock actual</th><th>Precio</th><th></th></tr></thead><tbody>'
+    + devItemsList.map((i, idx) => '<tr><td>'+i.nombre+'</td><td>'+i.categoria+'</td><td>'+i.stock+'</td><td>$'+parseFloat(i.precio_venta||0).toFixed(2)+'</td>'
+      +'<td><button class="btn btn-o btn-sm" onclick="selectDevItem('+idx+')">Seleccionar</button></td></tr>').join('')
+    +'</tbody></table></div>';
+}
+function selectDevItem(idx) {
+  devItem = devItemsList[idx];
+  if(!devItem) return;
+  document.getElementById('dev-nombre').value = devItem.nombre;
+  document.getElementById('dev-items').innerHTML = '';
+  document.getElementById('dev-q').value = '';
+  document.getElementById('dev-selected-card').style.display = '';
+}
+function clearDev() {
+  devItem = null;
+  document.getElementById('dev-selected-card').style.display = 'none';
+  document.getElementById('dev-q').value = '';
+  document.getElementById('dev-items').innerHTML = '';
+  document.getElementById('err-dev').style.display = 'none';
+}
+function processReturn() {
+  if(!devItem){ alert('Selecciona un artículo'); return; }
+  const cant = parseInt(document.getElementById('dev-cant').value)||1;
+  const paciente = document.getElementById('dev-paciente').value.trim();
+  const motivo = document.getElementById('dev-motivo').value.trim();
+  const err = document.getElementById('err-dev');
+  err.style.display = 'none';
+  if(!confirm('¿Confirmar devolución?\n\nArtículo: '+devItem.nombre+'\nCantidad: '+cant+'\n\nEl inventario se actualizará automáticamente.')) return;
+  const ret = {
+    paciente: paciente,
+    cajero: currentUser ? currentUser.nombre : '',
+    total: parseFloat(devItem.precio_venta||0) * cant,
+    motivo: motivo,
+    items: [{nombre:devItem.nombre, precio:parseFloat(devItem.precio_venta||0), cantidad:cant, tipo:'farmacia', itemId:devItem.id}]
+  };
+  gasPost({action:'saveReturn', ret:ret}, function(r) {
+    if(!r.ok){ err.textContent='Error: '+(r.error||''); err.style.display='block'; return; }
+    alert('✅ Devolución registrada. Folio: '+(r.folio||'—')+'\nInventario actualizado correctamente.');
+    clearDev();
+    loadPOS();
+  });
 }
 
 // ── AGENDA ────────────────────────────────────────────────
@@ -1968,6 +2173,13 @@ function printVisita() {
     +(ev.hc.alergias&&ev.hc.alergias!=='Ninguna conocida'?'<tr><td colspan="3" style="background:#ffebee;color:#e53935"><strong>⚠ ALERGIAS: '+ev.hc.alergias+'</strong></td></tr>':'')
     +'</table>';
 
+  // APP
+  if(ev.hc.app && Object.values(ev.hc.app).some(x=>x)) {
+    const appLbl = {exant:'Exantemáticas',quirurgs:'Quirúrgicos',traum:'Traumáticos',transf:'Transfusionales',cronicos:'Crónicos degenerativos',hosp:'Hospitalizaciones',infect:'Infectocontagiosos',alrgias:'Alergias',adic:'Adicciones',discap:'Discapacidad'};
+    html += '<h3>Antecedentes Personales Patológicos</h3><table>';
+    Object.entries(appLbl).forEach(([k,lbl]) => { if(ev.hc.app[k]) html += '<tr><td style="width:45%"><strong>'+lbl+':</strong></td><td>'+ev.hc.app[k]+'</td></tr>'; });
+    html += '</table>';
+  }
   // Padecimiento
   if(ev.hc.padecimiento) html += '<h3>Padecimiento Actual</h3><p>'+ev.hc.padecimiento+'</p>';
 
