@@ -99,7 +99,7 @@ tr:hover td{background:#f0faf9}
 <div id="loader"><div class="spin"></div></div>
 
 <nav class="navbar" id="navbar" style="display:none">
-  <div class="brand">
+  <div class="brand" onclick="currentUser && showScreen('home')" style="cursor:pointer" title="Ir al inicio">
     <svg viewBox="280 80 120 130" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
       <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#2a4e7a" transform="rotate(0,340,155)"/>
       <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#28aaa4" transform="rotate(60,340,155)"/>
@@ -366,7 +366,7 @@ tr:hover td{background:#f0faf9}
     </div>
   </div>
   <div class="card" id="hc-laboral-wrap">
-    <div class="card-title">🏭 Historia laboral</div>
+    <div class="card-title">🏭 Historia laboral — Puesto actual</div>
     <div class="form-row">
       <div class="fg"><label>Antigüedad en empresa</label><input id="hl-antig" type="text" placeholder="2 años"></div>
       <div class="fg"><label>Turno habitual</label><select id="hl-turno"><option value="">—</option><option>Matutino</option><option>Vespertino</option><option>Nocturno</option><option>Mixto</option><option>Rotativo</option></select></div>
@@ -377,6 +377,20 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>EPP utilizado</label><input id="hl-epp" type="text" placeholder="Casco, botas..."></div>
     </div>
     <div class="form-row"><div class="fg w100"><label>Exposición a riesgos</label><input id="hl-riesgos" type="text" placeholder="Químicos, ruido, vibración..."></div></div>
+    <div class="card-title mt16" style="font-size:.85em">📋 Empleos anteriores</div>
+    <div id="hl-prevjobs-list"></div>
+    <div id="hl-prevjob-form" style="border:1px dashed var(--brd);border-radius:8px;padding:10px;margin-top:8px">
+      <div class="form-row">
+        <div class="fg" style="flex:2"><label>Empresa anterior</label><input id="hl-prev-emp" type="text"></div>
+        <div class="fg"><label>Puesto</label><input id="hl-prev-puesto" type="text"></div>
+        <div class="fg"><label>Años</label><input id="hl-prev-anios" type="number" min="0" max="50"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Riesgos expuesto</label><input id="hl-prev-riesgos" type="text" placeholder="Ruido, químicos..."></div>
+        <div class="fg"><label>Motivo salida</label><input id="hl-prev-motivo" type="text"></div>
+      </div>
+      <button class="btn btn-o btn-sm" onclick="addPrevJob()">+ Agregar empleo anterior</button>
+    </div>
   </div>
   <div class="card" id="hc-gine-wrap" style="display:none">
     <div class="card-title">♀ Antecedentes ginecoobstétricos</div>
@@ -416,11 +430,32 @@ tr:hover td{background:#f0faf9}
     <div class="card-title">⚠ Investigación de riesgo de trabajo</div>
     <div class="form-row">
       <div class="fg"><label>Fecha del evento</label><input id="rt-fecha" type="date"></div>
+      <div class="fg"><label>Hora del evento</label><input id="rt-hora" type="time"></div>
       <div class="fg"><label>Tipo de riesgo</label><select id="rt-tipo"><option value="">—</option><option>Accidente de trabajo</option><option>Enfermedad de trabajo</option><option>Trayecto</option></select></div>
+      <div class="fg"><label>Probable riesgo</label><select id="rt-prob-riesgo"><option value="">—</option><option>Caída a mismo nivel</option><option>Caída a distinto nivel</option><option>Golpe con objeto</option><option>Atrapamiento</option><option>Corte/laceración</option><option>Quemadura</option><option>Exposición a sustancia química</option><option>Sobreesfuerzo</option><option>Postura forzada</option><option>Exposición a ruido</option><option>Accidente vial</option><option>Otro</option></select></div>
     </div>
-    <div class="form-row"><div class="fg w100"><label>Descripción del evento</label><textarea id="rt-desc" rows="3"></textarea></div></div>
-    <div class="form-row"><div class="fg w100"><label>Medidas tomadas</label><textarea id="rt-medidas" rows="2"></textarea></div></div>
-    <button class="btn btn-o btn-sm no-print" onclick="printRiesgoTrabajo()">🖨 Imprimir</button>
+    <div class="form-row">
+      <div class="fg"><label>Edad trabajador</label><input id="rt-edad" type="number" min="16" max="80"></div>
+      <div class="fg"><label>Sexo</label><select id="rt-sexo"><option value="">—</option><option>Masculino</option><option>Femenino</option></select></div>
+      <div class="fg"><label>Talla (cm)</label><input id="rt-talla" type="number" step="0.1"></div>
+      <div class="fg"><label>Peso (kg)</label><input id="rt-peso" type="number" step="0.1"></div>
+      <div class="fg"><label>Mano dominante</label><select id="rt-mano"><option value="">—</option><option>Derecha</option><option>Izquierda</option><option>Ambas</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Turno</label><select id="rt-turno"><option value="">—</option><option>Matutino</option><option>Vespertino</option><option>Nocturno</option><option>Mixto</option><option>Rotativo</option></select></div>
+      <div class="fg" style="flex:2"><label>Supervisor responsable</label><input id="rt-supervisor" type="text"></div>
+      <div class="fg"><label>Email supervisor</label><input id="rt-supervisor-email" type="email" placeholder="supervisor@empresa.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Agente / Factor</label><select id="rt-agente"><option value="">—</option><option>Mecánico</option><option>Eléctrico</option><option>Térmico</option><option>Químico</option><option>Biológico</option><option>Ergonómico</option><option>Psicosocial</option><option>Otro</option></select></div>
+      <div class="fg"><label>Asociado a</label><select id="rt-asociado"><option value="">—</option><option>Equipo de trabajo</option><option>Herramienta</option><option>Instalaciones</option><option>Vehículo</option><option>Materiales</option><option>Acto inseguro</option><option>Condición insegura</option></select></div>
+      <div class="fg"><label>Parte del cuerpo afectada</label><input id="rt-parte-cuerpo" type="text" placeholder="Mano derecha, columna..."></div>
+    </div>
+    <div class="form-row"><div class="fg w100"><label>Descripción del evento</label><textarea id="rt-desc" rows="3" placeholder="Describa detalladamente cómo ocurrió el accidente..."></textarea></div></div>
+    <div class="form-row"><div class="fg w100"><label>Medidas tomadas / Tratamiento inmediato</label><textarea id="rt-medidas" rows="2"></textarea></div></div>
+    <div class="flex gap8 no-print">
+      <button class="btn btn-o btn-sm" onclick="printRiesgoTrabajo()">🖨 Imprimir investigación</button>
+    </div>
   </div>
 </div>
 
@@ -549,7 +584,7 @@ tr:hover td{background:#f0faf9}
       <div class="form-row mt8">
         <div class="fg"><label>Estudio</label><input id="ls-nombre" type="text" placeholder="BH, QS, EGO..."></div>
         <div class="fg"><label>Resultado</label><input id="ls-res" type="text"></div>
-        <div class="fg"><label>Interpretación</label><input id="ls-interp" type="text"></div>
+        <div class="fg"><label>Interpretación</label><select id="ls-interp"><option value="">—</option><option>Normal</option><option>Anormal</option><option>Limítrofe</option></select></div>
       </div>
       <button class="btn btn-o btn-sm" onclick="addLabSol()">+ Agregar</button>
     </div>
@@ -596,7 +631,12 @@ tr:hover td{background:#f0faf9}
     <div class="exam-hdr"><input type="checkbox" id="chk-incap" onchange="toggleExam('incap',this.checked)"><span>Incapacidad laboral</span></div>
     <div id="body-incap" class="exam-body off">
       <div class="form-row">
-        <div class="fg"><label>Fecha inicio</label><input id="inc-inicio" type="date"></div>
+        <div class="fg"><label>Tipo de incapacidad</label><select id="inc-tipo" onchange="toggleIncapTipo()"><option value="INTERNA">Interna BiMASS</option><option value="IMSS">IMSS</option><option value="Ocupacional">Ocupacional/RT</option></select></div>
+        <div class="fg" id="inc-folio-imss-wrap" style="display:none"><label>Folio IMSS</label><input id="inc-folio-imss" type="text" placeholder="Núm. folio IMSS"></div>
+        <div class="fg"><label>Tipo</label><select id="inc-personalocup"><option value="Personal">Personal</option><option value="Ocupacional">Laboral/RT</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Fecha inicio</label><input id="inc-inicio" type="date" oninput="calcDiasIncap()"></div>
         <div class="fg"><label>Fecha fin</label><input id="inc-fin" type="date" oninput="calcDiasIncap()"></div>
         <div class="fg"><label>Días</label><input id="inc-dias" type="number" readonly style="background:#f0f0f0"></div>
       </div>
@@ -665,7 +705,13 @@ tr:hover td{background:#f0faf9}
       </select>
     </div>
     <div class="fg" style="flex:2"><label>Buscar</label><input id="inv-q" type="text" placeholder="Nombre del artículo..." oninput="renderInv()"></div>
-    <div class="fg" style="flex:0;align-self:flex-end"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inv-show-inactive" onchange="renderInv()"> Mostrar dados de baja</label></div>
+    <div class="fg" style="flex:0;align-self:flex-end">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inv-low-stock" onchange="renderInv()"> Solo stock bajo</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:4px"><input type="checkbox" id="inv-show-inactive" onchange="renderInv()"> Mostrar dados de baja</label>
+    </div>
+    <div class="fg" style="flex:0;align-self:flex-end">
+      <button class="btn btn-o btn-sm" onclick="exportInvCSV()">⬇ Excel</button>
+    </div>
   </div>
 </div>
 <div id="inv-table-wrap"></div>
@@ -821,8 +867,11 @@ tr:hover td{background:#f0faf9}
   </div>
   <div class="form-row">
     <div class="fg"><label>Tipo de visita</label><select id="ag-tipo"><option>Personal</option><option>Ocupacional</option><option>Corta</option><option>Checkup ingreso</option><option>Checkup periódico</option><option>Egreso</option><option>Especial</option></select></div>
+    <div class="fg"><label>Consulta</label><select id="ag-seq"><option value="Inicial">Inicial</option><option value="Subsecuente">Subsecuente</option></select></div>
     <div class="fg"><label>Modalidad</label><select id="ag-modal"><option>Presencial</option><option>Virtual</option></select></div>
-    <div class="fg"><label>Notas</label><input id="ag-notas" type="text"></div>
+  </div>
+  <div class="form-row">
+    <div class="fg w100"><label>Notas</label><input id="ag-notas" type="text"></div>
   </div>
   <div class="flex gap8 mt8">
     <button class="btn btn-p" onclick="saveAgendaItem()">Guardar cita</button>
@@ -849,6 +898,8 @@ tr:hover td{background:#f0faf9}
     <div class="rep-filter">
       <div class="fg"><label>Año</label><input id="suive-anio" type="number" value="2026" style="width:90px"></div>
       <div class="fg"><label>Mes</label><select id="suive-mes"><option value="">Todos</option><option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option></select></div>
+      <div class="fg"><label>Desde</label><input id="suive-desde" type="date"></div>
+      <div class="fg"><label>Hasta</label><input id="suive-hasta" type="date"></div>
       <button class="btn btn-p btn-sm" onclick="buildReporteSUIVE()">Generar</button>
       <button class="btn btn-o btn-sm" onclick="exportReporte('suive')">⬇ Excel</button>
     </div>
@@ -905,6 +956,34 @@ tr:hover td{background:#f0faf9}
 <div class="sec-hdr no-print">
   <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
   <h2>👥 Gestión de Usuarios</h2>
+  <button class="btn btn-p btn-sm" onclick="toggleAddUserForm()">+ Agregar usuario</button>
+</div>
+<div id="add-user-form" class="card" style="display:none">
+  <div class="card-title">Nuevo usuario manual</div>
+  <div id="err-adduser" class="alert alert-d" style="display:none"></div>
+  <div id="ok-adduser" class="alert alert-ok" style="display:none"></div>
+  <div class="form-row">
+    <div class="fg" style="flex:2"><label>Nombre completo *</label><input id="au-nombre" type="text"></div>
+    <div class="fg"><label>Correo *</label><input id="au-email" type="email"></div>
+    <div class="fg"><label>Contraseña *</label><input id="au-pass" type="password"></div>
+  </div>
+  <div class="form-row">
+    <div class="fg"><label>Perfil</label>
+      <select id="au-perfil">
+        <option value="Personal de salud">Personal de salud</option>
+        <option value="Admin médico">Admin médico</option>
+        <option value="Personal Admin">Personal Admin</option>
+        <option value="Director">Director</option>
+      </select>
+    </div>
+    <div class="fg"><label>Cédula profesional</label><input id="au-cedula" type="text"></div>
+    <div class="fg"><label>Especialidad</label><input id="au-esp" type="text"></div>
+    <div class="fg"><label>Teléfono</label><input id="au-tel" type="tel"></div>
+  </div>
+  <div class="flex gap8 mt8">
+    <button class="btn btn-p" onclick="saveNewUser()">Crear usuario</button>
+    <button class="btn btn-o" onclick="document.getElementById('add-user-form').style.display='none'">Cancelar</button>
+  </div>
 </div>
 <div id="users-table-wrap"></div>
 </div>
@@ -988,6 +1067,7 @@ let posItemsList = [];
 let invItemsRendered = [];
 let devItemsList = [];
 let devItem = null;
+let prevJobs = [];
 
 // ── LOADER ───────────────────────────────────────────────
 function showLoader(v){
@@ -998,6 +1078,11 @@ function showLoader(v){
 // ── gasPost ──────────────────────────────────────────────
 function gasPost(data, cb) {
   showLoader(true);
+  if(typeof google === 'undefined' || !google.script || !google.script.run) {
+    showLoader(false);
+    cb({ok:false, error:'⚠️ Esta aplicación debe abrirse desde Google Apps Script.\n\nSi ves esto al abrir el archivo HTML directamente, ve a: script.google.com → Desplegar → Como aplicación web → URL.'});
+    return;
+  }
   google.script.run
     .withSuccessHandler(function(res){
       showLoader(false);
@@ -1284,6 +1369,7 @@ function initClinical(prevData) {
   labItems = []; renderLabList();
   labSolItems = []; renderLabSolList();
   rxMeds = []; renderRxMeds();
+  prevJobs = []; renderPrevJobs();
   ciePrimary = null; cieSecondary = [];
   document.getElementById('cie-primary-tag').innerHTML = '';
   document.getElementById('cie-sec-tags').innerHTML = '';
@@ -1333,6 +1419,9 @@ function initClinical(prevData) {
   } else {
     if(prefillBanner) prefillBanner.style.display = 'none';
   }
+  // Apply Corta mode
+  const isCorta = currentVisitType === 'Corta';
+  applyShortVisitMode(isCorta);
   // Show first tab
   showClinTab('hc', null);
 }
@@ -1378,8 +1467,8 @@ function calcDiasIncap() {
   const i = document.getElementById('inc-inicio').value;
   const f = document.getElementById('inc-fin').value;
   if(i && f) {
-    const d = Math.ceil((new Date(f)-new Date(i))/(1000*60*60*24));
-    document.getElementById('inc-dias').value = d > 0 ? d : 0;
+    const d = Math.round((new Date(f)-new Date(i))/(1000*60*60*24)) + 1;
+    document.getElementById('inc-dias').value = d >= 1 ? d : 1;
   }
 }
 
@@ -1423,7 +1512,7 @@ function buildAntidGrid() {
   const div = document.getElementById('antid-grid');
   div.innerHTML = ANTIDP.map(s =>
     '<div class="fg" style="min-width:160px"><label>'+s.n+'</label>'
-    +'<select id="ad-'+s.c+'"><option value="N/S">N/S — No solicitado</option><option value="Negativo">Negativo</option><option value="Positivo">Positivo</option></select></div>'
+    +'<select id="ad-'+s.c+'"><option value="No solicitado">No solicitado</option><option value="Negativo">Negativo</option><option value="Positivo">Positivo</option></select></div>'
   ).join('');
 }
 
@@ -1557,10 +1646,10 @@ function collectVisit() {
       ahf:{dm:v('ahf-dm'),hta:v('ahf-hta'),cardio:v('ahf-card'),cancer:v('ahf-ca'),otros:v('ahf-otros')},
       hnp:{tabaquismo:v('hnp-tab'),tabN:v('hnp-tab-n'),alcoholismo:v('hnp-alc'),toxicomanias:v('hnp-tox'),af:v('hnp-af'),alimentacion:v('hnp-alim'),sueño:v('hnp-sue')},
       app:{exant:v('app-exant'),quirurgs:v('app-quirurgs'),traum:v('app-traum'),transf:v('app-transf'),cronicos:v('app-cronicos'),hosp:v('app-hosp'),infect:v('app-infect'),alrgias:v('app-alrgias'),adic:v('app-adic'),discap:v('app-discap')},
-      laboral:OCC_TYPES.includes(currentVisitType)?{antiguedad:v('hl-antig'),turno:v('hl-turno'),hrs:v('hl-hrs'),actividades:v('hl-act'),epp:v('hl-epp'),riesgos:v('hl-riesgos')}:null,
+      laboral:OCC_TYPES.includes(currentVisitType)?{antiguedad:v('hl-antig'),turno:v('hl-turno'),hrs:v('hl-hrs'),actividades:v('hl-act'),epp:v('hl-epp'),riesgos:v('hl-riesgos'),prevJobs:[...prevJobs]}:null,
       gine:v('hc-sexo')==='Femenino'?{fum:v('gine-fum'),menarq:v('gine-menarq'),ritmo:v('gine-ritmo'),g:v('gine-g'),p:v('gine-p'),c:v('gine-c'),a:v('gine-a'),mac:v('gine-mac'),embarazo:v('gine-emb'),sdg:v('gine-sdg')}:null,
       laboratorios:labItems, padecimiento:v('hc-pad'),
-      riesgo:OCC_TYPES.includes(currentVisitType)?{fecha:v('rt-fecha'),tipo:v('rt-tipo'),desc:v('rt-desc'),medidas:v('rt-medidas')}:null,
+      riesgo:OCC_TYPES.includes(currentVisitType)?{fecha:v('rt-fecha'),hora:v('rt-hora'),tipo:v('rt-tipo'),probableRiesgo:v('rt-prob-riesgo'),edad:v('rt-edad'),sexo:v('rt-sexo'),talla:v('rt-talla'),peso:v('rt-peso'),mano:v('rt-mano'),turno:v('rt-turno'),supervisor:v('rt-supervisor'),supervisorEmail:v('rt-supervisor-email'),agente:v('rt-agente'),asociado:v('rt-asociado'),parteCuerpo:v('rt-parte-cuerpo'),desc:v('rt-desc'),medidas:v('rt-medidas')}:null,
       secuencia:currentVisitSeq, visitaPreviaRef:prevVisitRef
     },
     exams: {
@@ -1578,7 +1667,7 @@ function collectVisit() {
       resultado: v('concl-res'),
       restricciones: v('concl-res')==='Apto con restricciones'?{tipo:v('restr-tipo'),parte:v('restr-parte'),lateralidad:v('restr-lat'),params:v('restr-params'),nocturno:v('restr-nocturno'),embarazo:v('restr-emb')}:null,
       comentarios: v('concl-coments'),
-      incapacidad: chk('chk-incap')?{inicio:v('inc-inicio'),fin:v('inc-fin'),dias:v('inc-dias'),indicaciones:v('inc-indicaciones')}:null
+      incapacidad: chk('chk-incap')?{tipo:v('inc-tipo'),folioImss:v('inc-folio-imss'),personalOcup:v('inc-personalocup'),inicio:v('inc-inicio'),fin:v('inc-fin'),dias:v('inc-dias'),indicaciones:v('inc-indicaciones')}:null
     },
     docs: {
       receta: chk('chk-rx')?{medicamentos:rxMeds}:null,
@@ -1616,24 +1705,31 @@ function renderInv() {
   const cat = document.getElementById('inv-cat-filter').value;
   const q = document.getElementById('inv-q').value.toLowerCase();
   const showInactive = document.getElementById('inv-show-inactive') && document.getElementById('inv-show-inactive').checked;
+  const onlyLow = document.getElementById('inv-low-stock') && document.getElementById('inv-low-stock').checked;
   const items = invCache.filter(i => {
     const catOk = !cat || i.categoria === cat;
     const qOk = !q || (i.nombre||'').toLowerCase().includes(q);
     const activeOk = showInactive || i.activo !== false;
-    return catOk && qOk && activeOk;
+    const lowOk = !onlyLow || (i.categoria !== 'Servicio' && (parseInt(i.stock)||0) <= (parseInt(i.stock_min)||0) && i.activo !== false);
+    return catOk && qOk && activeOk && lowOk;
   });
-  invItemsRendered = items; // store for index-based access
+  invItemsRendered = items;
   const canCost = canAccess('costos');
   const canBaja = canAccess('inventario') && (currentUser && (currentUser.perfil==='Director'||currentUser.perfil==='Admin médico'));
   const wrap = document.getElementById('inv-table-wrap');
   if(!items.length){ wrap.innerHTML = '<div class="card muted tc">Sin artículos</div>'; return; }
-  wrap.innerHTML = '<div class="card tw"><table><thead><tr><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Stock</th><th>Mín</th>'+(canCost?'<th>Precio</th>':'')+'<th>Caducidad</th><th>Acciones</th></tr></thead><tbody>'
+  wrap.innerHTML = '<div class="card tw"><table><thead><tr><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Stock</th><th>Mín</th>'
+    +(canCost?'<th>Precio</th><th>Costo</th><th>Utilidad</th>':'')
+    +'<th>Caducidad</th><th>Acciones</th></tr></thead><tbody>'
     + items.map((i, idx) => {
       const lowStock = i.categoria !== 'Servicio' && (parseInt(i.stock)||0) <= (parseInt(i.stock_min)||0);
       const isServ = i.categoria === 'Servicio';
       const isBaja = i.activo === false;
       const cad = i.caducidad ? i.caducidad.slice(0,10) : '';
       const expired = cad && new Date(cad) < new Date();
+      const precio = parseFloat(i.precio_venta||0);
+      const costo = parseFloat(i.costo||0);
+      const utilidad = precio - costo;
       return '<tr'+(isBaja?' style="opacity:.55;background:#f5f5f5"':(lowStock?' style="background:#fff3e0"':''))+'>'
         +'<td><strong>'+i.nombre+'</strong>'
         +(isBaja?'<span class="badge b-d" style="margin-left:4px">Baja</span>':'')
@@ -1643,7 +1739,7 @@ function renderInv() {
         +'<td>'+(isServ?'—':(i.unidad||''))+'</td>'
         +'<td>'+(isServ?'—':(i.stock||0))+'</td>'
         +'<td>'+(isServ?'—':(i.stock_min||0))+'</td>'
-        +(canCost?'<td>$'+parseFloat(i.precio_venta||0).toFixed(2)+'</td>':'')
+        +(canCost?'<td>$'+precio.toFixed(2)+'</td><td>$'+costo.toFixed(2)+'</td><td style="color:'+(utilidad>=0?'var(--ok)':'var(--danger)')+'"><strong>$'+utilidad.toFixed(2)+'</strong></td>':'')
         +'<td>'+(isServ?'—':cad)+'</td>'
         +'<td><div class="flex gap8">'
         +(!isBaja&&!isServ?'<button class="btn btn-o btn-sm" onclick="showMovForm(\''+i.id+'\',\''+i.nombre.replace(/'/g,'').replace(/"/g,'')+'\')" >± Mov</button>':'')
@@ -1652,6 +1748,25 @@ function renderInv() {
         +'</div></td></tr>';
     }).join('')
     +'</tbody></table></div>';
+}
+function exportInvCSV() {
+  const items = invItemsRendered.length ? invItemsRendered : invCache.filter(i => i.activo !== false);
+  if(!items.length){ alert('No hay artículos para exportar'); return; }
+  const canCost = canAccess('costos');
+  const cols = ['Nombre','Categoría','Unidad','Stock','Stock mínimo','Caducidad'].concat(canCost?['Precio','Costo','Utilidad']:[]);
+  let csv = cols.join(',') + '\n';
+  items.forEach(i => {
+    const precio = parseFloat(i.precio_venta||0);
+    const costo = parseFloat(i.costo||0);
+    const row = [i.nombre,i.categoria,i.unidad||'',i.stock||0,i.stock_min||0,i.caducidad?i.caducidad.slice(0,10):'']
+      .concat(canCost?[precio.toFixed(2),costo.toFixed(2),(precio-costo).toFixed(2)]:[]);
+    csv += row.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',') + '\n';
+  });
+  const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='BiMASS_inventario_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
 }
 function showAddItem() {
   editItemId = null;
@@ -1807,7 +1922,13 @@ function processSale() {
   };
   gasPost({action:'saveSale', sale:sale}, function(r) {
     if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+    sale.folio = r.folio || sale.folio;
     printTicket(sale);
+    // Ask about email
+    const emailDest = window.prompt('¿Enviar ticket por correo?\nIngresa el correo del destinatario (o cancela para omitir):','');
+    if(emailDest && emailDest.includes('@')) {
+      emailTicket(Object.assign({}, sale, {emailDest: emailDest}));
+    }
     cart = []; renderCart();
     document.getElementById('pos-paciente').value='';
     loadPOS();
@@ -1816,9 +1937,11 @@ function processSale() {
 function printTicket(sale) {
   const fecha = new Date().toLocaleString('es-MX');
   const folio = sale.folio || ('VTA-'+Date.now().toString().slice(-6));
+  sale.folio = folio; // store for email
   let html = docHeader('Ticket de Venta','Punto de Venta BiMASS')
     + '<p style="font-size:.8em;color:#666">'+fecha+'</p>'
-    + '<p style="font-size:.8em">Folio: '+folio+'</p>'
+    + '<p style="font-size:.8em">Folio: <strong>'+folio+'</strong></p>'
+    + (sale.cajero?'<p style="font-size:.8em">Vendedor: '+sale.cajero+'</p>':'')
     + (sale.paciente?'<p style="font-size:.85em">Paciente: '+sale.paciente+'</p>':'')
     + '<hr style="margin:8px 0">'
     + '<table style="width:100%;font-size:.85em;border-collapse:collapse">'
@@ -1826,7 +1949,7 @@ function printTicket(sale) {
     + '<tr><td colspan="2"><strong>Total</strong></td><td style="text-align:right"><strong>$'+parseFloat(sale.total).toFixed(2)+'</strong></td></tr>'
     + '</table><hr style="margin:8px 0">'
     + '<p style="font-size:.75em;text-align:center">RFC: CBI260129AM4 · Tel: 662 4265969<br>BiMASS Hermosillo, Sonora</p>';
-  printWin(html, 'Ticket '+folio);
+  printWin(html, 'Ticket Clínica BiMASS — '+folio);
 }
 
 // ── DEVOLUCIONES ─────────────────────────────────────────
@@ -1901,20 +2024,40 @@ function renderAgenda() {
     return dateOk && consOk;
   }).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
   const div = document.getElementById('agenda-list');
-  if(!items.length){ div.innerHTML='<div class="card muted tc">Sin citas para el filtro seleccionado</div>'; return; }
-  div.innerHTML = items.map(a =>
-    '<div class="card ag-slot">'
-    +'<div class="flex gap8" style="flex-wrap:wrap">'
-    +'<span style="font-weight:700;font-size:1em">'+a.hora+'</span>'
-    +'<strong>'+a.paciente+'</strong>'
-    +'<span class="badge b-teal">'+a.tipoVisita+'</span>'
-    +'<span class="badge b-azul">Cons. '+a.consultorio+'</span>'
-    +'<span class="badge '+(a.modalidad==='Virtual'?'b-pur':'b-ok')+'">'+a.modalidad+'</span>'
-    +'</div>'
-    + (a.telefono ? '<div class="muted">Tel: '+a.telefono+'</div>' : '')
-    + (a.notas ? '<div class="muted">'+a.notas+'</div>' : '')
-    +'</div>'
-  ).join('');
+
+  function slotHtml(a, compact) {
+    const sz = compact ? 'font-size:.88em' : 'font-size:1em';
+    return '<div class="ag-slot" style="margin-bottom:6px;background:#fff;border:1px solid var(--brd);border-radius:8px;padding:10px">'
+      +'<div class="flex gap8" style="flex-wrap:wrap;align-items:center">'
+      +'<span style="font-weight:700;'+sz+'">'+a.hora+'</span>'
+      +'<strong style="'+sz+'">'+a.paciente+'</strong>'
+      +'<span class="badge b-teal">'+a.tipoVisita+'</span>'
+      +(a.secuencia?'<span class="badge b-pur">'+a.secuencia+'</span>':'')
+      +'<span class="badge '+(a.modalidad==='Virtual'?'b-pur':'b-ok')+'">'+a.modalidad+'</span>'
+      +'</div>'
+      +(a.telefono?'<div class="muted" style="font-size:.8em;margin-top:3px">📞 '+a.telefono+'</div>':'')
+      +(a.notas?'<div class="muted" style="font-size:.8em">'+a.notas+'</div>':'')
+      +(a.id?'<div style="margin-top:6px"><button class="btn btn-d btn-sm" onclick="deleteAgendaItem(\''+a.id+'\')">✕ Cancelar</button></div>':'')
+      +'</div>';
+  }
+
+  if(!consF) {
+    // 3-column simultaneous view
+    const c1 = items.filter(a => String(a.consultorio)==='1');
+    const c2 = items.filter(a => String(a.consultorio)==='2');
+    const c3 = items.filter(a => String(a.consultorio)==='3');
+    const empty = '<div class="muted tc" style="font-size:.82em;padding:14px">Sin citas</div>';
+    const colStyle = 'border:1px solid var(--brd);border-radius:8px;overflow:hidden';
+    const hdrStyle = 'font-weight:700;color:var(--azul);padding:8px 10px;border-bottom:2px solid var(--teal);background:#f5f7fa;font-size:.88em';
+    div.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
+      +'<div style="'+colStyle+'"><div style="'+hdrStyle+'">🏥 Consultorio 1 <span class="badge b-teal">'+c1.length+'</span></div><div style="padding:8px">'+(c1.length?c1.map(a=>slotHtml(a,true)).join(''):empty)+'</div></div>'
+      +'<div style="'+colStyle+'"><div style="'+hdrStyle+'">🏥 Consultorio 2 <span class="badge b-teal">'+c2.length+'</span></div><div style="padding:8px">'+(c2.length?c2.map(a=>slotHtml(a,true)).join(''):empty)+'</div></div>'
+      +'<div style="'+colStyle+'"><div style="'+hdrStyle+'">🏥 Consultorio 3 <span class="badge b-teal">'+c3.length+'</span></div><div style="padding:8px">'+(c3.length?c3.map(a=>slotHtml(a,true)).join(''):empty)+'</div></div>'
+      +'</div>';
+  } else {
+    if(!items.length){ div.innerHTML='<div class="card muted tc">Sin citas para el filtro seleccionado</div>'; return; }
+    div.innerHTML = items.map(a => slotHtml(a, false)).join('');
+  }
 }
 function showAgendaForm() {
   document.getElementById('ag-form-title').textContent = 'Nueva cita';
@@ -1932,6 +2075,7 @@ function saveAgendaItem() {
     paciente:pac, fecha:fecha, hora:hora,
     consultorio:document.getElementById('ag-cons').value,
     tipoVisita:document.getElementById('ag-tipo').value,
+    secuencia:document.getElementById('ag-seq').value,
     modalidad:document.getElementById('ag-modal').value,
     telefono:document.getElementById('ag-tel').value.trim(),
     email:document.getElementById('ag-email').value.trim(),
@@ -1941,6 +2085,13 @@ function saveAgendaItem() {
     if(!r.ok){ alert('Error: '+(r.error||'')); return; }
     document.getElementById('agenda-form-wrap').style.display='none';
     ['ag-pac','ag-tel','ag-email','ag-hora','ag-notas'].forEach(id=>document.getElementById(id).value='');
+    loadAgenda();
+  });
+}
+function deleteAgendaItem(id) {
+  if(!confirm('¿Cancelar esta cita?')) return;
+  gasPost({action:'deleteAgenda', id:id}, function(r) {
+    if(!r.ok){ alert('Error: '+(r.error||'')); return; }
     loadAgenda();
   });
 }
@@ -1958,16 +2109,21 @@ function showRepTab(tab, btn) {
 function buildReporteSUIVE() {
   const anio = parseInt(document.getElementById('suive-anio').value)||new Date().getFullYear();
   const mes = parseInt(document.getElementById('suive-mes').value)||0;
-  gasPost({action:'save'}, function(){});
-  // Load evals
-  gasPost({action:'inventory'}, function(){});
-  fetch && fetch(''); // placeholder — load actual evals
+  const desde = document.getElementById('suive-desde').value;
+  const hasta = document.getElementById('suive-hasta').value;
+  evalsCache = []; // force reload
   loadEvalsAndRender(function(evals) {
     const filtered = evals.filter(e => {
       if(!e.ts) return false;
+      const ds = e.ts.slice(0,10);
       const d = new Date(e.ts);
-      if(d.getFullYear() !== anio) return false;
-      if(mes && d.getMonth()+1 !== mes) return false;
+      if(desde || hasta) {
+        if(desde && ds < desde) return false;
+        if(hasta && ds > hasta) return false;
+      } else {
+        if(d.getFullYear() !== anio) return false;
+        if(mes && d.getMonth()+1 !== mes) return false;
+      }
       return true;
     });
     const byDx = {};
@@ -1975,9 +2131,13 @@ function buildReporteSUIVE() {
       const cie = e.conclusion && e.conclusion.ciePrimary ? e.conclusion.ciePrimary.c+' '+e.conclusion.ciePrimary.d : 'Sin diagnóstico';
       byDx[cie] = (byDx[cie]||0)+1;
     });
-    lastRepData = Object.entries(byDx).map(([dx,n])=>({Diagnóstico:dx,Casos:n}));
+    lastRepData = Object.entries(byDx).map(([dx,n])=>({Diagnóstico:dx,Casos:n})).sort((a,b)=>b.Casos-a.Casos);
     lastRepType = 'suive';
-    document.getElementById('suive-table').innerHTML = renderRepTable(lastRepData, ['Diagnóstico','Casos']);
+    if(!lastRepData.length) {
+      document.getElementById('suive-table').innerHTML = '<div class="alert alert-i" style="margin-top:10px">Sin datos para el período seleccionado. Total de casos: 0</div>';
+    } else {
+      document.getElementById('suive-table').innerHTML = renderRepTable(lastRepData, ['Diagnóstico','Casos']);
+    }
   });
 }
 function buildReporteVentas() {
@@ -1990,15 +2150,32 @@ function buildReporteVentas() {
       const d = v.ts.slice(0,10);
       return (!desde || d >= desde) && (!hasta || d <= hasta);
     });
-    const byItem = {};
-    filtered.forEach(v => (v.items||[]).forEach(i => {
-      byItem[i.nombre] = (byItem[i.nombre]||{nombre:i.nombre,cantidad:0,total:0});
-      byItem[i.nombre].cantidad += parseInt(i.cantidad)||1;
-      byItem[i.nombre].total += parseFloat(i.precio||0)*(parseInt(i.cantidad)||1);
-    }));
-    lastRepData = Object.values(byItem).sort((a,b)=>b.total-a.total).map(x=>({Artículo:x.nombre,Cantidad:x.cantidad,Total:'$'+x.total.toFixed(2)}));
+    if(!filtered.length) {
+      lastRepData = []; lastRepType = 'ventas';
+      document.getElementById('ventas-table').innerHTML = '<div class="alert alert-i" style="margin-top:10px">Sin ventas para el período seleccionado.</div>';
+      return;
+    }
+    // Full detail per ticket
+    lastRepData = filtered.map(v => {
+      const ts = v.ts||'';
+      const fecha = ts.slice(0,10);
+      const hora = ts.length >= 19 ? ts.slice(11,16) : '';
+      const articulos = (v.items||[]).map(i => i.nombre+(i.cantidad>1?' x'+i.cantidad:'')).join(', ');
+      const unidades = (v.items||[]).reduce((s,i)=>s+(parseInt(i.cantidad)||1),0);
+      return {
+        'Fecha': fecha,
+        'Hora': hora,
+        'Folio': v.folio||'',
+        'Artículos': articulos,
+        'Unidades': unidades,
+        'Total': '$'+parseFloat(v.total||0).toFixed(2),
+        'Vendedor': v.cajero||v.medico||''
+      };
+    }).sort((a,b)=>a.Fecha.localeCompare(b.Fecha));
     lastRepType = 'ventas';
-    document.getElementById('ventas-table').innerHTML = renderRepTable(lastRepData, ['Artículo','Cantidad','Total']);
+    const totalGlobal = filtered.reduce((s,v)=>s+parseFloat(v.total||0),0);
+    document.getElementById('ventas-table').innerHTML = renderRepTable(lastRepData, ['Fecha','Hora','Folio','Artículos','Unidades','Total','Vendedor'])
+      + '<div style="padding:10px;font-weight:700;text-align:right;border-top:2px solid var(--teal);margin-top:4px">Total período: <span style="color:var(--teal);font-size:1.1em">$'+totalGlobal.toFixed(2)+'</span></div>';
   });
 }
 function buildReporteOcup() {
@@ -2054,14 +2231,10 @@ function buildReporteCustom() {
 }
 function loadEvalsAndRender(cb) {
   if(evalsCache.length) { cb(evalsCache); return; }
-  gasPost({action:'save'}, function(){}); // no-op stub; reload from server
-  // Actually load evals:
-  google.script.run
-    .withSuccessHandler(function(res){
-      try { const r=JSON.parse(res); evalsCache=r.ok?r.items:[]; cb(evalsCache); } catch(e){ cb([]); }
-    })
-    .withFailureHandler(function(){ cb([]); })
-    .serverAction(JSON.stringify({action:'evals'}));
+  gasPost({action:'evals'}, function(r) {
+    evalsCache = r.ok ? r.items : [];
+    cb(evalsCache);
+  });
 }
 function renderRepTable(data, cols) {
   if(!data.length) return '<div class="muted tc">Sin datos para el filtro seleccionado</div>';
@@ -2129,16 +2302,136 @@ function changeRole(id, perfil) {
   });
 }
 
+// ── USUARIOS: AGREGAR MANUALMENTE ────────────────────────
+function toggleAddUserForm() {
+  const f = document.getElementById('add-user-form');
+  f.style.display = f.style.display === 'none' ? '' : 'none';
+  document.getElementById('err-adduser').style.display='none';
+  document.getElementById('ok-adduser').style.display='none';
+}
+function saveNewUser() {
+  const nombre = document.getElementById('au-nombre').value.trim();
+  const email = document.getElementById('au-email').value.trim();
+  const pass = document.getElementById('au-pass').value;
+  const perfil = document.getElementById('au-perfil').value;
+  const err = document.getElementById('err-adduser');
+  const ok = document.getElementById('ok-adduser');
+  err.style.display='none'; ok.style.display='none';
+  if(!nombre||!email||!pass){ err.textContent='Nombre, correo y contraseña son obligatorios'; err.style.display='block'; return; }
+  gasPost({action:'register', user:{
+    nombre:nombre, email:email, password:pass, perfil:perfil,
+    cedula:document.getElementById('au-cedula').value.trim(),
+    especialidad:document.getElementById('au-esp').value.trim(),
+    telefono:document.getElementById('au-tel').value.trim(),
+    manualCreate:true
+  }}, function(r) {
+    if(!r.ok){ err.textContent=r.error||'Error al crear usuario'; err.style.display='block'; return; }
+    // Auto-approve since director is creating it
+    gasPost({action:'approveUser', userId:r.userId||'', approved:true, perfil:perfil}, function(r2){
+      ok.textContent='✅ Usuario "'+nombre+'" creado y aprobado con perfil '+perfil;
+      ok.style.display='block';
+      ['au-nombre','au-email','au-pass','au-cedula','au-esp','au-tel'].forEach(id=>document.getElementById(id).value='');
+      loadUsers();
+    });
+  });
+}
+
+// ── INCAPACIDAD TIPO ──────────────────────────────────────
+function toggleIncapTipo() {
+  const tipo = document.getElementById('inc-tipo').value;
+  document.getElementById('inc-folio-imss-wrap').style.display = tipo==='IMSS' ? '' : 'none';
+}
+
+// ── HISTORIA LABORAL — EMPLEOS PREVIOS ───────────────────
+function addPrevJob() {
+  const emp = document.getElementById('hl-prev-emp').value.trim();
+  if(!emp) { alert('Ingresa el nombre de la empresa'); return; }
+  prevJobs.push({
+    empresa: emp,
+    puesto: document.getElementById('hl-prev-puesto').value.trim(),
+    anios: document.getElementById('hl-prev-anios').value,
+    riesgos: document.getElementById('hl-prev-riesgos').value.trim(),
+    motivo: document.getElementById('hl-prev-motivo').value.trim()
+  });
+  ['hl-prev-emp','hl-prev-puesto','hl-prev-anios','hl-prev-riesgos','hl-prev-motivo'].forEach(id => document.getElementById(id).value='');
+  renderPrevJobs();
+}
+function renderPrevJobs() {
+  const div = document.getElementById('hl-prevjobs-list');
+  if(!prevJobs.length){ div.innerHTML='<div class="muted" style="font-size:.82em;margin:4px 0">Sin empleos anteriores registrados</div>'; return; }
+  div.innerHTML = '<div class="tw"><table><thead><tr><th>Empresa</th><th>Puesto</th><th>Años</th><th>Riesgos</th><th>Motivo salida</th><th></th></tr></thead><tbody>'
+    + prevJobs.map((j,i)=>'<tr><td>'+j.empresa+'</td><td>'+j.puesto+'</td><td>'+j.anios+'</td><td>'+j.riesgos+'</td><td>'+j.motivo+'</td>'
+      +'<td><button class="btn btn-d btn-sm" onclick="prevJobs.splice('+i+',1);renderPrevJobs()">✕</button></td></tr>').join('')
+    +'</tbody></table></div>';
+}
+
+// ── CORTA MODE: ocultar secciones no pertinentes ─────────
+function applyShortVisitMode(isCorta) {
+  const hideIds = ['hc-laboral-wrap','hc-gine-wrap','hc-riesgo-wrap'];
+  const hideCards = ['ahf','hnp']; // card titles that contain AHF and ANP
+  // Hide HC cards not needed in Corta
+  document.querySelectorAll('#ctab-hc .card').forEach(card => {
+    const title = card.querySelector('.card-title');
+    if(!title) return;
+    const t = title.textContent;
+    const hideInCorta = t.includes('Antecedentes heredofamiliares') || t.includes('Antecedentes personales no patológicos') || t.includes('Historia laboral') || t.includes('Antecedentes ginecoobstétricos') || t.includes('Laboratorio / Imagen') || t.includes('Investigación de riesgo');
+    card.style.display = isCorta && hideInCorta ? 'none' : '';
+  });
+  // In exams tab: hide everything except Examen físico in Corta
+  if(isCorta) {
+    ['chk-visual','chk-audio','chk-espiro','chk-antid','chk-berlin','chk-nordic','chk-labsol'].forEach(id => {
+      const chk = document.getElementById(id);
+      if(chk) { chk.checked = false; toggleExam(id.replace('chk-',''), false); }
+      const card = chk ? chk.closest('.card') : null;
+      if(card) card.style.display = 'none';
+    });
+  } else {
+    ['chk-visual','chk-audio','chk-espiro','chk-antid','chk-berlin','chk-nordic','chk-labsol'].forEach(id => {
+      const chk = document.getElementById(id);
+      if(chk) { chk.checked = true; toggleExam(id.replace('chk-',''), true); }
+      const card = chk ? chk.closest('.card') : null;
+      if(card) card.style.display = '';
+    });
+  }
+  // Rename "Examen físico" → "Exploración física" in Corta
+  const efSpan = document.querySelector('#chk-fisico + span');
+  if(efSpan) efSpan.textContent = isCorta ? 'Exploración física' : 'Examen físico';
+}
+
+// ── TICKET POR CORREO ─────────────────────────────────────
+function emailTicket(sale) {
+  const dest = prompt('Correo del destinatario (paciente/empresa):');
+  if(!dest) return;
+  const fecha = new Date().toLocaleString('es-MX');
+  const folio = sale.folio || ('VTA-'+Date.now().toString().slice(-6));
+  const body = 'Ticket Clínica BiMASS\n\nFolio: '+folio+'\nFecha: '+fecha+'\n'
+    +(sale.paciente?'Paciente: '+sale.paciente+'\n':'')
+    +'\nDetalle:\n'
+    + sale.items.map(i=>'• '+i.nombre+' x'+i.cantidad+' = $'+(i.precio*i.cantidad).toFixed(2)).join('\n')
+    +'\n\nTotal: $'+parseFloat(sale.total).toFixed(2)
+    +'\n\nRFC: CBI260129AM4 · Tel: 662 4265969 · Hermosillo, Sonora';
+  gasPost({action:'sendTicketEmail', dest:dest, folio:folio, body:body, sale:sale}, function(r) {
+    if(r.ok) alert('✅ Ticket enviado a '+dest);
+    else alert('Error al enviar: '+(r.error||''));
+  });
+}
+
 // ── PRINT FUNCTIONS ───────────────────────────────────────
-function printWin(html, titulo) {
-  const w = window.open('','_blank','width=800,height=700');
+function printWin(html, titulo, extraButtons) {
+  const w = window.open('','_blank','width=820,height=720');
+  const btns = extraButtons||'';
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+titulo+'</title>'
     +'<style>body{font-family:"Segoe UI",Arial,sans-serif;margin:20px;color:#333;font-size:13px}'
     +'table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border:1px solid #ddd}'
     +'th{background:#2a4e7a;color:#fff}.sig-box{border-top:1px solid #333;margin-top:40px;padding-top:6px;font-size:.8em;text-align:center}'
-    +'@media print{button{display:none}}h3{color:#2a4e7a}.header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #28aaa4}'
+    +'@media print{.no-print{display:none!important}}h3{color:#2a4e7a}.header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #28aaa4}'
+    +'button{margin:4px;padding:8px 16px;cursor:pointer;border:none;border-radius:6px;font-size:.9em}'
+    +'.btn-print{background:#28aaa4;color:#fff}.btn-email{background:#2a4e7a;color:#fff}'
     +'</style></head><body>'+html
-    +'<div style="margin-top:20px;text-align:center"><button onclick="window.print()">Imprimir</button></div>'
+    +'<div class="no-print" style="margin-top:20px;text-align:center">'
+    +'<button class="btn-print" onclick="window.print()">🖨 Imprimir</button>'
+    +btns
+    +'</div>'
     +'</body></html>');
   w.document.close();
 }
@@ -2285,8 +2578,8 @@ function printAntidoping() {
     +'<p><strong>Paciente:</strong> '+p.nombre+' &nbsp; <strong>Fecha:</strong> '+new Date().toLocaleDateString('es-MX')+'</p>'
     +'<table><tr><th>Sustancia</th><th>Resultado</th></tr>'
     + ANTIDP.map(s => {
-      const v = document.getElementById('ad-'+s.c) ? document.getElementById('ad-'+s.c).value : 'N/S';
-      if(v==='N/S — No solicitado'||v==='N/S') return '';
+      const v = document.getElementById('ad-'+s.c) ? document.getElementById('ad-'+s.c).value : 'No solicitado';
+      if(v==='No solicitado'||v==='N/S') return '';
       return '<tr><td>'+s.n+'</td><td style="'+(v==='Positivo'?'color:#e53935;font-weight:700':'')+'">'+v+'</td></tr>';
     }).join('') + '</table>'
     + sigBox();
@@ -2328,15 +2621,23 @@ function printSpirometry() {
 function printIncap() {
   const p = currentPatient||{};
   function v(id){ return document.getElementById(id)?document.getElementById(id).value:''; }
-  const folio = 'INC-'+Date.now().toString().slice(-6);
-  let html = docHeader('Incapacidad Médica Laboral','Clínica BiMASS')
+  const tipoInc = v('inc-tipo') || 'INTERNA';
+  const folioImss = v('inc-folio-imss');
+  const folioDisp = tipoInc === 'IMSS' ? (folioImss||'POR ASIGNAR') : '(folio generado al guardar)';
+  const personalOcup = v('inc-personalocup') || 'Personal';
+  let html = docHeader(tipoInc === 'IMSS' ? 'Incapacidad IMSS' : 'Incapacidad Médica Interna','Clínica BiMASS')
     +'<p>Hermosillo, Sonora, a '+new Date().toLocaleDateString('es-MX',{year:'numeric',month:'long',day:'numeric'})+'</p>'
-    +'<p>Se expide incapacidad laboral a: <strong>'+p.nombre+'</strong></p>'
-    +'<p><strong>Período:</strong> del '+fmtDate(v('inc-inicio'))+' al '+fmtDate(v('inc-fin'))+' ('+v('inc-dias')+' días)</p>'
-    +(v('inc-indicaciones')?'<p><strong>Indicaciones:</strong> '+v('inc-indicaciones')+'</p>':'')
-    +'<p style="font-size:.8em;color:#666">Folio: '+folio+' — El diagnóstico es información confidencial.</p>'
+    +'<table style="width:100%;font-size:.88em;margin-bottom:12px">'
+    +'<tr><td><strong>Folio:</strong> '+folioDisp+'</td><td><strong>Tipo:</strong> '+tipoInc+'</td><td><strong>Clasificación:</strong> '+personalOcup+'</td></tr>'
+    +'</table>'
+    +'<p>Se expide incapacidad laboral a: <strong>'+p.nombre+'</strong>'+(p.curp?' (CURP: '+p.curp+')':'')+'</p>'
+    +'<p><strong>Período de incapacidad:</strong> del <strong>'+fmtDate(v('inc-inicio'))+'</strong> al <strong>'+fmtDate(v('inc-fin'))+'</strong></p>'
+    +'<p><strong>Total de días:</strong> <span style="font-size:1.2em;font-weight:700">'+v('inc-dias')+'</span> día(s)</p>'
+    +(v('inc-indicaciones')?'<p><strong>Indicaciones médicas:</strong> '+v('inc-indicaciones')+'</p>':'')
+    +'<p style="font-size:.78em;color:#666;margin-top:16px">El diagnóstico es información confidencial y no aparece en este documento.</p>'
     + sigBox();
-  printWin(html, 'Incapacidad');
+  const emailBtn = '<button class="btn-email" onclick="alert(\'Use el botón de correo en la plataforma para enviar la incapacidad.\')">✉ Enviar por correo</button>';
+  printWin(html, 'Incapacidad Médica', emailBtn);
 }
 
 function printRef() {
@@ -2354,16 +2655,34 @@ function printRef() {
 
 function printRiesgoTrabajo() {
   const p = currentPatient||{};
-  function v(id){ return document.getElementById(id)?document.getElementById(id).value:''; }
+  function v(id){ const el=document.getElementById(id); return el?el.value:''; }
+  const supEmail = v('rt-supervisor-email');
   let html = docHeader('Investigación de Riesgo de Trabajo','Clínica BiMASS')
-    +'<p><strong>Paciente:</strong> '+p.nombre+' &nbsp; <strong>Empresa:</strong> '+v('hc-empresa')+'</p>'
-    +'<p><strong>Puesto:</strong> '+v('hc-puesto')+'</p>'
-    +'<p><strong>Tipo de riesgo:</strong> '+v('rt-tipo')+'</p>'
-    +'<p><strong>Fecha del evento:</strong> '+fmtDate(v('rt-fecha'))+'</p>'
-    +'<h3>Descripción del evento</h3><p>'+v('rt-desc')+'</p>'
-    +'<h3>Medidas tomadas</h3><p>'+v('rt-medidas')+'</p>'
+    +'<table style="width:100%;font-size:.88em">'
+    +'<tr><td style="width:50%"><strong>Paciente/Trabajador:</strong> '+p.nombre+'</td><td><strong>Empresa:</strong> '+v('hc-empresa')+'</td></tr>'
+    +'<tr><td><strong>Puesto:</strong> '+v('hc-puesto')+'</td><td><strong>Fecha del evento:</strong> '+fmtDate(v('rt-fecha'))+(v('rt-hora')?' — '+v('rt-hora'):'')+'</td></tr>'
+    +'<tr><td><strong>Probable riesgo:</strong> '+v('rt-tipo')+'</td><td><strong>Tipo específico:</strong> '+v('rt-prob-riesgo')+'</td></tr>'
+    +'<tr><td><strong>Edad:</strong> '+v('rt-edad')+'</td><td><strong>Sexo:</strong> '+v('rt-sexo')+'</td></tr>'
+    +'<tr><td><strong>Talla:</strong> '+v('rt-talla')+' cm</td><td><strong>Peso:</strong> '+v('rt-peso')+' kg</td></tr>'
+    +'<tr><td><strong>Mano dominante:</strong> '+v('rt-mano')+'</td><td><strong>Turno:</strong> '+v('rt-turno')+'</td></tr>'
+    +'<tr><td><strong>Supervisor:</strong> '+v('rt-supervisor')+'</td><td><strong>Agente/Factor:</strong> '+v('rt-agente')+'</td></tr>'
+    +'<tr><td><strong>Asociado a:</strong> '+v('rt-asociado')+'</td><td><strong>Parte del cuerpo:</strong> '+v('rt-parte-cuerpo')+'</td></tr>'
+    +'</table>'
+    +'<h3>Declaración del paciente</h3><p style="white-space:pre-line">'+v('rt-desc')+'</p>'
+    +'<h3>Declaración del personal de salud</h3><p style="white-space:pre-line">'+v('rt-medidas')+'</p>'
     + sigBox();
-  printWin(html, 'Riesgo de Trabajo');
+  const emailBtn = supEmail ? '<button class="btn-email" onclick="alert(\'Para enviar al supervisor ('+supEmail+'), use la opción de correo en el sistema.\')">✉ Enviar a supervisor</button>' : '';
+  printWin(html, 'Investigación de Riesgo de Trabajo', emailBtn);
+}
+function emailRiesgoTrabajo() {
+  function v(id){ const el=document.getElementById(id); return el?el.value:''; }
+  const supEmail = v('rt-supervisor-email');
+  if(!supEmail){ alert('No hay correo del supervisor registrado'); return; }
+  const p = currentPatient||{};
+  gasPost({action:'sendRtEmail', dest:supEmail, paciente:p.nombre, empresa:v('hc-empresa'), fecha:v('rt-fecha'), tipo:v('rt-tipo'), desc:v('rt-desc')}, function(r) {
+    if(r.ok) alert('✅ Investigación enviada a '+supEmail);
+    else alert('Error al enviar: '+(r.error||''));
+  });
 }
 
 // ── INIT ─────────────────────────────────────────────────
