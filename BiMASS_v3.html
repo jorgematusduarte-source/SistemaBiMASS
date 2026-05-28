@@ -2168,21 +2168,22 @@ function printTicket(sale) {
   window._lastTicketSale = sale;
   window._lastTicketFolio = folio;
   const emailBtn = '<div class="no-print" style="display:flex;gap:8px;align-items:center;margin-top:10px;padding:10px;background:#f5f7fa;border-radius:8px;border:1px solid #dde3ea">'
+    + '<span style="font-size:.85em;color:#555;white-space:nowrap">&#x2709; Enviar a:</span>'
     + '<input id="ticket-email-dest" type="email" placeholder="Correo del comprador..." style="flex:1;padding:7px 10px;border:1px solid #ccc;border-radius:6px;font-size:.9em">'
-    + '<button style="background:var(--teal);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap" onclick="sendTicketEmailFromWindow()">&#x2709; Enviar</button></div>';
+    + '<button style="background:#28aaa4;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap" onclick="window.opener.sendTicketFromPopup(document.getElementById(\'ticket-email-dest\').value)">&#x2709; Enviar</button></div>';
   printWin(html, 'Ticket Clínica BiMASS — '+folio, emailBtn);
 }
-function sendTicketEmailFromWindow() {
-  const d = document.getElementById('ticket-email-dest');
-  if(!d){ alert('Campo de correo no encontrado'); return; }
-  const dest = d.value.trim();
-  if(!dest||!dest.includes('@')){ alert('Ingresa un correo válido'); return; }
+function sendTicketFromPopup(dest) {
+  if(!dest || !dest.includes('@')){ alert('Ingresa un correo válido'); return; }
   const sale = window._lastTicketSale;
   const folio = window._lastTicketFolio;
   if(!sale){ alert('No hay ticket activo'); return; }
-  gasPost({action:'sendTicketEmail', dest:dest, folio:folio, sale:sale}, function(r){
-    if(r.ok){ d.value=''; alert('Ticket enviado a '+dest); }
-    else alert('Error: '+(r.error||''));
+  const body = 'Ticket #'+folio+'\n\nClínica BiMASS\nHermosillo, Sonora\nRFC: CBI260129AM4\nTel: 662 4265969\n\n'
+    + sale.items.map(function(i){ return '• '+i.nombre+' x'+i.cantidad+' = $'+(i.precio*i.cantidad).toFixed(2); }).join('\n')
+    + '\n\nTotal: $'+parseFloat(sale.total).toFixed(2);
+  gasPost({action:'sendTicketEmail', dest:dest, folio:folio, body:body, sale:sale}, function(r){
+    if(r.ok){ alert('✓ Ticket enviado a '+dest); }
+    else alert('Error al enviar: '+(r.error||''));
   });
 }
 
