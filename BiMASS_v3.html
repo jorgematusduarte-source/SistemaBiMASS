@@ -222,8 +222,8 @@ tr:hover td{background:#f0faf9}
     </div>
     <div class="home-card" id="card-xray" onclick="gotoMod('xray')">
       <div class="home-icon">🩻</div>
-      <div class="home-label">Rayos X</div>
-      <div class="home-sub">Imágenes · Diagnóstico</div>
+      <div class="home-label">Imagenología</div>
+      <div class="home-sub">Rayos X · Imágenes · Diagnóstico</div>
     </div>
   </div>
   <div id="home-admin-row" style="display:none">
@@ -1051,6 +1051,7 @@ tr:hover td{background:#f0faf9}
         <option value="Personal Admin">Personal Admin</option>
         <option value="Director">Director</option>
         <option value="Laboratorio">Laboratorio</option>
+        <option value="Imagenología">Imagenología</option>
       </select>
     </div>
     <div class="fg"><label>Cédula profesional</label><input id="au-cedula" type="text"></div>
@@ -1190,7 +1191,9 @@ function showScreen(id) {
   document.getElementById('nav-mod').textContent = {
     home:'Inicio', patient:'Atención Clínica', vtype:'Tipo de visita',
     clinical:'Atención Clínica', inv:'Inventario', pos:'Punto de Venta',
-    dev:'Devoluciones', agenda:'Agenda', reportes:'Reportes', usuarios:'Usuarios'
+    dev:'Devoluciones', agenda:'Agenda', reportes:'Reportes', usuarios:'Usuarios',
+    hist:'Historial del paciente', lab:'Laboratorio', xray:'Imagenología',
+    audit:'Auditorías STPS', ausent:'Ausentismo'
   }[id] || '';
 }
 
@@ -1223,7 +1226,7 @@ function canAccess(feature) {
   const isAdmin = (p === 'Director' || p === 'Admin médico');
   const isSalud = (p === 'Personal de salud');
   const isAdminPer = (p === 'Personal Admin');
-  const isLab = (p === 'Laboratorio');
+  const isLab = (p === 'Laboratorio' || p === 'Imagenología');
   if(feature === 'reportes') return isAdmin;
   if(feature === 'usuarios') return isAdmin;
   if(feature === 'inventario') return isAdmin || isAdminPer;
@@ -2580,6 +2583,7 @@ function loadUsers() {
         +'<option value="Personal de salud"'+(u.perfil==='Personal de salud'?' selected':'')+'>Personal de salud</option>'
         +'<option value="Personal Admin"'+(u.perfil==='Personal Admin'?' selected':'')+'>Personal Admin</option>'
         +'<option value="Laboratorio"'+(u.perfil==='Laboratorio'?' selected':'')+'>Laboratorio</option>'
+        +'<option value="Imagenología"'+(u.perfil==='Imagenología'?' selected':'')+'>Imagenología</option>'
         +'</select></td>'
         +'<td><span class="badge '+(u.aprobado?'b-ok':'b-w')+'">'+(u.aprobado?'Aprobado':'Pendiente')+'</span></td>'
         +'<td>'+u.cedula+'</td>'
@@ -3569,14 +3573,52 @@ function evalIndicadorOp(value, op, target) {
   return v >= t; // '>=' default
 }
 
-// ══ LAB / RAYOS X ═══════════════════════════════════════════
+// ══ LAB / RAYOS X — multi-tipo chip system ══════════════════
+var labTiposData = {lab: [], xray: []};
+
+function addLabTipo(mod) {
+  var inp = document.getElementById(mod+'-tipo-input') || document.getElementById(mod+'-tipo');
+  if(!inp) return;
+  var val = inp.value.trim();
+  if(!val) return;
+  if(!labTiposData[mod]) labTiposData[mod] = [];
+  labTiposData[mod].push(val);
+  inp.value = '';
+  renderLabTipos(mod);
+}
+
+function removeLabTipo(mod, idx) {
+  if(labTiposData[mod]) labTiposData[mod].splice(idx, 1);
+  renderLabTipos(mod);
+}
+
+function renderLabTipos(mod) {
+  var chips = document.getElementById(mod+'-tipos-chips');
+  if(!chips) return;
+  var arr = labTiposData[mod] || [];
+  if(!arr.length) {
+    chips.innerHTML = '<span style="color:#aaa;font-size:.82em;padding:2px 4px">Sin estudios seleccionados...</span>';
+    return;
+  }
+  chips.innerHTML = arr.map(function(t,i){
+    return '<span class="lab-chip-item" data-mod="'+mod+'" data-idx="'+i+'" '
+      +'style="background:var(--teal);color:#fff;border-radius:20px;padding:3px 10px;font-size:.83em;display:inline-flex;align-items:center;gap:5px;cursor:default">'
+      +t+' <span class="lab-chip-x" style="cursor:pointer;font-weight:700;opacity:.85;margin-left:2px">×</span></span>';
+  }).join('');
+  // Attach remove listeners
+  chips.querySelectorAll('.lab-chip-item').forEach(function(chip){
+    chip.querySelector('.lab-chip-x').addEventListener('click', function(){
+      removeLabTipo(chip.dataset.mod, parseInt(chip.dataset.idx));
+    });
+  });
+}
+
 let labCache = [], xrayCache = [];
-let currentLabModal = null;
 
 function loadLabResults() {
   gasPost({action:'loadLab'}, function(r){
     labCache = r.ok ? r.items : [];
-    const t = new Date().toISOString().slice(0,10);
+    var t = new Date().toISOString().slice(0,10);
     if(!document.getElementById('lab-f-desde').value) {
       document.getElementById('lab-f-desde').value = t.slice(0,8)+'01';
       document.getElementById('lab-f-hasta').value = t;
@@ -3588,7 +3630,7 @@ function loadLabResults() {
 function loadXrayResults() {
   gasPost({action:'loadXray'}, function(r){
     xrayCache = r.ok ? r.items : [];
-    const t = new Date().toISOString().slice(0,10);
+    var t = new Date().toISOString().slice(0,10);
     if(!document.getElementById('xray-f-desde').value) {
       document.getElementById('xray-f-desde').value = t.slice(0,8)+'01';
       document.getElementById('xray-f-hasta').value = t;
@@ -3598,25 +3640,25 @@ function loadXrayResults() {
 }
 
 function renderLabResults(mod) {
-  const cache = mod==='lab' ? labCache : xrayCache;
-  const desde = document.getElementById(mod+'-f-desde').value;
-  const hasta = document.getElementById(mod+'-f-hasta').value;
-  const fPac  = (document.getElementById(mod+'-f-pac').value||'').toLowerCase();
-  const fTipo = (document.getElementById(mod+'-f-tipo').value||'').toLowerCase();
-  const items = cache.filter(r => {
-    const d = (r.fecha||'');
-    const dateOk = (!desde||d>=desde) && (!hasta||d<=hasta);
-    const pacOk  = !fPac  || (r.paciente||'').toLowerCase().includes(fPac);
-    const tipoOk = !fTipo || (r.tipo||'').toLowerCase().includes(fTipo);
+  var cache = mod==='lab' ? labCache : xrayCache;
+  var desde = document.getElementById(mod+'-f-desde').value;
+  var hasta = document.getElementById(mod+'-f-hasta').value;
+  var fPac  = (document.getElementById(mod+'-f-pac').value||'').toLowerCase();
+  var fTipo = (document.getElementById(mod+'-f-tipo').value||'').toLowerCase();
+  var items = cache.filter(function(r){
+    var d = (r.fecha||'');
+    var dateOk = (!desde||d>=desde) && (!hasta||d<=hasta);
+    var pacOk  = !fPac  || (r.paciente||'').toLowerCase().includes(fPac);
+    var tipoOk = !fTipo || (r.tipo||'').toLowerCase().includes(fTipo);
     return dateOk && pacOk && tipoOk;
   });
-  const div = document.getElementById(mod+'-list');
+  var div = document.getElementById(mod+'-list');
   if(!items.length){ div.innerHTML='<div class="card muted tc">Sin resultados para el filtro</div>'; return; }
   div.innerHTML = '<div class="tw"><table><thead><tr>'
-    +'<th>Fecha</th><th>Paciente</th><th>Empresa</th><th>Tipo de estudio</th><th>Observaciones</th><th>Archivo</th><th>Cargado por</th>'
+    +'<th>Fecha</th><th>Paciente</th><th>Empresa</th><th>Tipos de estudio</th><th>Observaciones</th><th>Archivo</th><th>Cargado por</th>'
     +'</tr></thead><tbody>'
-    + items.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')).map(r=>{
-      const fileLink = r.fileUrl ? '<a href="'+r.fileUrl+'" target="_blank" class="btn btn-o btn-sm">📄 Ver archivo</a>' : '<span class="muted">—</span>';
+    + items.sort(function(a,b){return (b.fecha||'').localeCompare(a.fecha||'');}).map(function(r){
+      var fileLink = r.fileUrl ? '<a href="'+r.fileUrl+'" target="_blank" class="btn btn-o btn-sm">📄 Ver archivo</a>' : '<span class="muted">—</span>';
       return '<tr>'
         +'<td>'+r.fecha+'</td>'
         +'<td>'+(r.paciente||'—')+'</td>'
@@ -3631,46 +3673,85 @@ function renderLabResults(mod) {
 }
 
 function saveLabResult(mod) {
-  const pac   = document.getElementById(mod+'-pac').value.trim();
-  const emp   = document.getElementById(mod+'-emp').value.trim();
-  const fecha = document.getElementById(mod+'-fecha').value;
-  const tipo  = document.getElementById(mod+'-tipo').value.trim();
-  const obs   = document.getElementById(mod+'-obs').value.trim();
-  const fileInput = document.getElementById(mod+'-file');
-  const errEl = document.getElementById('err-'+mod);
-  const statusEl = document.getElementById(mod+'-upload-status');
+  var pac   = document.getElementById(mod+'-pac').value.trim();
+  var emp   = document.getElementById(mod+'-emp').value.trim();
+  var fecha = document.getElementById(mod+'-fecha').value;
+  var obs   = document.getElementById(mod+'-obs').value.trim();
+  var fileInput = document.getElementById(mod+'-file');
+  var errEl = document.getElementById('err-'+mod);
+  var statusEl = document.getElementById(mod+'-upload-status');
   errEl.style.display='none';
-  if(!fecha||!tipo){ errEl.textContent='Fecha y tipo de estudio son obligatorios'; errEl.style.display='block'; return; }
+
+  // Get tipos: chip array for lab, text input for xray
+  var tipos = [];
+  if(mod==='lab') {
+    tipos = (labTiposData['lab']||[]).slice();
+  } else {
+    var tipoInp = document.getElementById(mod+'-tipo');
+    if(tipoInp && tipoInp.value.trim()) tipos = [tipoInp.value.trim()];
+  }
+  var tipoStr = tipos.join(', ');
+
+  if(!fecha || !tipos.length) {
+    errEl.textContent = mod==='lab'
+      ? 'Fecha y al menos un tipo de estudio son obligatorios'
+      : 'Fecha y tipo de estudio son obligatorios';
+    errEl.style.display='block';
+    return;
+  }
 
   function doSave(base64, fileName, mimeType) {
-    const rec = {
+    var rec = {
       id: Date.now().toString(),
       ts: new Date().toISOString(),
-      fecha: fecha, tipo: tipo, paciente: pac, empresa: emp,
+      fecha: fecha, tipo: tipoStr, tipos: tipos,
+      paciente: pac, empresa: emp,
       obs: obs, fileName: fileName, base64: base64, mimeType: mimeType,
       cargadoPor: currentUser ? currentUser.nombre : ''
     };
     statusEl.textContent = '⏳ Guardando...';
-    const action = mod==='lab' ? 'saveLabResult' : 'saveXrayResult';
+    var action = mod==='lab' ? 'saveLabResult' : 'saveXrayResult';
     gasPost({action:action, rec:rec}, function(r){
       statusEl.textContent = '';
-      if(!r.ok){ errEl.textContent=r.error||'Error al guardar'; errEl.style.display='block'; return; }
+      if(!r.ok){
+        errEl.textContent = r.error || 'Error al guardar. Verifica tu conexión e intenta de nuevo.';
+        errEl.style.display='block';
+        return;
+      }
       rec.fileUrl = r.fileUrl||'';
-      (mod==='lab'?labCache:xrayCache).push(rec);
+      (mod==='lab' ? labCache : xrayCache).push(rec);
       document.getElementById(mod+'-form').style.display='none';
-      ['pac','emp','fecha','tipo','obs'].forEach(k=>document.getElementById(mod+'-'+k).value='');
-      fileInput.value='';
+      // Reset form
+      ['pac','emp','fecha','obs'].forEach(function(k){
+        var el = document.getElementById(mod+'-'+k);
+        if(el) el.value='';
+      });
+      if(fileInput) fileInput.value='';
+      if(mod==='lab') {
+        labTiposData['lab'] = [];
+        renderLabTipos('lab');
+        var tipoInp2 = document.getElementById('lab-tipo-input');
+        if(tipoInp2) tipoInp2.value='';
+      } else {
+        var tipoEl = document.getElementById(mod+'-tipo');
+        if(tipoEl) tipoEl.value='';
+      }
       renderLabResults(mod);
     });
   }
 
-  if(fileInput.files && fileInput.files[0]) {
-    const file = fileInput.files[0];
-    const reader = new FileReader();
+  if(fileInput && fileInput.files && fileInput.files[0]) {
+    var file = fileInput.files[0];
+    var reader = new FileReader();
     statusEl.textContent = '📁 Leyendo archivo...';
     reader.onload = function(e){
-      const b64 = e.target.result.split(',')[1]||'';
+      var b64 = e.target.result.split(',')[1]||'';
       doSave(b64, file.name, file.type);
+    };
+    reader.onerror = function(){
+      statusEl.textContent='';
+      errEl.textContent='Error al leer el archivo seleccionado';
+      errEl.style.display='block';
     };
     reader.readAsDataURL(file);
   } else {
@@ -3963,8 +4044,16 @@ function saveHistorialNota() {
     <div class="fg"><label>Fecha del estudio *</label><input id="lab-fecha" type="date"></div>
   </div>
   <div class="form-row">
-    <div class="fg" style="flex:2"><label>Tipo de estudio *</label>
-      <input id="lab-tipo" type="text" list="lab-tipo-list" placeholder="Ej: Biometría hemática, Química sanguínea...">
+    <div class="fg" style="flex:2">
+      <label>Tipos de estudio * <span class="muted" style="font-size:.78em">(agrega uno o más)</span></label>
+      <div id="lab-tipos-chips" style="display:flex;flex-wrap:wrap;gap:5px;min-height:32px;border:1px solid var(--brd);border-radius:6px;padding:4px 6px;background:#f9f9f9;margin-bottom:5px">
+        <span style="color:#aaa;font-size:.82em;padding:2px 4px">Sin estudios seleccionados...</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <input id="lab-tipo-input" type="text" list="lab-tipo-list" placeholder="Escribe o selecciona un estudio..." style="flex:1;padding:6px 8px;border:1px solid var(--brd);border-radius:6px;font-size:.88em"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addLabTipo('lab');}">
+        <button type="button" onclick="addLabTipo('lab')" style="background:var(--teal);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:700;font-size:1.1em">+</button>
+      </div>
       <datalist id="lab-tipo-list">
         <option>Biometría hemática completa</option>
         <option>Química sanguínea</option>
@@ -3986,6 +4075,12 @@ function saveHistorialNota() {
         <option>Urocultivo</option>
         <option>Proteína C reactiva</option>
         <option>Factor reumatoide</option>
+        <option>Espirometría</option>
+        <option>Audiometría</option>
+        <option>Electrocardiograma</option>
+        <option>Examen de la vista</option>
+        <option>Coprocultivo</option>
+        <option>Panel hepático completo</option>
       </datalist>
     </div>
     <div class="fg"><label>Observaciones / Resultado texto</label><input id="lab-obs" type="text" placeholder="Resumen del resultado..."></div>
@@ -4020,11 +4115,11 @@ function saveHistorialNota() {
 <div id="screen-xray" class="screen">
 <div class="sec-hdr no-print">
   <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
-  <h2>🩻 Rayos X</h2>
+  <h2>🩻 Imagenología</h2>
   <button class="btn btn-p btn-sm" onclick="document.getElementById('xray-form').style.display=document.getElementById('xray-form').style.display==='none'?'':'none'">+ Cargar imagen</button>
 </div>
 <div id="xray-form" class="card" style="display:none">
-  <div class="card-title">Nueva imagen de Rayos X</div>
+  <div class="card-title">Nueva imagen de Imagenología</div>
   <div id="err-xray" class="alert alert-d" style="display:none"></div>
   <div class="form-row">
     <div class="fg"><label>Paciente</label><input id="xray-pac" type="text" placeholder="Nombre del paciente (opcional)"></div>
