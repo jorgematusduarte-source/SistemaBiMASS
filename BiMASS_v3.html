@@ -304,6 +304,11 @@ tr:hover td{background:#f0faf9}
     <div class="fg"><label>Número ID</label><input id="np-numId" type="text"></div>
     <div class="fg"><label>Grupo sanguíneo</label><select id="np-gs"><option value="">—</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
   </div>
+  <div class="form-row">
+    <div class="fg" style="flex:1.5"><label>Derechohabiencia</label><select id="np-derecho"><option value="Particular">Particular</option><option value="IMSS">IMSS</option><option value="ISSSTE">ISSSTE</option><option value="Pemex">Pemex</option><option value="SEDENA">SEDENA</option><option value="SEMAR">SEMAR</option><option value="INSABI">INSABI</option><option value="Otro">Otro</option></select></div>
+    <div class="fg" style="flex:1.5"><label>Núm. afiliación</label><input id="np-num-afil" type="text" placeholder="Número de afiliación (si aplica)"></div>
+    <div class="fg" style="flex:1"><label>NHC</label><input id="np-nhc" type="text" readonly placeholder="Auto (BiM-0001)" style="background:var(--bg2);font-weight:700;color:var(--teal)"></div>
+  </div>
   <div class="form-row"><div class="fg w100"><label>Alergias conocidas</label><input id="np-alrg" type="text" placeholder="Ninguna conocida"></div></div>
   <div id="err-np" class="alert alert-d" style="display:none"></div>
   <button class="btn btn-s mt8" onclick="saveNewPatient()">Registrar y continuar →</button>
@@ -376,6 +381,7 @@ tr:hover td{background:#f0faf9}
   <h2 id="clin-title">Atención Clínica</h2>
   <button class="btn btn-p btn-sm" onclick="saveVisit()">💾 Guardar</button>
   <button class="btn btn-s btn-sm" onclick="printVisita()">🖨 Imprimir visita</button>
+  <button class="btn btn-o btn-sm" onclick="exportHL7()" title="Exportar expediente en formato HL7 CDA R2 (NOM-024)">📄 HL7</button>
 </div>
 <div class="aler-alrg" id="alrg-banner2"></div>
 <div class="tabs no-print">
@@ -532,6 +538,27 @@ tr:hover td{background:#f0faf9}
   <div class="card">
     <div class="card-title">📝 Padecimiento actual</div>
     <div class="fg w100"><textarea id="hc-pad" rows="4" placeholder="Motivo de consulta y padecimiento actual..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="exam-hdr"><input type="checkbox" id="chk-soap" checked onchange="toggleExam('soap',this.checked)"><span>🗒 Nota SOAP (NOM-024)</span></div>
+    <div id="body-soap" class="exam-body">
+      <div class="form-row" style="align-items:flex-start">
+        <div class="fg w100"><label style="color:#1565c0;font-weight:700">S — Subjetivo <span style="font-weight:400;font-size:.82em;color:#636875">(síntomas referidos por el paciente)</span></label>
+          <textarea id="soap-s" rows="3" placeholder="¿Qué refiere el paciente? Evolución, intensidad, factores que agravan o alivian..."></textarea></div>
+      </div>
+      <div class="form-row" style="align-items:flex-start">
+        <div class="fg w100"><label style="color:#1565c0;font-weight:700">O — Objetivo <span style="font-weight:400;font-size:.82em;color:#636875">(hallazgos del médico)</span></label>
+          <textarea id="soap-o" rows="3" placeholder="Exploración física, signos vitales relevantes, resultados de laboratorio..."></textarea></div>
+      </div>
+      <div class="form-row" style="align-items:flex-start">
+        <div class="fg w100"><label style="color:#1565c0;font-weight:700">A — Análisis <span style="font-weight:400;font-size:.82em;color:#636875">(impresión diagnóstica)</span></label>
+          <textarea id="soap-a" rows="3" placeholder="Diagnóstico o diagnósticos diferenciales..."></textarea></div>
+      </div>
+      <div class="form-row" style="align-items:flex-start">
+        <div class="fg w100"><label style="color:#1565c0;font-weight:700">P — Plan <span style="font-weight:400;font-size:.82em;color:#636875">(tratamiento y seguimiento)</span></label>
+          <textarea id="soap-p" rows="3" placeholder="Tratamiento, indicaciones, próxima cita, estudios a solicitar..."></textarea></div>
+      </div>
+    </div>
   </div>
   <div class="card" id="hc-riesgo-wrap">
     <div class="exam-hdr"><input type="checkbox" id="chk-rt" checked onchange="toggleExam('rt',this.checked)"><span>⚠ Investigación de riesgo de trabajo</span></div>
@@ -1184,6 +1211,16 @@ tr:hover td{background:#f0faf9}
     <div class="fg"><label>Especialidad</label><input id="au-esp" type="text"></div>
     <div class="fg"><label>Teléfono</label><input id="au-tel" type="tel"></div>
   </div>
+  <div class="form-row" style="align-items:flex-end">
+    <div class="fg" style="flex:2">
+      <label>📎 Foto de cédula profesional <span style="font-size:.78em;color:#636875">(se añade marca de agua automáticamente)</span></label>
+      <input type="file" id="au-cedula-img" accept="image/*" onchange="previewCedula(this)" style="margin-top:4px">
+    </div>
+    <div class="fg" style="flex:1;text-align:center">
+      <canvas id="cedula-preview-canvas" style="max-width:100%;max-height:120px;border:1px solid var(--brd);border-radius:6px;display:none"></canvas>
+      <span id="cedula-preview-none" style="font-size:.8em;color:#999">Sin imagen seleccionada</span>
+    </div>
+  </div>
   <div class="form-row">
     <div class="fg"><label>CURP</label><input id="au-curp" type="text" style="text-transform:uppercase"></div>
     <div class="fg"><label>RFC</label><input id="au-rfc" type="text" style="text-transform:uppercase"></div>
@@ -1375,7 +1412,7 @@ function renderCotizaciones(items) {
       '<td style="padding:8px 10px">' + (c.empresa||'NO APLICA') + '</td>' +
       '<td style="padding:8px 10px;text-align:right;font-weight:600">' + monto + '</td>' +
       '<td style="padding:8px 10px;text-align:center">' +
-        '<select onchange="updateCotizStatus('' + c.id + '',this.value,'+idx+')" style="padding:3px 7px;border-radius:12px;font-size:.8em;font-weight:600;border:none;cursor:pointer;' + stSty + '">' +
+        '<select onchange="updateCotizStatus(\'' + c.id + '\',this.value,'+idx+')" style="padding:3px 7px;border-radius:12px;font-size:.8em;font-weight:600;border:none;cursor:pointer;' + stSty + '">' +
           '<option value="Cotizado"' + (st==='Cotizado'?' selected':'') + '>● Cotizado</option>' +
           '<option value="Vendido"'  + (st==='Vendido' ?' selected':'') + '>● Vendido</option>'  +
           '<option value="Perdido"'  + (st==='Perdido' ?' selected':'') + '>● Perdido</option>'  +
@@ -1977,11 +2014,16 @@ function saveNewPatient() {
     tipoId: document.getElementById('np-tipoId').value,
     numId: document.getElementById('np-numId').value.trim(),
     grupoSanguineo: document.getElementById('np-gs').value,
-    alergias: document.getElementById('np-alrg').value.trim() || 'Ninguna conocida'
+    alergias: document.getElementById('np-alrg').value.trim() || 'Ninguna conocida',
+    derechohabiencia: document.getElementById('np-derecho').value || 'Particular',
+    numAfiliacion: document.getElementById('np-num-afil').value.trim()
   };
   gasPost({action:'savePatient', patient:p}, function(r) {
     if(!r.ok) { err.textContent = r.error||'Error al guardar'; err.style.display='block'; return; }
-    p.id = r.id || p.id;
+    p.id  = r.id  || p.id;
+    p.nhc = r.nhc || p.nhc;
+    const nhcEl = document.getElementById('np-nhc');
+    if(nhcEl && p.nhc) nhcEl.value = p.nhc;
     currentPatient = p;
     showVTypeScreen();
   });
@@ -2035,17 +2077,69 @@ function startVisit() {
   if(!currentVisitType) { alert('Selecciona el tipo de visita'); return; }
   currentVisitSeq = document.getElementById('vtype-seq').value;
   prevVisitRef = document.getElementById('vtype-prev-sel').value || null;
-  // Find previous visit data for auto-fill
+  // Show Consentimiento Informado modal before starting visit (NOM-024)
+  showCIModal();
+}
+
+function showCIModal() {
+  const p = currentPatient||{};
+  const u = currentUser||{};
+  document.getElementById('ci-paciente-name').textContent = p.nombre||'—';
+  document.getElementById('ci-visit-type').textContent = currentVisitType||'—';
+  document.getElementById('ci-medico-name').textContent = u.nombre||'—';
+  // Reset checkboxes
+  ['ci-chk1','ci-chk2','ci-chk3'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) { el.checked = false; el.onchange = updateCIBtn; }
+  });
+  document.getElementById('ci-accept-btn').disabled = true;
+  document.getElementById('ci-error').style.display = 'none';
+  document.getElementById('ci-modal').style.display = 'block';
+}
+
+function updateCIBtn() {
+  const all = ['ci-chk1','ci-chk2','ci-chk3'].every(id => {
+    const el = document.getElementById(id); return el && el.checked;
+  });
+  document.getElementById('ci-accept-btn').disabled = !all;
+  document.getElementById('ci-error').style.display = 'none';
+}
+
+function closeCIModal() {
+  document.getElementById('ci-modal').style.display = 'none';
+}
+
+function acceptConsentimiento() {
+  const all = ['ci-chk1','ci-chk2','ci-chk3'].every(id => {
+    const el = document.getElementById(id); return el && el.checked;
+  });
+  if(!all) { document.getElementById('ci-error').style.display = 'block'; return; }
+  // Save consent record
+  const p = currentPatient||{};
+  const u = currentUser||{};
+  const ciRecord = {
+    pacienteId: p.id||'', pacienteNombre: p.nombre||'',
+    medico: u.nombre||'', medicoId: u.id||'',
+    tipoVisita: currentVisitType,
+    fecha: new Date().toISOString(),
+    aceptado: true
+  };
+  // Store in session for audit trail
+  window._ciRecord = ciRecord;
+  closeCIModal();
+  // Now actually start the visit
   let prevData = null;
   if(prevVisitsData.length) {
     if(prevVisitRef) {
       prevData = prevVisitsData.find(v => v.id === prevVisitRef) || prevVisitsData[0];
     } else {
-      prevData = prevVisitsData[0]; // more recent
+      prevData = prevVisitsData[0];
     }
   }
   initClinical(prevData);
   showScreen('clinical');
+  // Log consent to audit
+  gasPost({action:'logAudit', entry:{tipo:'consentimiento', pacienteId:p.id, medicoId:u.id, fecha:ciRecord.fecha, tipoVisita:currentVisitType}}, function(){});
 }
 
 // ── CLINICAL INIT ────────────────────────────────────────
@@ -2653,6 +2747,7 @@ function collectVisit() {
       laboral:OCC_TYPES.includes(currentVisitType)?{antiguedad:v('hl-antig'),turno:v('hl-turno'),hrs:v('hl-hrs'),actividades:v('hl-act'),epp:v('hl-epp'),riesgos:v('hl-riesgos'),prevJobs:[...prevJobs]}:null,
       gine:v('hc-sexo')==='Femenino'?{fum:v('gine-fum'),menarq:v('gine-menarq'),ritmo:v('gine-ritmo'),g:v('gine-g'),p:v('gine-p'),c:v('gine-c'),a:v('gine-a'),mac:v('gine-mac'),embarazo:v('gine-emb'),sdg:v('gine-sdg')}:null,
       laboratorios:labItems, padecimiento:v('hc-pad'),
+      soap:document.getElementById('chk-soap')&&document.getElementById('chk-soap').checked?{s:v('soap-s'),o:v('soap-o'),a:v('soap-a'),p:v('soap-p')}:null,
       riesgo:OCC_TYPES.includes(currentVisitType)?{fecha:v('rt-fecha'),hora:v('rt-hora'),tipo:v('rt-tipo'),probableRiesgo:v('rt-prob-riesgo'),edad:v('rt-edad'),sexo:v('rt-sexo'),talla:v('rt-talla'),peso:v('rt-peso'),mano:v('rt-mano'),turno:v('rt-turno'),supervisor:v('rt-supervisor'),supervisorEmail:v('rt-supervisor-email'),agente:v('rt-agente'),asociado:v('rt-asociado'),parteCuerpo:v('rt-parte-cuerpo'),desc:v('rt-desc'),medidas:v('rt-medidas')}:null,
       secuencia:currentVisitSeq, visitaPreviaRef:prevVisitRef
     },
@@ -2687,8 +2782,12 @@ function saveVisit() {
   const medico = currentUser ? currentUser.nombre : 'Sistema';
   if(!ev._audit) ev._audit = [];
   ev._audit.push({medico: medico, fecha: ahora, accion: 'guardado'});
+  if(window._ciRecord) ev._consentimiento = window._ciRecord;
   gasPost({action:'save', eval:ev}, function(r) {
     if(!r.ok){ alert('Error al guardar: '+(r.error||'')); return; }
+    // Log to audit trail (NOM-024)
+    const _p = currentPatient||{};
+    gasPost({action:'logAudit', entry:{tipo:'guardado', visitaId:r.id||'', pacienteId:_p.id||'', paciente:_p.nombre||'', medicoId:currentUser&&currentUser.id||'', medico:medico, hash:r.hash||'', fecha:ahora}}, function(){});
     if(ev.docs && ev.docs.receta && ev.docs.receta.medicamentos && ev.docs.receta.medicamentos.length) {
       const rx = {paciente:(currentPatient?currentPatient.nombre:''), medico:currentUser.nombre, cedula:currentUser.cedula||'', diagnostico:ciePrimary?ciePrimary.c+' '+ciePrimary.d:'', medicamentos:ev.docs.receta.medicamentos};
       gasPost({action:'saveRx', rx:rx}, function(){});
@@ -3495,6 +3594,48 @@ function toggleAddUserForm() {
   document.getElementById('err-adduser').style.display='none';
   document.getElementById('ok-adduser').style.display='none';
 }
+function previewCedula(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.getElementById('cedula-preview-canvas');
+      const maxW = 280, maxH = 180;
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = h*(maxW/w); w = maxW; }
+      if(h > maxH){ w = w*(maxH/h); h = maxH; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      // Watermark
+      ctx.save();
+      ctx.globalAlpha = 0.35;
+      ctx.font = 'bold '+(Math.round(w/8))+'px Arial';
+      ctx.fillStyle = '#2a4e7a';
+      ctx.translate(w/2, h/2);
+      ctx.rotate(-Math.PI/6);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('BiMASS', 0, 0);
+      ctx.font = 'bold '+(Math.round(w/14))+'px Arial';
+      ctx.fillText('© USO EXCLUSIVO CLÍNICA', 0, Math.round(w/8)+4);
+      ctx.restore();
+      canvas.style.display = 'block';
+      document.getElementById('cedula-preview-none').style.display = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function getCedulaWatermarkedBase64() {
+  const canvas = document.getElementById('cedula-preview-canvas');
+  if(!canvas || canvas.style.display === 'none') return null;
+  return canvas.toDataURL('image/png');
+}
+
 function saveNewUser() {
   const nombre = document.getElementById('au-nombre').value.trim();
   const email = document.getElementById('au-email').value.trim();
@@ -3522,6 +3663,18 @@ function saveNewUser() {
       ok.textContent='✅ Usuario "'+nombre+'" creado y aprobado con perfil '+perfil;
       ok.style.display='block';
       ['au-nombre','au-email','au-pass','au-cedula','au-esp','au-tel','au-curp','au-rfc','au-ciudad','au-dir'].forEach(id=>document.getElementById(id).value='');
+      // Upload cédula photo with watermark if present
+      const cedulaB64 = getCedulaWatermarkedBase64();
+      if(cedulaB64 && r2.userId) {
+        gasPost({action:'saveCedulaFoto', userId:r2.userId, base64:cedulaB64, mimeType:'image/png'}, function(cr){
+          if(cr && cr.cedulaUrl) ok.textContent += ' · 📎 Cédula guardada';
+        });
+      }
+      const cedulaInput = document.getElementById('au-cedula-img');
+      if(cedulaInput) cedulaInput.value = '';
+      const previewCanvas = document.getElementById('cedula-preview-canvas');
+      if(previewCanvas) previewCanvas.style.display = 'none';
+      document.getElementById('cedula-preview-none').style.display = 'inline';
       loadUsers();
     });
   });
@@ -3626,8 +3779,9 @@ function printWin(html, titulo, extraButtons) {
     +'\n</body></html>');
   w.document.close();
 }
-function docHeader(titulo, subtitulo) {
-  return '<div class="header">'+LOGO_SVG_PRINT+'<div><h2 style="color:#2a4e7a;margin:0">'+titulo+'</h2><div style="color:#636875;font-size:.85em">'+subtitulo+'</div><div style="color:#636875;font-size:.78em">Clínica BiMASS · Hermosillo, Sonora · RFC: CBI260129AM4 · Tel: 662 4265969</div></div></div>';
+function docHeader(titulo, subtitulo, nhc) {
+  var nhcTag = nhc ? '<span style="margin-left:12px;background:#e0f7fa;color:#00796b;padding:1px 7px;border-radius:10px;font-size:.8em;font-weight:700">'+nhc+'</span>' : '';
+  return '<div class="header">'+LOGO_SVG_PRINT+'<div><h2 style="color:#2a4e7a;margin:0">'+titulo+nhcTag+'</h2><div style="color:#636875;font-size:.85em">'+subtitulo+'</div><div style="color:#636875;font-size:.78em">Clínica BiMASS · Hermosillo, Sonora · RFC: CBI260129AM4 · Tel: 662 4265969</div></div></div>';
 }
 function sigBox() {
   const u = currentUser;
@@ -3646,15 +3800,24 @@ function printVisita() {
   const ev = collectVisit();
   const p = currentPatient||{};
   const u = currentUser||{};
+  // Audit: log impresión (NOM-024)
+  gasPost({action:'logAudit', entry:{tipo:'impresion', pacienteId:p.id||'', paciente:p.nombre||'', medicoId:u.id||'', medico:u.nombre||'', fecha:new Date().toISOString()}}, function(){});
   function pchk(id){ const el=document.getElementById(id); return !el || el.checked; }
-  let html = docHeader('Reporte de Visita Médica', ev.hc.tipoVisita||'')
+  let html = docHeader('Reporte de Visita Médica', ev.hc.tipoVisita||'', (currentPatient&&currentPatient.nhc)||'')
     + '<p style="font-size:.82em;color:#666">Fecha: '+new Date().toLocaleString('es-MX')+'</p>';
 
   // Ficha (siempre imprime)
-  html += '<h3>Ficha de Identificación</h3><table><tr><td><strong>Paciente:</strong> '+ev.hc.nombre+'</td><td><strong>Sexo:</strong> '+ev.hc.sexo+'</td><td><strong>F. Nac:</strong> '+fmtDate(ev.hc.fnac)+'</td></tr>'
+  const _nhc = (currentPatient&&currentPatient.nhc)||'';
+  const _derecho = (currentPatient&&currentPatient.derechohabiencia)||'';
+  const _numAfil = (currentPatient&&currentPatient.numAfiliacion)||'';
+  html += '<h3>Ficha de Identificación</h3><table>'
+    +'<tr><td><strong>Paciente:</strong> '+ev.hc.nombre+'</td><td><strong>Sexo:</strong> '+ev.hc.sexo+'</td><td><strong>F. Nac:</strong> '+fmtDate(ev.hc.fnac)+'</td></tr>'
+    +'<tr><td><strong>NHC:</strong> <span style="font-weight:700;color:#28aaa4">'+(_nhc||'—')+'</span></td>'
+    +'<td><strong>Derechohabiencia:</strong> '+(_derecho||'Particular')+(_numAfil?' ('+_numAfil+')':'')+'</td>'
+    +'<td><strong>Grupo sg.:</strong> '+ev.hc.grupoSanguineo+'</td></tr>'
     +'<tr><td><strong>CURP:</strong> '+ev.hc.curp+'</td><td><strong>RFC:</strong> '+ev.hc.rfc+'</td><td><strong>Tel:</strong> '+ev.hc.telefono+'</td></tr>'
     +'<tr><td colspan="3"><strong>Domicilio:</strong> '+ev.hc.calle+' '+ev.hc.numero+', Col. '+ev.hc.colonia+'</td></tr>'
-    +'<tr><td><strong>Empresa:</strong> '+ev.hc.empresa+'</td><td><strong>Puesto:</strong> '+ev.hc.puesto+'</td><td><strong>Grupo sg.:</strong> '+ev.hc.grupoSanguineo+'</td></tr>'
+    +'<tr><td><strong>Empresa:</strong> '+ev.hc.empresa+'</td><td><strong>Puesto:</strong> '+ev.hc.puesto+'</td><td></td></tr>'
     +(ev.hc.alergias&&ev.hc.alergias!=='Ninguna conocida'?'<tr><td colspan="3" style="background:#ffebee;color:#e53935"><strong>⚠ ALERGIAS: '+ev.hc.alergias+'</strong></td></tr>':'')
     +'</table>';
 
@@ -3707,6 +3870,17 @@ function printVisita() {
   }
   // Padecimiento
   if(ev.hc.padecimiento) html += '<h3>Padecimiento Actual</h3><p>'+ev.hc.padecimiento+'</p>';
+
+  // Nota SOAP
+  if(pchk('chk-soap') && ev.hc.soap && (ev.hc.soap.s||ev.hc.soap.o||ev.hc.soap.a||ev.hc.soap.p)) {
+    const soap = ev.hc.soap;
+    html += '<h3>Nota de Evolución SOAP</h3><table style="width:100%">';
+    if(soap.s) html += '<tr><td style="width:8%;background:#e3f2fd;font-weight:700;color:#1565c0;vertical-align:top;padding:6px">S</td><td style="padding:6px">'+soap.s+'</td></tr>';
+    if(soap.o) html += '<tr><td style="background:#e8f5e9;font-weight:700;color:#2e7d32;vertical-align:top;padding:6px">O</td><td style="padding:6px">'+soap.o+'</td></tr>';
+    if(soap.a) html += '<tr><td style="background:#fff8e1;font-weight:700;color:#f57f17;vertical-align:top;padding:6px">A</td><td style="padding:6px">'+soap.a+'</td></tr>';
+    if(soap.p) html += '<tr><td style="background:#fce4ec;font-weight:700;color:#c62828;vertical-align:top;padding:6px">P</td><td style="padding:6px">'+soap.p+'</td></tr>';
+    html += '</table>';
+  }
 
   // Examen físico
   if(pchk('chk-fisico') && ev.exams.fisico) {
@@ -3780,14 +3954,196 @@ function printVisita() {
 function printRx() {
   if(!rxMeds.length){ alert('No hay medicamentos en la receta'); return; }
   const p = currentPatient||{}; const u = currentUser||{};
+  const cedulaUrl = u.cedulaUrl||'';
+  const qrId = 'rx-qr-'+Date.now();
+  // QR div placeholder — will render after printWin opens
+  const qrBlock = cedulaUrl
+    ? '<div style="display:flex;align-items:center;gap:16px;margin-top:20px;padding-top:12px;border-top:1px solid #ddd">'
+      +'<div id="'+qrId+'" style="width:72px;height:72px;flex-shrink:0"></div>'
+      +'<div style="font-size:.76em;color:#555"><strong>Verificación de cédula médica</strong><br>Escanea el QR para ver la cédula oficial<br><span style="color:#28aaa4">Clínica BiMASS · NOM-024-SSA3-2012</span></div>'
+      +'</div>'
+    : '';
   let html = docHeader('Receta Médica','')
     +'<p><strong>Paciente:</strong> '+p.nombre+' &nbsp; <strong>Fecha:</strong> '+new Date().toLocaleDateString('es-MX')+'</p>'
     +(ciePrimary?'<p><strong>Dx:</strong> '+ciePrimary.c+' — '+ciePrimary.d+'</p>':'')
     +'<table><tr><th>Medicamento</th><th>Dosis</th><th>Frecuencia</th><th>Duración</th><th>Cant.</th></tr>'
     + rxMeds.map(m=>'<tr><td>'+m.nombre+'</td><td>'+m.dosis+'</td><td>'+m.frecuencia+'</td><td>'+m.duracion+'</td><td>'+m.cantidad+'</td></tr>').join('')+'</table>'
     +(rxMeds[0]&&rxMeds[0].indicaciones?'<p><strong>Indicaciones:</strong> '+rxMeds[0].indicaciones+'</p>':'')
-    + sigBox();
-  printWin(html, 'Receta');
+    + sigBox()
+    + qrBlock;
+  // Extra script to render QR after window opens
+  const qrScript = cedulaUrl ? (
+    '<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>'
+    +'<script>window.onload=function(){'
+    +'var el=document.getElementById("'+qrId+'");'
+    +'if(el&&typeof QRCode!=="undefined"){ new QRCode(el,{text:"'+cedulaUrl.replace(/"/g,'\"')+'",width:72,height:72,colorDark:"#2a4e7a",colorLight:"#ffffff"}); }'
+    +'};<\/script>'
+  ) : '';
+  printWin(html + qrScript, 'Receta');
+}
+
+function exportHL7() {
+  const ev = collectVisit();
+  const p = currentPatient||{};
+  const u = currentUser||{};
+  const now = new Date();
+  const ts = now.toISOString().replace(/[-:]/g,'').split('.')[0];
+  const docId = (p.id||'BIMASS') + '_' + ts;
+  const nhc = p.nhc||'';
+  const curp = p.curp||ev.hc.curp||'';
+  const sexCode = (ev.hc.sexo||p.sexo||'')==='Femenino'?'F':'M';
+  const fechaNac = (p.fechaNac||ev.hc.fnac||'').replace(/-/g,'');
+  const medNombre = u.nombre||'Médico BiMASS';
+  const medCedula = u.cedula||'';
+  const medEsp = u.especialidad||'Medicina del Trabajo';
+
+  // Build diagnoses section
+  let dxEntries = '';
+  if(ev.conclusion && ev.conclusion.ciePrimary) {
+    const dx = ev.conclusion.ciePrimary;
+    dxEntries += '<entry typeCode="DRIV"><observation classCode="OBS" moodCode="EVN">' +
+      '<code code="'+dx.c+'" codeSystem="2.16.840.1.113883.6.90" codeSystemName="ICD-10" displayName="'+dx.d+'"/>' +
+      '<statusCode code="completed"/>' +
+      '</observation></entry>';
+  }
+  if(ev.conclusion && ev.conclusion.cieSecondary && ev.conclusion.cieSecondary.length) {
+    ev.conclusion.cieSecondary.forEach(function(dx) {
+      dxEntries += '<entry typeCode="DRIV"><observation classCode="OBS" moodCode="EVN">' +
+        '<code code="'+dx.c+'" codeSystem="2.16.840.1.113883.6.90" codeSystemName="ICD-10" displayName="'+dx.d+'"/>' +
+        '<statusCode code="completed"/>' +
+        '</observation></entry>';
+    });
+  }
+
+  // Build medications section
+  let rxEntries = '';
+  if(ev.docs && ev.docs.receta && ev.docs.receta.medicamentos) {
+    ev.docs.receta.medicamentos.forEach(function(m, i) {
+      rxEntries += '<entry typeCode="DRIV"><substanceAdministration classCode="SBADM" moodCode="RQO">' +
+        '<id root="2.16.840.1.113883.4.642" extension="med'+i+'"/>' +
+        '<statusCode code="active"/>' +
+        '<routeCode nullFlavor="OTH"/>' +
+        '<doseQuantity value="'+m.dosis+'"/>' +
+        '<consumable><manufacturedProduct classCode="MANU"><manufacturedMaterial>' +
+        '<code code="" codeSystem="2.16.840.1.113883.6.69" displayName="'+m.nombre+'"/>' +
+        '<name>'+m.nombre+'</name>' +
+        '</manufacturedMaterial></manufacturedProduct></consumable>' +
+        '</substanceAdministration></entry>';
+    });
+  }
+
+  // Build vital signs section
+  let vitalEntries = '';
+  if(ev.exams && ev.exams.fisico) {
+    const ef = ev.exams.fisico;
+    const vitals = [{code:'59408-5',name:'Saturación O2',val:ef.spo2,unit:'%'},{code:'8310-5',name:'Temperatura',val:ef.temp,unit:'Cel'},{code:'8867-4',name:'FC',val:ef.fc,unit:'/min'},{code:'9279-1',name:'FR',val:ef.fr,unit:'/min'},{code:'8480-6',name:'TA sistólica',val:ef.ta,unit:'mm[Hg]'}];
+    vitals.forEach(function(v) {
+      if(!v.val) return;
+      vitalEntries += '<component><observation classCode="OBS" moodCode="EVN">' +
+        '<code code="'+v.code+'" codeSystem="2.16.840.1.113883.6.1" displayName="'+v.name+'"/>' +
+        '<statusCode code="completed"/>' +
+        '<value xsi:type="PQ" value="'+v.val+'" unit="'+v.unit+'"/>' +
+        '</observation></component>';
+    });
+  }
+
+  // Build SOAP note section
+  let soapText = '';
+  if(ev.hc && ev.hc.soap) {
+    const s = ev.hc.soap;
+    if(s.s) soapText += 'S: '+s.s+'\n';
+    if(s.o) soapText += 'O: '+s.o+'\n';
+    if(s.a) soapText += 'A: '+s.a+'\n';
+    if(s.p) soapText += 'P: '+s.p;
+  } else if(ev.hc && ev.hc.padecimiento) {
+    soapText = ev.hc.padecimiento;
+  }
+
+  const xmlDoc = '<?xml version="1.0" encoding="UTF-8"?>' +
+  '<ClinicalDocument xmlns="urn:hl7-org:v3"' +
+  '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
+  '  xsi:schemaLocation="urn:hl7-org:v3 CDA.xsd">' +
+  '<typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>' +
+  '<id root="2.16.840.1.113883.2.4.6.3" extension="'+docId+'"/>' +
+  '<code code="34133-9" codeSystem="2.16.840.1.113883.6.1" displayName="Resumen de Historia Clínica"/>' +
+  '<title>Expediente Clínico Electrónico — Clínica BiMASS</title>' +
+  '<effectiveTime value="'+ts+'"/>' +
+  '<confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>' +
+  '<languageCode code="es-MX"/>' +
+  '<!-- PATIENT -->' +
+  '<recordTarget><patientRole>' +
+    '<id extension="'+nhc+'" root="2.16.840.1.113883.2.4.6.3" assigningAuthorityName="ClínicaBiMASS-NHC"/>' +
+    '<id extension="'+curp+'" root="2.16.840.1.113883.2.4.3.32.1.2" assigningAuthorityName="RENAPO-CURP"/>' +
+    '<addr><city>Hermosillo</city><state>Sonora</state><country>MX</country></addr>' +
+    '<telecom value="tel:'+p.telefono+'" use="HP"/>' +
+    '<patient>' +
+      '<name><given>'+p.nombre+'</given></name>' +
+      '<administrativeGenderCode code="'+sexCode+'" codeSystem="2.16.840.1.113883.5.1"/>' +
+      '<birthTime value="'+fechaNac+'"/>' +
+    '</patient>' +
+  '</patientRole></recordTarget>' +
+  '<!-- AUTHOR -->' +
+  '<author>' +
+    '<time value="'+ts+'"/>' +
+    '<assignedAuthor>' +
+      '<id extension="'+medCedula+'" root="2.16.840.1.113883.2.4.6.3"/>' +
+      '<assignedPerson><name><given>'+medNombre+'</given></name></assignedPerson>' +
+      '<representedOrganization>' +
+        '<id root="2.16.840.1.113883.2.4.6.3" extension="CBI260129AM4"/>' +
+        '<name>Clínica BiMASS</name>' +
+        '<telecom value="tel:6624265969"/>' +
+        '<addr><city>Hermosillo</city><state>Sonora</state><country>MX</country></addr>' +
+      '</representedOrganization>' +
+    '</assignedAuthor>' +
+  '</author>' +
+  '<!-- BODY -->' +
+  '<component><structuredBody>' +
+    // --- Diagnoses section ---
+    (dxEntries ? (
+    '<component><section>' +
+    '<templateId root="2.16.840.1.113883.10.20.22.2.5.1"/>' +
+    '<code code="11450-4" codeSystem="2.16.840.1.113883.6.1" displayName="Diagnósticos y Problemas"/>' +
+    '<title>Diagnósticos</title>' +
+    '<text>' + (ev.conclusion&&ev.conclusion.ciePrimary?ev.conclusion.ciePrimary.c+' '+ev.conclusion.ciePrimary.d:'') + '</text>' +
+    dxEntries +
+    '</section></component>') : '') +
+    // --- Medications section ---
+    (rxEntries ? (
+    '<component><section>' +
+    '<templateId root="2.16.840.1.113883.10.20.22.2.1.1"/>' +
+    '<code code="10160-0" codeSystem="2.16.840.1.113883.6.1" displayName="Medicamentos"/>' +
+    '<title>Medicamentos</title>' +
+    rxEntries +
+    '</section></component>') : '') +
+    // --- Vital signs section ---
+    (vitalEntries ? (
+    '<component><section>' +
+    '<templateId root="2.16.840.1.113883.10.20.22.2.4.1"/>' +
+    '<code code="8716-3" codeSystem="2.16.840.1.113883.6.1" displayName="Signos vitales"/>' +
+    '<title>Signos Vitales</title>' +
+    '<entry typeCode="DRIV"><organizer classCode="CLUSTER" moodCode="EVN">' +
+    '<statusCode code="completed"/>' + vitalEntries + '</organizer></entry>' +
+    '</section></component>') : '') +
+    // --- Notes / SOAP section ---
+    (soapText ? (
+    '<component><section>' +
+    '<templateId root="2.16.840.1.113883.10.20.22.2.65"/>' +
+    '<code code="51847-2" codeSystem="2.16.840.1.113883.6.1" displayName="Evaluación + Plan de Tratamiento"/>' +
+    '<title>Nota de Evolución</title>' +
+    '<text>'+soapText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</text>' +
+    '</section></component>') : '') +
+  '</structuredBody></component>' +
+  '</ClinicalDocument>';
+
+  // Download as XML file
+  const blob = new Blob([xmlDoc], {type:'application/xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'HL7_CDA_'+nhc+'_'+ts.slice(0,8)+'.xml';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 500);
 }
 
 function printCert(tipo) {
@@ -5389,6 +5745,55 @@ function saveHistorialNota() {
   </div>
 </div>
 </div><!-- end screen-cotiz -->
+
+
+<!-- ═══ MODAL: CONSENTIMIENTO INFORMADO NOM-024 ═══ -->
+<div id="ci-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:10000;overflow-y:auto">
+  <div style="background:#fff;max-width:640px;margin:40px auto;border-radius:12px;padding:32px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:2em">🏥</div>
+      <h2 style="color:#2a4e7a;margin:6px 0">Consentimiento Informado</h2>
+      <p style="color:#636875;font-size:.85em;margin:0">Clínica BiMASS · NOM-024-SSA3-2012</p>
+    </div>
+    <div id="ci-body" style="background:#f8f9fa;border-radius:8px;padding:16px;font-size:.88em;max-height:260px;overflow-y:auto;margin-bottom:16px;line-height:1.6">
+      <p><strong>Estimado/a paciente,</strong></p>
+      <p>De acuerdo con la <strong>NOM-024-SSA3-2012</strong> de expediente clínico electrónico, le informamos que:</p>
+      <ul style="margin:8px 0;padding-left:20px">
+        <li>Sus datos personales y de salud serán almacenados en un expediente clínico electrónico conforme a la normativa mexicana.</li>
+        <li>La información será utilizada exclusivamente para la prestación de servicios médicos en Clínica BiMASS.</li>
+        <li>Sus datos están protegidos bajo la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares</strong>.</li>
+        <li>Tiene derecho a acceder, rectificar, cancelar u oponerse al tratamiento de sus datos (derechos ARCO).</li>
+        <li>El expediente podrá ser compartido con médicos tratantes o autoridades sanitarias cuando la ley lo requiera.</li>
+        <li>Sus datos de salud no serán compartidos con terceros sin su consentimiento expreso, salvo por imperativo legal.</li>
+      </ul>
+      <p>Al aceptar este consentimiento, confirma que ha leído y comprendido las condiciones anteriores.</p>
+    </div>
+    <div id="ci-checks" style="margin-bottom:20px">
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer">
+        <input type="checkbox" id="ci-chk1" style="margin-top:2px;width:16px;height:16px;flex-shrink:0">
+        <span style="font-size:.88em">Acepto que mis datos de salud sean almacenados en el expediente clínico electrónico de Clínica BiMASS.</span>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer">
+        <input type="checkbox" id="ci-chk2" style="margin-top:2px;width:16px;height:16px;flex-shrink:0">
+        <span style="font-size:.88em">He sido informado/a sobre mis derechos ARCO y la Ley Federal de Protección de Datos Personales.</span>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+        <input type="checkbox" id="ci-chk3" style="margin-top:2px;width:16px;height:16px;flex-shrink:0">
+        <span style="font-size:.88em">Autorizo al personal médico de Clínica BiMASS a realizar la evaluación y tratamiento correspondiente a este tipo de visita.</span>
+      </label>
+    </div>
+    <div id="ci-info" style="background:#e8f5e9;border-radius:6px;padding:10px 14px;font-size:.8em;color:#2e7d32;margin-bottom:16px">
+      <strong>Paciente:</strong> <span id="ci-paciente-name"></span><br>
+      <strong>Tipo de visita:</strong> <span id="ci-visit-type"></span><br>
+      <strong>Médico responsable:</strong> <span id="ci-medico-name"></span>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end">
+      <button class="btn btn-o" onclick="closeCIModal()">Cancelar</button>
+      <button id="ci-accept-btn" class="btn" style="background:#28aaa4;color:#fff" onclick="acceptConsentimiento()" disabled>✓ Acepto y Continúo</button>
+    </div>
+    <p id="ci-error" style="color:#e53935;font-size:.82em;text-align:center;display:none;margin-top:8px">⚠ Debe aceptar todos los puntos para continuar.</p>
+  </div>
+</div>
 
 </body>
 </html>
