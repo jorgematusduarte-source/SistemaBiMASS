@@ -194,8 +194,7 @@ tr:hover td{background:#f0faf9}
   <div class="home-title" id="home-greeting">Bienvenido a BiMASS</div>
   <div class="home-subtitle">Clínica BiMASS · Hermosillo, Sonora</div>
 
-  <div class="home-section-lbl">🩺 Atención Clínica</div>
-  <div class="home-grid">
+  <div class="home-grid" style="grid-template-columns:repeat(3,1fr)">
     <div class="home-card card-clinical" onclick="gotoMod('atencion')">
       <div class="home-icon">🩺</div>
       <div class="home-label">Atención Clínica</div>
@@ -211,10 +210,6 @@ tr:hover td{background:#f0faf9}
       <div class="home-label">Ausentismo</div>
       <div class="home-sub">Incapacidades · Seguimiento</div>
     </div>
-  </div>
-
-  <div class="home-section-lbl">🔬 Diagnóstico</div>
-  <div class="home-grid">
     <div class="home-card card-lab" id="card-lab" onclick="gotoMod('lab')">
       <div class="home-icon">🔬</div>
       <div class="home-label">Laboratorio</div>
@@ -230,10 +225,6 @@ tr:hover td{background:#f0faf9}
       <div class="home-label">Auditorías STPS</div>
       <div class="home-sub">Normas · Cumplimiento</div>
     </div>
-  </div>
-
-  <div class="home-section-lbl">💼 Administración</div>
-  <div class="home-grid">
     <div class="home-card card-admin" onclick="gotoMod('pos')">
       <div class="home-icon">🛒</div>
       <div class="home-label">Punto de Venta</div>
@@ -252,8 +243,7 @@ tr:hover td{background:#f0faf9}
   </div>
 
   <div id="home-admin-row" style="display:none">
-    <div class="home-section-lbl">⚙️ Dirección</div>
-    <div class="home-grid">
+    <div class="home-grid" style="grid-template-columns:repeat(3,1fr);margin-top:12px">
       <div class="home-card card-mgmt" onclick="gotoMod('reportes')">
         <div class="home-icon">📊</div>
         <div class="home-label">Reportes</div>
@@ -384,14 +374,15 @@ tr:hover td{background:#f0faf9}
   <button class="btn btn-o btn-sm" onclick="exportHL7()" title="Exportar expediente en formato HL7 CDA R2 (NOM-024)">📄 HL7</button>
 </div>
 <div class="aler-alrg" id="alrg-banner2"></div>
-<div class="tabs no-print">
-  <button class="tab-btn active" onclick="showClinTab('hc','this')">Historia Clínica</button>
-  <button class="tab-btn" onclick="showClinTab('exams','this')">Exámenes</button>
-  <button class="tab-btn" onclick="showClinTab('concl','this')">Conclusión</button>
-  <button class="tab-btn" onclick="showClinTab('docs','this')">Documentos</button>
+<div class="tabs no-print" style="flex-wrap:wrap;gap:6px">
+  <button class="tab-btn active" onclick="showClinTab('hc',this)">📋 Historia Clínica</button>
+  <button class="tab-btn" onclick="showClinTab('subj',this)">🗣 Subjetivo</button>
+  <button class="tab-btn" onclick="showClinTab('obj',this)">🔬 Objetivo</button>
+  <button class="tab-btn" onclick="showClinTab('anl',this)">💡 Análisis</button>
+  <button class="tab-btn" onclick="showClinTab('plan',this)">📋 Plan</button>
 </div>
 
-<!-- HC TAB -->
+<!-- HISTORIA CLÍNICA: Ficha, AHF, APNP, APP, Laboral, Gine -->
 <div id="ctab-hc" class="ctab active">
   <div id="prefill-banner" class="alert alert-i" style="display:none;margin-bottom:10px"></div>
   <div class="card">
@@ -522,6 +513,19 @@ tr:hover td{background:#f0faf9}
     </div>
       </div>
   </div>
+</div>
+
+<div id="ctab-subj" class="ctab">
+  <div class="card">
+    <div class="card-title">📝 Padecimiento actual</div>
+    <div class="fg w100"><textarea id="hc-pad" rows="4" placeholder="Motivo de consulta y padecimiento actual..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="exam-hdr"><input type="checkbox" id="chk-soap-s" checked onchange="toggleExam('soap-s',this.checked)"><span>🗒 Nota subjetiva — S (NOM-024)</span></div>
+    <div id="body-soap-s" class="exam-body">
+      <div class="fg w100"><textarea id="soap-s" rows="3" placeholder="¿Qué refiere el paciente? Síntomas, evolución, intensidad, factores que agravan o alivian..."></textarea></div>
+    </div>
+  </div>
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-labprev" checked onchange="toggleExam('labprev',this.checked)"><span>🧪 Laboratorio / Imagen previos</span></div>
     <div id="body-labprev" class="exam-body">
@@ -534,31 +538,6 @@ tr:hover td{background:#f0faf9}
     </div>
     <button class="btn btn-o btn-sm" onclick="addLab()">+ Agregar</button>
       </div>
-  </div>
-  <div class="card">
-    <div class="card-title">📝 Padecimiento actual</div>
-    <div class="fg w100"><textarea id="hc-pad" rows="4" placeholder="Motivo de consulta y padecimiento actual..."></textarea></div>
-  </div>
-  <div class="card">
-    <div class="exam-hdr"><input type="checkbox" id="chk-soap" checked onchange="toggleExam('soap',this.checked)"><span>🗒 Nota SOAP (NOM-024)</span></div>
-    <div id="body-soap" class="exam-body">
-      <div class="form-row" style="align-items:flex-start">
-        <div class="fg w100"><label style="color:#1565c0;font-weight:700">S — Subjetivo <span style="font-weight:400;font-size:.82em;color:#636875">(síntomas referidos por el paciente)</span></label>
-          <textarea id="soap-s" rows="3" placeholder="¿Qué refiere el paciente? Evolución, intensidad, factores que agravan o alivian..."></textarea></div>
-      </div>
-      <div class="form-row" style="align-items:flex-start">
-        <div class="fg w100"><label style="color:#1565c0;font-weight:700">O — Objetivo <span style="font-weight:400;font-size:.82em;color:#636875">(hallazgos del médico)</span></label>
-          <textarea id="soap-o" rows="3" placeholder="Exploración física, signos vitales relevantes, resultados de laboratorio..."></textarea></div>
-      </div>
-      <div class="form-row" style="align-items:flex-start">
-        <div class="fg w100"><label style="color:#1565c0;font-weight:700">A — Análisis <span style="font-weight:400;font-size:.82em;color:#636875">(impresión diagnóstica)</span></label>
-          <textarea id="soap-a" rows="3" placeholder="Diagnóstico o diagnósticos diferenciales..."></textarea></div>
-      </div>
-      <div class="form-row" style="align-items:flex-start">
-        <div class="fg w100"><label style="color:#1565c0;font-weight:700">P — Plan <span style="font-weight:400;font-size:.82em;color:#636875">(tratamiento y seguimiento)</span></label>
-          <textarea id="soap-p" rows="3" placeholder="Tratamiento, indicaciones, próxima cita, estudios a solicitar..."></textarea></div>
-      </div>
-    </div>
   </div>
   <div class="card" id="hc-riesgo-wrap">
     <div class="exam-hdr"><input type="checkbox" id="chk-rt" checked onchange="toggleExam('rt',this.checked)"><span>⚠ Investigación de riesgo de trabajo</span></div>
@@ -639,7 +618,10 @@ tr:hover td{background:#f0faf9}
 </div>
 
 <!-- EXAMS TAB -->
-<div id="ctab-exams" class="ctab">
+</div>
+
+<!-- OBJETIVO: Todos los exámenes -->
+<div id="ctab-obj" class="ctab">
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-fisico" checked onchange="toggleExam('fisico',this.checked)"><span>Examen físico</span></div>
     <div id="body-fisico" class="exam-body">
@@ -786,7 +768,16 @@ tr:hover td{background:#f0faf9}
 </div>
 
 <!-- CONCLUSION TAB -->
-<div id="ctab-concl" class="ctab">
+  <div class="card">
+    <div class="exam-hdr"><input type="checkbox" id="chk-soap-o" checked onchange="toggleExam('soap-o',this.checked)"><span>🗒 Nota objetiva — O (NOM-024)</span></div>
+    <div id="body-soap-o" class="exam-body">
+      <div class="fg w100"><textarea id="soap-o" rows="3" placeholder="Hallazgos del médico: exploración física, signos vitales, resultados de laboratorio relevantes..."></textarea></div>
+    </div>
+  </div>
+</div>
+
+<!-- ANÁLISIS: CIE-10, Observaciones, Nota A -->
+<div id="ctab-anl" class="ctab">
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-cie" checked onchange="toggleExam('cie',this.checked)"><span>🔬 Diagnósticos CIE-10</span></div>
     <div id="body-cie" class="exam-body">
@@ -796,6 +787,20 @@ tr:hover td{background:#f0faf9}
     <div><span class="muted" style="font-size:.78em">SECUNDARIOS: </span><span id="cie-sec-tags"></span></div>
       </div>
   </div>
+  <div class="card">
+    <div class="card-title">📝 Observaciones adicionales al diagnóstico</div>
+    <div class="fg w100"><textarea id="obs-diag" rows="4" placeholder="Observaciones del médico sobre el análisis diagnóstico, hallazgos relevantes, consideraciones clínicas adicionales..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="exam-hdr"><input type="checkbox" id="chk-soap-a" checked onchange="toggleExam('soap-a',this.checked)"><span>🗒 Nota de análisis — A (NOM-024)</span></div>
+    <div id="body-soap-a" class="exam-body">
+      <div class="fg w100"><textarea id="soap-a" rows="3" placeholder="Impresión diagnóstica, diagnósticos diferenciales, análisis clínico..."></textarea></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN: Aptitud, Reevaluación, Incapacidad, Receta, Referencia, Certificados, Nota P -->
+<div id="ctab-plan" class="ctab">
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-aptitud" checked onchange="toggleExam('aptitud',this.checked)"><span>✅ Aptitud laboral</span></div>
     <div id="body-aptitud" class="exam-body">
@@ -826,6 +831,26 @@ tr:hover td{background:#f0faf9}
       </div>
   </div>
   <div class="card">
+    <div class="card-title">🔄 Reevaluación médica</div>
+    <div class="form-row">
+      <div class="fg">
+        <label style="font-weight:600;margin-bottom:8px;display:block">¿El paciente requiere reevaluación médica?</label>
+        <div style="display:flex;gap:28px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1.05em;font-weight:600">
+            <input type="radio" name="reeval" id="reeval-si" value="Si" onchange="onReevalChange()"> Sí
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1.05em;font-weight:600">
+            <input type="radio" name="reeval" id="reeval-no" value="No" onchange="onReevalChange()" checked> No
+          </label>
+        </div>
+      </div>
+    </div>
+    <div id="reeval-agenda-wrap" style="display:none;margin-top:12px">
+      <div class="alert alert-i" style="margin-bottom:10px">✅ Se requiere reevaluación. Puedes agendar la próxima cita desde aquí.</div>
+      <button class="btn btn-p" onclick="gotoMod('agenda')">📅 Ir a Agenda para agendar reevaluación</button>
+    </div>
+  </div>
+  <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-incap" onchange="toggleExam('incap',this.checked)"><span>Incapacidad laboral</span></div>
     <div id="body-incap" class="exam-body off">
       <div class="form-row">
@@ -842,10 +867,6 @@ tr:hover td{background:#f0faf9}
       <button class="btn btn-o btn-sm no-print" onclick="printIncap()">🖨 Imprimir incapacidad</button>
     </div>
   </div>
-</div>
-
-<!-- DOCS TAB -->
-<div id="ctab-docs" class="ctab">
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-rx" onchange="toggleExam('rx',this.checked)"><span>Receta médica</span></div>
     <div id="body-rx" class="exam-body off">
@@ -871,15 +892,6 @@ tr:hover td{background:#f0faf9}
     </div>
   </div>
   <div class="card">
-    <div class="exam-hdr"><input type="checkbox" id="chk-cert" checked onchange="toggleExam('cert',this.checked)"><span>📄 Certificados</span></div>
-    <div id="body-cert" class="exam-body">
-    <div class="flex gap8">
-      <button class="btn btn-o" onclick="printCert('laboral')">🖨 Cert. Laboral</button>
-      <button class="btn btn-o" onclick="printCert('general')">🖨 Cert. General</button>
-    </div>
-      </div>
-  </div>
-  <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-ref" onchange="toggleExam('ref',this.checked)"><span>Referencia / Interconsulta</span></div>
     <div id="body-ref" class="exam-body off">
       <div class="form-row">
@@ -889,9 +901,33 @@ tr:hover td{background:#f0faf9}
       <div class="form-row"><div class="fg w100"><label>Motivo de referencia</label><textarea id="ref-motivo" rows="3"></textarea></div></div>
       <button class="btn btn-o btn-sm no-print" onclick="printRef()">🖨 Imprimir referencia</button>
     </div>
+  <div class="card">
+    <div class="exam-hdr"><input type="checkbox" id="chk-cert" checked onchange="toggleExam('cert',this.checked)"><span>📄 Certificados</span></div>
+    <div id="body-cert" class="exam-body">
+    <div class="flex gap8">
+      <button class="btn btn-o" onclick="printCert('laboral')">🖨 Cert. Laboral</button>
+      <button class="btn btn-o" onclick="printCert('general')">🖨 Cert. General</button>
+    </div>
+      </div>
   </div>
+  <div class="card">
+    <div class="exam-hdr"><input type="checkbox" id="chk-soap-p" checked onchange="toggleExam('soap-p',this.checked)"><span>🗒 Nota de plan — P (NOM-024)</span></div>
+    <div id="body-soap-p" class="exam-body">
+      <div class="fg w100"><textarea id="soap-p" rows="3" placeholder="Tratamiento, indicaciones, próxima cita, estudios a solicitar, seguimiento..."></textarea></div>
+    </div>
+  </div>
+  <input type="checkbox" id="chk-soap" checked style="display:none">
 </div>
 <div class="mt20 no-print"><button class="btn btn-p btn-lg" onclick="saveVisit()">💾 Guardar visita completa</button></div>
+</div>
+
+<!-- AGENDA DETAIL MODAL -->
+<div id="ag-detail-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;max-width:500px;width:92%;border-radius:14px;padding:26px;position:relative;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <button onclick="document.getElementById('ag-detail-modal').style.display='none'" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.5em;cursor:pointer;color:#888;line-height:1">✕</button>
+    <h3 style="margin:0 0 16px;color:#2a4e7a;font-size:1.05em">📅 Detalles de la cita</h3>
+    <div id="ag-detail-body"></div>
+  </div>
 </div>
 
 <!-- INVENTARIO -->
@@ -1366,9 +1402,11 @@ function saveCotizacion() {
   };
   gasPost({action:'saveCotizacion', cotiz:cotiz}, function(r) {
     if(r && r.ok) {
-      alert('✅ Cotización guardada: ' + r.id);
+      var savedId = r.id || '—';
       clearCotizForm();
       loadCotizaciones();
+      // Show post-save action panel
+      showCotizSavedPanel(savedId, cotiz);
     } else {
       alert('Error al guardar: ' + (r && r.error ? r.error : 'desconocido'));
     }
@@ -1485,7 +1523,7 @@ function buildCotizHTML(c, forPrint) {
     '<div style="margin-top:30px;display:flex;justify-content:flex-end">' +
       '<div style="text-align:center;min-width:200px">' +
         '<div style="border-top:1px solid #333;padding-top:6px;font-size:.85em"><b>'+(c.director||'_________________________')+'</b></div>' +
-        '<div style="font-size:.78em;color:#555">Director Médico — BiMASS</div>' +
+        '<div style="font-size:.8em;color:#28aaa4;font-weight:600;letter-spacing:.02em">BiMASS · Construimos Bienestar</div>' +
       '</div>' +
     '</div>' +
     '<div style="margin-top:20px;text-align:center;font-size:.75em;color:#999;border-top:1px solid #eee;padding-top:10px">Cotización válida por 30 días a partir de la fecha de emisión. Precios en MXN.</div>' +
@@ -1542,14 +1580,87 @@ function exportCotizExcel(idx) {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
-// Initialize cotiz form when screen is shown
-var _origShowScreen = showScreen;
-showScreen = function(id) {
-  _origShowScreen(id);
-  if(id === 'cotiz') {
-    initCotizForm();
+// ── POST-SAVE ACTION PANEL ───────────────────────────────
+function showCotizSavedPanel(id, cotiz) {
+  var modal = document.getElementById('cotiz-saved-modal');
+  var content = document.getElementById('cotiz-saved-content');
+  if(!modal || !content) return;
+  var isAdmin = currentUser && (currentUser.perfil === 'Director' || currentUser.perfil === 'Admin médico');
+  var statusSel = isAdmin
+    ? '<select id="csm-status" style="padding:6px 12px;border-radius:8px;font-weight:700;border:1.5px solid var(--brd);font-size:.9em">'
+      + '<option value="Cotizado" selected>● Cotizado</option>'
+      + '<option value="Vendido">● Vendido</option>'
+      + '<option value="Perdido">● Perdido</option>'
+      + '</select>'
+    : '<span style="background:#fff8e1;color:#f57f17;border:1px solid #ffe082;padding:5px 14px;border-radius:20px;font-weight:700;font-size:.9em">● Cotizado</span>';
+  content.innerHTML =
+    '<div style="text-align:center;margin-bottom:18px">'
+    + '<div style="font-size:2em">✅</div>'
+    + '<h3 style="margin:6px 0;color:#2a4e7a">Cotización guardada</h3>'
+    + '<div style="font-size:.9em;color:var(--muted)">Folio: <strong style="color:var(--teal)">' + id + '</strong></div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
+    + '<button class="btn btn-p" onclick="printCotizByObj(' + JSON.stringify(cotiz) + ')" style="display:flex;align-items:center;justify-content:center;gap:6px">🖨 Imprimir</button>'
+    + '<button class="btn btn-o" onclick="viewCotizByObj(' + JSON.stringify(cotiz) + ')" style="display:flex;align-items:center;justify-content:center;gap:6px">👁 Previsualizar</button>'
+    + '<button class="btn btn-o" onclick="emailCotizById('' + id + '')" style="display:flex;align-items:center;justify-content:center;gap:6px">✉ Enviar correo</button>'
+    + '<div style="display:flex;align-items:center;gap:8px">'
+    + '<span style="font-size:.82em;font-weight:600;color:var(--gris)">Status:</span>'
+    + statusSel
+    + '</div>'
+    + '</div>';
+  if(isAdmin) {
+    content.innerHTML += '<button class="btn btn-p w100" onclick="applyCotizSavedStatus('' + id + '')" style="margin-top:6px">💾 Actualizar status</button>';
   }
-};
+  content.innerHTML += '<button class="btn btn-o w100" onclick="document.getElementById('cotiz-saved-modal').style.display='none'" style="margin-top:8px">Cerrar</button>';
+  modal.style.display = 'flex';
+}
+
+function applyCotizSavedStatus(id) {
+  var sel = document.getElementById('csm-status');
+  if(!sel) return;
+  gasPost({action:'updateCotizStatus', id:id, status:sel.value}, function(r) {
+    if(r && r.ok) {
+      alert('Status actualizado: ' + sel.value);
+      loadCotizaciones();
+    }
+  });
+}
+
+function printCotizByObj(cotiz) {
+  document.getElementById('cotiz-saved-modal').style.display = 'none';
+  // Find in cache by matching or just print using the cotiz object directly
+  var idx = cotizCache.findIndex(function(c){ return c.id === cotiz.id; });
+  if(idx >= 0) printCotizacion(idx);
+  else { cotizCache.push(cotiz); printCotizacion(cotizCache.length-1); }
+}
+function viewCotizByObj(cotiz) {
+  document.getElementById('cotiz-saved-modal').style.display = 'none';
+  var idx = cotizCache.findIndex(function(c){ return c.id === cotiz.id; });
+  if(idx >= 0) viewCotizacion(idx);
+  else { cotizCache.push(cotiz); viewCotizacion(cotizCache.length-1); }
+}
+function emailCotizById(id) {
+  document.getElementById('cotiz-saved-modal').style.display = 'none';
+  var idx = cotizCache.findIndex(function(c){ return c.id === id; });
+  if(idx >= 0) exportCotizPDF(idx);
+}
+
+// ── RESTRICT STATUS CHANGE in list ───────────────────────
+function updateCotizStatus(id, status, idx) {
+  var isAdmin = currentUser && (currentUser.perfil === 'Director' || currentUser.perfil === 'Admin médico');
+  if(!isAdmin && (status === 'Vendido' || status === 'Perdido')) {
+    alert('Solo el Director o Admin médico puede cambiar el status a Vendido o Perdido.');
+    loadCotizaciones();
+    return;
+  }
+  gasPost({action:'updateCotizStatus', id:id, status:status}, function(r) {
+    if(r && r.ok) { cotizCache[idx] = Object.assign(cotizCache[idx]||{}, {status:status}); }
+    else { alert('Error al actualizar status'); loadCotizaciones(); }
+  });
+}
+
+// Initialize cotiz form when screen is shown (kept for back-compat)
+
 
 </script>
 <script>
@@ -1693,7 +1804,7 @@ function gotoMod(mod) {
     showScreen('usuarios'); loadUsers(); return;
   }
   if(mod === 'lab')  { showScreen('lab');  loadLabResults();  return; }
-  if(mod === 'cotiz'){ showScreen('cotiz'); loadCotizaciones(); return; }
+  if(mod === 'cotiz'){ showScreen('cotiz'); loadCotizaciones(); initCotizForm(); return; }
   if(mod === 'xray') { showScreen('xray'); loadXrayResults(); return; }
 }
 
@@ -2189,11 +2300,11 @@ function initClinical(prevData) {
   buildNordic();
   // Pre-fill antecedentes from previous visit
   const prefillBanner = document.getElementById('prefill-banner');
-  if(prevData && prevData.hc) {
+  if(prevData && prevData.hc && currentVisitSeq === 'subsecuente') {
     const hc = prevData.hc;
     const prevDate = prevData.ts ? prevData.ts.slice(0,10) : '';
     if(prefillBanner) {
-      prefillBanner.innerHTML = '📋 Antecedentes pre-cargados de la visita del <strong>'+prevDate+'</strong>. Revisa y actualiza si es necesario.';
+      prefillBanner.innerHTML = '📋 Cargando antecedentes de la visita del <strong>'+prevDate+'</strong>...';
       prefillBanner.style.display = 'block';
     }
     // AHF
@@ -2222,6 +2333,27 @@ function initClinical(prevData) {
       const gm = {fum:'gine-fum',menarq:'gine-menarq',ritmo:'gine-ritmo',g:'gine-g',p:'gine-p',c:'gine-c',a:'gine-a',mac:'gine-mac',embarazo:'gine-emb',sdg:'gine-sdg'};
       Object.entries(gm).forEach(([k,id]) => { const el=document.getElementById(id); if(el&&hc.gine[k]) el.value=hc.gine[k]; });
       toggleSDG();
+    }
+    // Historia laboral (for subsecuentes only)
+    if(currentVisitSeq === 'subsecuente' && hc.laboral) {
+      const s2 = (id, val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+      s2('hl-antig', hc.laboral.antiguedad); s2('hl-turno', hc.laboral.turno);
+      s2('hl-hrs', hc.laboral.hrs); s2('hl-act', hc.laboral.actividades);
+      s2('hl-epp', hc.laboral.epp); s2('hl-riesgos', hc.laboral.riesgos);
+    }
+    // Also fill Ficha extra fields from prevData for subsecuentes
+    if(currentVisitSeq === 'subsecuente') {
+      const sf = (id, val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+      sf('hc-empresa', hc.empresa); sf('hc-puesto', hc.puesto);
+      sf('hc-rfc', hc.rfc); sf('hc-curp', hc.curp);
+      sf('hc-calle', hc.calle); sf('hc-numdom', hc.numero); sf('hc-col', hc.colonia);
+      sf('hc-gs', hc.grupoSanguineo);
+      if(hc.alergias) sf('hc-alrg', hc.alergias);
+    }
+    // Update banner for subsecuentes
+    if(currentVisitSeq === 'subsecuente' && prefillBanner) {
+      prefillBanner.innerHTML = '📋 <strong>Visita subsecuente:</strong> Datos cargados de visita del <strong>'+prevDate+'</strong>. Laboratorio/Imagen previos e Investigación de riesgo de trabajo están en blanco.';
+      prefillBanner.style.display = 'block';
     }
   } else {
     if(prefillBanner) prefillBanner.style.display = 'none';
@@ -2257,6 +2389,11 @@ function toggleTab() {
 }
 function toggleSDG() {
   document.getElementById('gine-sdg-wrap').style.display = document.getElementById('gine-emb').value!=='No' ? '' : 'none';
+}
+function onReevalChange() {
+  const si = document.getElementById('reeval-si');
+  const wrap = document.getElementById('reeval-agenda-wrap');
+  if(wrap) wrap.style.display = (si && si.checked) ? '' : 'none';
 }
 function toggleExam(id, checked) {
   document.getElementById('body-'+id).classList.toggle('off', !checked);
@@ -2747,7 +2884,7 @@ function collectVisit() {
       laboral:OCC_TYPES.includes(currentVisitType)?{antiguedad:v('hl-antig'),turno:v('hl-turno'),hrs:v('hl-hrs'),actividades:v('hl-act'),epp:v('hl-epp'),riesgos:v('hl-riesgos'),prevJobs:[...prevJobs]}:null,
       gine:v('hc-sexo')==='Femenino'?{fum:v('gine-fum'),menarq:v('gine-menarq'),ritmo:v('gine-ritmo'),g:v('gine-g'),p:v('gine-p'),c:v('gine-c'),a:v('gine-a'),mac:v('gine-mac'),embarazo:v('gine-emb'),sdg:v('gine-sdg')}:null,
       laboratorios:labItems, padecimiento:v('hc-pad'),
-      soap:document.getElementById('chk-soap')&&document.getElementById('chk-soap').checked?{s:v('soap-s'),o:v('soap-o'),a:v('soap-a'),p:v('soap-p')}:null,
+      soap:{s:v('soap-s'),o:v('soap-o'),a:v('soap-a'),p:v('soap-p')},
       riesgo:OCC_TYPES.includes(currentVisitType)?{fecha:v('rt-fecha'),hora:v('rt-hora'),tipo:v('rt-tipo'),probableRiesgo:v('rt-prob-riesgo'),edad:v('rt-edad'),sexo:v('rt-sexo'),talla:v('rt-talla'),peso:v('rt-peso'),mano:v('rt-mano'),turno:v('rt-turno'),supervisor:v('rt-supervisor'),supervisorEmail:v('rt-supervisor-email'),agente:v('rt-agente'),asociado:v('rt-asociado'),parteCuerpo:v('rt-parte-cuerpo'),desc:v('rt-desc'),medidas:v('rt-medidas')}:null,
       secuencia:currentVisitSeq, visitaPreviaRef:prevVisitRef
     },
@@ -2764,6 +2901,8 @@ function collectVisit() {
     conclusion: {
       ciePrimary: ciePrimary, cieSecondary: cieSecondary,
       resultado: v('concl-res'),
+      obsDiag: v('obs-diag'),
+      reevaluacion: (document.getElementById('reeval-si')&&document.getElementById('reeval-si').checked)?'Si':'No',
       restricciones: v('concl-res')==='Apto con restricciones'?{tipo:v('restr-tipo'),parte:v('restr-parte'),lateralidad:v('restr-lat'),params:v('restr-params'),nocturno:v('restr-nocturno'),embarazo:v('restr-emb')}:null,
       comentarios: v('concl-coments'),
       incapacidad: chk('chk-incap')?{tipo:v('inc-tipo'),folioImss:v('inc-folio-imss'),personalOcup:v('inc-personalocup'),inicio:v('inc-inicio'),fin:v('inc-fin'),dias:v('inc-dias'),indicaciones:v('inc-indicaciones')}:null
@@ -3155,14 +3294,62 @@ function agCardHtml(a) {
   const clrs=['#1565c0','#2e7d32','#6a1b9a'];
   const bg=clrs[(parseInt(a.consultorio)||1)-1]||'#1565c0';
   const meetBtn = (a.modalidad==='Virtual' && a.meetLink)
-    ? '<a href="'+a.meetLink+'" target="_blank" title="Unirse a Google Meet" style="display:inline-block;background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 5px;font-size:.82em;text-decoration:none;margin-left:4px">🎥 Meet</a>'
+    ? '<a href="'+a.meetLink+'" target="_blank" title="Unirse a Google Meet" onclick="event.stopPropagation()" style="display:inline-block;background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 5px;font-size:.82em;text-decoration:none;margin-left:4px">🎥 Meet</a>'
     : '';
-  return '<div style="background:'+bg+';color:#fff;border-radius:6px;padding:4px 7px;margin-bottom:2px;font-size:.79em">'
+  const safeId = a.id ? String(a.id).replace(/'/g,"\'") : '';
+  return '<div style="background:'+bg+';color:#fff;border-radius:6px;padding:4px 7px;margin-bottom:2px;font-size:.79em;cursor:pointer" onclick="showAgDetail(''+safeId+'')">'
     +'<b>'+a.hora+' '+a.paciente+'</b>'
     +'<div>'+a.tipoVisita+' · '+(a.secuencia||'')+(a.modalidad==='Virtual'?' · 📱':'')+meetBtn+'</div>'
     +(a.telefono?'<div>📞 '+a.telefono+'</div>':'')
     +(a.id?'<div style="margin-top:2px"><button onclick="event.stopPropagation();deleteAgendaItem(this.dataset.id)" data-id="'+a.id+'" style="background:rgba(255,255,255,.28);color:#fff;border:none;cursor:pointer;padding:1px 6px;border-radius:4px;font-size:.82em">✕ Cancelar</button></div>':'')
     +'</div>';
+}
+
+function showAgDetail(id) {
+  if(!id) return;
+  const a = agendaCache.find(x => String(x.id) === String(id));
+  if(!a) return;
+  const modal = document.getElementById('ag-detail-modal');
+  const body = document.getElementById('ag-detail-body');
+  if(!modal || !body) return;
+  const clrs=['#1565c0','#2e7d32','#6a1b9a'];
+  const bg = clrs[(parseInt(a.consultorio)||1)-1]||'#1565c0';
+  const meetRow = (a.modalidad==='Virtual' && a.meetLink)
+    ? '<tr><td style="padding:7px 10px;font-weight:700;color:#555;width:38%">Link Meet</td>'
+      +'<td style="padding:7px 10px"><a href="'+a.meetLink+'" target="_blank" style="color:#1565c0;font-weight:700">🎥 Unirse a Google Meet</a><br><span style="font-size:.75em;color:#888;word-break:break-all">'+a.meetLink+'</span></td></tr>'
+    : '';
+  body.innerHTML =
+    '<div style="background:'+bg+';color:#fff;border-radius:10px;padding:14px 18px;margin-bottom:18px">'
+    + '<div style="font-size:1.1em;font-weight:800">'+a.paciente+'</div>'
+    + '<div style="opacity:.85;font-size:.88em;margin-top:2px">'+a.tipoVisita+' · '+(a.secuencia||'Inicial')+(a.modalidad==='Virtual'?' · 📱 Virtual':'')+'</div>'
+    + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:.9em">'
+    + '<tr style="background:#f5f7fa"><td style="padding:7px 10px;font-weight:700;color:#555;width:38%">Fecha</td><td style="padding:7px 10px">'+(a.fecha||'—')+'</td></tr>'
+    + '<tr><td style="padding:7px 10px;font-weight:700;color:#555">Hora</td><td style="padding:7px 10px">'+(a.hora||'—')+'</td></tr>'
+    + '<tr style="background:#f5f7fa"><td style="padding:7px 10px;font-weight:700;color:#555">Consultorio</td><td style="padding:7px 10px">Consultorio '+(a.consultorio||'1')+'</td></tr>'
+    + '<tr><td style="padding:7px 10px;font-weight:700;color:#555">Modalidad</td><td style="padding:7px 10px">'+(a.modalidad||'Presencial')+'</td></tr>'
+    + '<tr style="background:#f5f7fa"><td style="padding:7px 10px;font-weight:700;color:#555">Tipo de visita</td><td style="padding:7px 10px">'+(a.tipoVisita||'—')+'</td></tr>'
+    + '<tr><td style="padding:7px 10px;font-weight:700;color:#555">Secuencia</td><td style="padding:7px 10px">'+(a.secuencia||'Inicial')+'</td></tr>'
+    + (a.telefono?'<tr style="background:#f5f7fa"><td style="padding:7px 10px;font-weight:700;color:#555">Teléfono</td><td style="padding:7px 10px">📞 '+a.telefono+'</td></tr>':'')
+    + (a.email?'<tr><td style="padding:7px 10px;font-weight:700;color:#555">Correo</td><td style="padding:7px 10px">'+a.email+'</td></tr>':'')
+    + meetRow
+    + (a.notas?'<tr style="background:#f5f7fa"><td style="padding:7px 10px;font-weight:700;color:#555">Notas</td><td style="padding:7px 10px;font-style:italic">'+a.notas+'</td></tr>':'')
+    + '</table>'
+    + (a.id?'<div style="margin-top:16px;display:flex;gap:10px">'
+        +'<button class="btn btn-p" onclick="iniciarCitaDesdeAgenda(''+a.id+'')" style="flex:1">🩺 Iniciar atención</button>'
+        +'<button class="btn btn-o" style="color:#e53935;border-color:#e53935" onclick="deleteAgendaItem(''+a.id+'');document.getElementById('ag-detail-modal').style.display='none'">✕ Cancelar cita</button>'
+        +'</div>':'');
+  modal.style.display = 'flex';
+}
+
+function iniciarCitaDesdeAgenda(id) {
+  document.getElementById('ag-detail-modal').style.display = 'none';
+  const a = agendaCache.find(x => String(x.id) === String(id));
+  if(!a) return;
+  // Pre-fill the patient search with patient name
+  showScreen('patient');
+  const qEl = document.getElementById('pat-q');
+  if(qEl) { qEl.value = a.paciente||''; searchPatUI(); }
 }
 
 function renderAgenda() {
@@ -3714,11 +3901,20 @@ function applyShortVisitMode(isCorta) {
   const hideIds = ['hc-laboral-wrap','hc-gine-wrap','hc-riesgo-wrap'];
   const hideCards = ['ahf','hnp']; // card titles that contain AHF and ANP
   // Hide HC cards not needed in Corta
+  // HC tab: hide long sections in Corta
   document.querySelectorAll('#ctab-hc .card').forEach(card => {
-    const title = card.querySelector('.card-title');
+    const title = card.querySelector('.card-title,.exam-hdr span');
     if(!title) return;
     const t = title.textContent;
-    const hideInCorta = t.includes('Antecedentes heredofamiliares') || t.includes('Antecedentes personales no patológicos') || t.includes('Historia laboral') || t.includes('Antecedentes ginecoobstétricos') || t.includes('Laboratorio / Imagen') || t.includes('Investigación de riesgo');
+    const hideInCorta = t.includes('Antecedentes heredofamiliares') || t.includes('Antecedentes personales no patológicos') || t.includes('Historia laboral') || t.includes('Antecedentes ginecoobstétricos');
+    card.style.display = isCorta && hideInCorta ? 'none' : '';
+  });
+  // Subj tab: hide Lab previos and RT in Corta
+  document.querySelectorAll('#ctab-subj .card').forEach(card => {
+    const title = card.querySelector('.card-title,.exam-hdr span');
+    if(!title) return;
+    const t = title.textContent;
+    const hideInCorta = t.includes('Laboratorio / Imagen') || t.includes('Investigación de riesgo');
     card.style.display = isCorta && hideInCorta ? 'none' : '';
   });
   // In exams tab: hide everything except Examen físico in Corta
@@ -3872,7 +4068,7 @@ function printVisita() {
   if(ev.hc.padecimiento) html += '<h3>Padecimiento Actual</h3><p>'+ev.hc.padecimiento+'</p>';
 
   // Nota SOAP
-  if(pchk('chk-soap') && ev.hc.soap && (ev.hc.soap.s||ev.hc.soap.o||ev.hc.soap.a||ev.hc.soap.p)) {
+  if(ev.hc.soap && (ev.hc.soap.s||ev.hc.soap.o||ev.hc.soap.a||ev.hc.soap.p)) {
     const soap = ev.hc.soap;
     html += '<h3>Nota de Evolución SOAP</h3><table style="width:100%">';
     if(soap.s) html += '<tr><td style="width:8%;background:#e3f2fd;font-weight:700;color:#1565c0;vertical-align:top;padding:6px">S</td><td style="padding:6px">'+soap.s+'</td></tr>';
@@ -3931,6 +4127,11 @@ function printVisita() {
   }
 
   // Diagnóstico y conclusión
+  // Observaciones adicionales al diagnóstico
+  const obsDiagText = document.getElementById('obs-diag') ? document.getElementById('obs-diag').value : '';
+  if(obsDiagText) {
+    html += sec('📝 Observaciones adicionales al diagnóstico', '<p style="white-space:pre-wrap">'+obsDiagText+'</p>');
+  }
   if(pchk('chk-cie') || pchk('chk-aptitud')) {
     html += '<h3>Diagnóstico y Conclusión</h3>';
     if(pchk('chk-cie')) {
@@ -5699,9 +5900,9 @@ function saveHistorialNota() {
       <textarea id="cotiz-obs" rows="3" placeholder="Condiciones de pago, vigencia de la cotización, notas adicionales..."></textarea>
     </div>
     <div class="fg" style="flex:1">
-      <label class="lbl">Firma / Nombre del Director</label>
+      <label class="lbl">Nombre y puesto de personal BiMASS</label>
       <input id="cotiz-director" type="text" placeholder="Dr. Nombre Apellido">
-      <div style="margin-top:6px;border-top:1px solid var(--brd);padding-top:6px;font-size:.78em;color:var(--muted);text-align:center">Director Médico — BiMASS</div>
+      <div style="margin-top:6px;border-top:1px solid var(--brd);padding-top:6px;font-size:.8em;color:var(--teal);text-align:center;font-weight:600;letter-spacing:.03em">BiMASS · Construimos Bienestar</div>
     </div>
   </div>
 
@@ -5742,6 +5943,12 @@ function saveHistorialNota() {
   <div style="background:#fff;max-width:760px;margin:30px auto;border-radius:12px;padding:28px;position:relative">
     <button onclick="document.getElementById('cotiz-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.4em;cursor:pointer;color:#888">✕</button>
     <div id="cotiz-modal-content"></div>
+  </div>
+</div>
+<!-- Modal post-save cotización -->
+<div id="cotiz-saved-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;max-width:460px;width:90%;border-radius:14px;padding:28px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <div id="cotiz-saved-content"></div>
   </div>
 </div>
 </div><!-- end screen-cotiz -->
