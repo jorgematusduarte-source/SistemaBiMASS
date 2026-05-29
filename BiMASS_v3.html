@@ -21,14 +21,22 @@ body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:#333;min
 .auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;color:var(--gris);font-weight:600;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
 .auth-tab.active{color:var(--azul);border-bottom-color:var(--teal)}
 .auth-form{display:none}.auth-form.active{display:block}
-.home-wrap{max-width:720px;margin:30px auto}
-.home-title{text-align:center;color:var(--azul);font-size:1.15em;margin-bottom:24px;font-weight:600}
-.home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.home-card{background:var(--white);border-radius:16px;box-shadow:var(--shad);padding:30px 20px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;border:2px solid transparent}
-.home-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.13);border-color:var(--teal)}
-.home-icon{font-size:2.8em;margin-bottom:10px}
-.home-label{font-size:1.12em;font-weight:700;color:var(--azul)}
-.home-sub{font-size:.8em;color:var(--gris);margin-top:4px}
+.home-wrap{max-width:880px;margin:20px auto;padding:0 12px}
+.home-title{text-align:center;color:var(--azul);font-size:1.2em;margin-bottom:4px;font-weight:700}
+.home-subtitle{text-align:center;color:var(--gris);font-size:.82em;margin-bottom:18px}
+.home-section-lbl{font-size:.72em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);margin:14px 0 7px 2px}
+.home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.home-card{background:var(--white);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:16px 12px 12px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all .18s;position:relative;overflow:hidden}
+.home-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0;opacity:0;transition:opacity .18s;background:var(--teal)}
+.home-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.11);border-color:var(--teal)}
+.home-card:hover::before{opacity:1}
+.home-card.card-clinical::before{background:#28aaa4}
+.home-card.card-admin::before{background:#e65100}
+.home-card.card-lab::before{background:#1565c0}
+.home-card.card-mgmt::before{background:#6a1b9a}
+.home-icon{font-size:2em;margin-bottom:6px}
+.home-label{font-size:.93em;font-weight:700;color:var(--azul)}
+.home-sub{font-size:.73em;color:var(--gris);margin-top:3px;line-height:1.3}
 .card{background:var(--white);border-radius:var(--rad);box-shadow:var(--shad);padding:18px;margin-bottom:14px}
 .card-title{font-weight:700;color:var(--azul);font-size:.95em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--teal);flex-wrap:wrap}
@@ -82,7 +90,7 @@ tr:hover td{background:#f0faf9}
 .ag-slot{background:var(--white);border:1px solid var(--brd);border-radius:8px;padding:10px;margin-bottom:6px;font-size:.88em}
 .ag-slot:hover{border-color:var(--teal)}
 @media print{.no-print{display:none!important}body{background:#fff}}
-@media(max-width:600px){.home-grid{grid-template-columns:1fr}.form-row{flex-direction:column}}
+@media(max-width:700px){.home-grid{grid-template-columns:repeat(2,1fr)}.form-row{flex-direction:column}}
 .vtype-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:16px}
 .vtype-card{background:var(--white);border:1.5px solid var(--brd);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;font-size:.88em;font-weight:600;color:var(--azul)}
 .vtype-card:hover,.vtype-card.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
@@ -184,64 +192,77 @@ tr:hover td{background:#f0faf9}
 <div id="screen-home" class="screen">
 <div class="home-wrap">
   <div class="home-title" id="home-greeting">Bienvenido a BiMASS</div>
+  <div class="home-subtitle">Clínica BiMASS · Hermosillo, Sonora</div>
+
+  <div class="home-section-lbl">🩺 Atención Clínica</div>
   <div class="home-grid">
-    <div class="home-card" onclick="gotoMod('agenda')">
-      <div class="home-icon">📅</div>
-      <div class="home-label">Agenda</div>
-      <div class="home-sub">Citas · 3 consultorios</div>
-    </div>
-    <div class="home-card" onclick="gotoMod('pos')">
-      <div class="home-icon">🛒</div>
-      <div class="home-label">Punto de Venta</div>
-      <div class="home-sub">Cobros · Farmacia · Servicios</div>
-    </div>
-    <div class="home-card" id="card-inv" onclick="gotoMod('inv')">
-      <div class="home-icon">📦</div>
-      <div class="home-label">Inventario</div>
-      <div class="home-sub">Medicamentos · Materiales</div>
-    </div>
-    <div class="home-card" onclick="gotoMod('atencion')">
+    <div class="home-card card-clinical" onclick="gotoMod('atencion')">
       <div class="home-icon">🩺</div>
       <div class="home-label">Atención Clínica</div>
-      <div class="home-sub">Consultas · Expedientes</div>
+      <div class="home-sub">Consultas · Historia Clínica · Expedientes</div>
     </div>
-    <div class="home-card" id="card-audit" onclick="gotoMod('audit')">
-      <div class="home-icon">📋</div>
-      <div class="home-label">Auditorías STPS</div>
-      <div class="home-sub">Normas · Cumplimiento</div>
-    </div>
-    <div class="home-card" id="card-ausent" onclick="gotoMod('ausent')">
+    <div class="home-card card-clinical" onclick="gotoMod('agenda')">
       <div class="home-icon">📅</div>
-      <div class="home-label">Ausentismo</div>
-      <div class="home-sub">Incapacidades · Reportes</div>
+      <div class="home-label">Agenda</div>
+      <div class="home-sub">Citas · 3 consultorios · Virtual</div>
     </div>
-    <div class="home-card" id="card-lab" onclick="gotoMod('lab')">
+    <div class="home-card card-clinical" id="card-ausent" onclick="gotoMod('ausent')">
+      <div class="home-icon">🗓</div>
+      <div class="home-label">Ausentismo</div>
+      <div class="home-sub">Incapacidades · Seguimiento</div>
+    </div>
+  </div>
+
+  <div class="home-section-lbl">🔬 Diagnóstico</div>
+  <div class="home-grid">
+    <div class="home-card card-lab" id="card-lab" onclick="gotoMod('lab')">
       <div class="home-icon">🔬</div>
       <div class="home-label">Laboratorio</div>
-      <div class="home-sub">Resultados · Archivos</div>
+      <div class="home-sub">Resultados · Archivos · Análisis</div>
     </div>
-    <div class="home-card" id="card-xray" onclick="gotoMod('xray')">
+    <div class="home-card card-lab" id="card-xray" onclick="gotoMod('xray')">
       <div class="home-icon">🩻</div>
       <div class="home-label">Imagenología</div>
       <div class="home-sub">Rayos X · Imágenes · Diagnóstico</div>
     </div>
-    <div class="home-card" id="card-cotiz" onclick="gotoMod('cotiz')">
-      <div class="home-icon">📝</div>
-      <div class="home-label">Cotizaciones</div>
-      <div class="home-sub">Propuestas · Seguimiento</div>
+    <div class="home-card card-lab" id="card-audit" onclick="gotoMod('audit')">
+      <div class="home-icon">📋</div>
+      <div class="home-label">Auditorías STPS</div>
+      <div class="home-sub">Normas · Cumplimiento</div>
     </div>
   </div>
+
+  <div class="home-section-lbl">💼 Administración</div>
+  <div class="home-grid">
+    <div class="home-card card-admin" onclick="gotoMod('pos')">
+      <div class="home-icon">🛒</div>
+      <div class="home-label">Punto de Venta</div>
+      <div class="home-sub">Cobros · Farmacia · Servicios</div>
+    </div>
+    <div class="home-card card-admin" id="card-inv" onclick="gotoMod('inv')">
+      <div class="home-icon">📦</div>
+      <div class="home-label">Inventario</div>
+      <div class="home-sub">Medicamentos · Materiales · Stock</div>
+    </div>
+    <div class="home-card card-admin" id="card-cotiz" onclick="gotoMod('cotiz')">
+      <div class="home-icon">📝</div>
+      <div class="home-label">Cotizaciones</div>
+      <div class="home-sub">Propuestas · Seguimiento · Status</div>
+    </div>
+  </div>
+
   <div id="home-admin-row" style="display:none">
-    <div class="home-grid mt20" style="max-width:380px;margin:20px auto 0">
-      <div class="home-card" onclick="gotoMod('reportes')">
+    <div class="home-section-lbl">⚙️ Dirección</div>
+    <div class="home-grid">
+      <div class="home-card card-mgmt" onclick="gotoMod('reportes')">
         <div class="home-icon">📊</div>
         <div class="home-label">Reportes</div>
-        <div class="home-sub">Estadísticas · Exportes</div>
+        <div class="home-sub">Estadísticas · SUIVE · Exportes</div>
       </div>
-      <div class="home-card" onclick="gotoMod('usuarios')">
+      <div class="home-card card-mgmt" onclick="gotoMod('usuarios')">
         <div class="home-icon">👥</div>
         <div class="home-label">Usuarios</div>
-        <div class="home-sub">Accesos · Perfiles</div>
+        <div class="home-sub">Accesos · Perfiles · Contraseñas</div>
       </div>
     </div>
   </div>
@@ -1324,8 +1345,8 @@ function loadCotizaciones() {
       renderCotizaciones(cotizCache);
       // Set next folio hint
       var yr = new Date().getFullYear();
-      var next = String(cotizCache.length + 1).padStart(3,'0');
-      document.getElementById('cotiz-folio').placeholder = 'BiM-'+yr+'-'+next+' (auto)';
+      var next = String(cotizCache.length + 1).padStart(4,'0');
+      document.getElementById('cotiz-folio').placeholder = next+'-'+yr+' (auto)';
     }
   });
 }
@@ -2347,103 +2368,166 @@ function calcSpiro() {
   drawSpiroCharts(fvc, fev1, pef, fef25, fef50, fef75);
 }
 function drawSpiroCharts(fvc, fev1, pef, fef25, fef50, fef75) {
-  // ── F-V Chart (Flow-Volume) ──
-  var fvCanvas = document.getElementById('spiro-fv-chart');
-  if(fvCanvas && fvc > 0) {
-    var ctx = fvCanvas.getContext('2d');
-    var W=260, H=180, PAD=30;
+  if(!fvc || fvc <= 0) return;
+  var maxF = pef > 0 ? pef * 1.08 : Math.max(fev1 * 2.5, 8);
+
+  // ── F-V Chart ──────────────────────────────────────────────
+  var fvCvs = document.getElementById('spiro-fv-chart');
+  if(fvCvs) {
+    var ctx = fvCvs.getContext('2d');
+    var W=260, H=180, PAD=34;
     ctx.clearRect(0,0,W,H);
-    // Grid
-    ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=1;
-    for(var i=0;i<=4;i++){var x=PAD+i*(W-2*PAD)/4;ctx.beginPath();ctx.moveTo(x,PAD);ctx.lineTo(x,H-PAD);ctx.stroke();}
-    for(var j=0;j<=4;j++){var y=PAD+j*(H-2*PAD)/4;ctx.beginPath();ctx.moveTo(PAD,y);ctx.lineTo(W-PAD,y);ctx.stroke();}
-    // Axes
-    ctx.strokeStyle='#555'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(PAD,PAD); ctx.lineTo(PAD,H-PAD); ctx.lineTo(W-PAD,H-PAD); ctx.stroke();
-    // Labels
-    ctx.fillStyle='#636875'; ctx.font='9px Arial'; ctx.textAlign='center';
-    ctx.fillText('Volumen (L)',W/2,H-4);
-    ctx.save(); ctx.translate(10,H/2); ctx.rotate(-Math.PI/2);
-    ctx.fillText('Flujo (L/s)',0,0); ctx.restore();
-    // Scale: x = 0..fvc, y = 0..pef (or estimate)
-    var maxFlow = pef > 0 ? pef : Math.max(fev1*3, 6);
-    var scX = (W-2*PAD)/Math.max(fvc,0.1);
-    var scY = (H-2*PAD)/Math.max(maxFlow,0.1);
-    // F-V curve: approximate as half-ellipse then linear descent
-    // Points: (0,0), (fev1*0.2, pef), (fev1, fef25), (fvc*0.5, fef50), (fvc*0.75, fef75), (fvc, 0)
-    var pts = [
-      [0, 0],
-      [fev1*0.15, maxFlow*0.9],
-      [fev1*0.3, pef>0?pef:maxFlow],
-      [fev1, fef25>0?fef25:maxFlow*0.6],
-      [fvc*0.5, fef50>0?fef50:maxFlow*0.4],
-      [fvc*0.75, fef75>0?fef75:maxFlow*0.2],
-      [fvc, 0]
-    ];
-    ctx.beginPath(); ctx.strokeStyle='#28aaa4'; ctx.lineWidth=2.5;
-    pts.forEach(function(p,i){
-      var x=PAD+p[0]*scX, y=H-PAD-p[1]*scY;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-    // Fill
-    ctx.fillStyle='rgba(40,170,164,0.08)';
-    ctx.beginPath();
-    pts.forEach(function(p,i){
-      var x=PAD+p[0]*scX, y=H-PAD-p[1]*scY;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.lineTo(W-PAD,H-PAD); ctx.lineTo(PAD,H-PAD); ctx.closePath(); ctx.fill();
-    // Axis ticks
-    ctx.fillStyle='#636875'; ctx.font='8px Arial'; ctx.textAlign='center';
-    [0, fvc/2, fvc].forEach(function(v){if(v>0||v===0){ctx.fillText(v.toFixed(1), PAD+v*scX, H-PAD+10);}});
-    ctx.textAlign='right';
-    [0, maxFlow/2, maxFlow].forEach(function(v){ctx.fillText(v.toFixed(1), PAD-3, H-PAD-v*scY+3);});
-  }
-  // ── V-T Chart (Volume-Time) ──
-  var vtCanvas = document.getElementById('spiro-vt-chart');
-  if(vtCanvas && fvc > 0) {
-    var ctx2 = vtCanvas.getContext('2d');
-    var W=260, H=180, PAD=30;
-    ctx2.clearRect(0,0,W,H);
-    ctx2.strokeStyle='#f0f0f0'; ctx2.lineWidth=1;
-    for(var i=0;i<=4;i++){var x=PAD+i*(W-2*PAD)/4;ctx2.beginPath();ctx2.moveTo(x,PAD);ctx2.lineTo(x,H-PAD);ctx2.stroke();}
-    for(var j=0;j<=4;j++){var y=PAD+j*(H-2*PAD)/4;ctx2.beginPath();ctx2.moveTo(PAD,y);ctx2.lineTo(W-PAD,y);ctx2.stroke();}
-    ctx2.strokeStyle='#555'; ctx2.lineWidth=1.5;
-    ctx2.beginPath(); ctx2.moveTo(PAD,PAD); ctx2.lineTo(PAD,H-PAD); ctx2.lineTo(W-PAD,H-PAD); ctx2.stroke();
-    ctx2.fillStyle='#636875'; ctx2.font='9px Arial'; ctx2.textAlign='center';
-    ctx2.fillText('Tiempo (s)',W/2,H-4);
-    ctx2.save(); ctx2.translate(10,H/2); ctx2.rotate(-Math.PI/2);
-    ctx2.fillText('Volumen (L)',0,0); ctx2.restore();
-    var maxT = 6, scX2=(W-2*PAD)/maxT, scY2=(H-2*PAD)/Math.max(fvc,0.1);
-    // V-T curve: rises fast then plateaus (typical FVC maneuver)
-    // t=0 → V=0, t=1 → V=fev1, t=3 → V=fvc*0.95, t=6 → V=fvc
-    var vtPts = [[0,0],[0.1,0],[0.25,fev1*0.4],[0.5,fev1*0.75],[1,fev1],[2,fvc*0.9],[3,fvc*0.96],[4,fvc*0.98],[6,fvc]];
-    ctx2.beginPath(); ctx2.strokeStyle='#2a4e7a'; ctx2.lineWidth=2.5;
-    vtPts.forEach(function(p,i){
-      var x=PAD+p[0]*scX2, y=H-PAD-p[1]*scY2;
-      i===0 ? ctx2.moveTo(x,y) : ctx2.lineTo(x,y);
-    });
-    ctx2.stroke();
-    ctx2.fillStyle='rgba(42,78,122,0.08)';
-    ctx2.beginPath();
-    vtPts.forEach(function(p,i){
-      var x=PAD+p[0]*scX2, y=H-PAD-p[1]*scY2;
-      i===0 ? ctx2.moveTo(x,y) : ctx2.lineTo(x,y);
-    });
-    ctx2.lineTo(W-PAD,H-PAD); ctx2.lineTo(PAD,H-PAD); ctx2.closePath(); ctx2.fill();
-    // FEV1 marker
-    if(fev1>0){
-      ctx2.setLineDash([3,3]); ctx2.strokeStyle='#e53935'; ctx2.lineWidth=1;
-      ctx2.beginPath(); ctx2.moveTo(PAD+scX2,H-PAD); ctx2.lineTo(PAD+scX2,H-PAD-fev1*scY2); ctx2.lineTo(PAD,H-PAD-fev1*scY2); ctx2.stroke();
-      ctx2.setLineDash([]);
-      ctx2.fillStyle='#e53935'; ctx2.font='8px Arial'; ctx2.textAlign='left';
-      ctx2.fillText('FEV1='+fev1.toFixed(1)+'L', PAD+scX2+2, H-PAD-fev1*scY2-2);
+    var scX = (W-2*PAD)/fvc;
+    var scY = (H-2*PAD)/maxF;
+    function px(v){ return PAD + v*scX; }
+    function py(f){ return H-PAD - f*scY; }
+
+    // Grid lines
+    ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=0.7;
+    for(var gi=1;gi<5;gi++){
+      var xg=PAD+gi*(W-2*PAD)/4;
+      ctx.beginPath();ctx.moveTo(xg,PAD);ctx.lineTo(xg,H-PAD);ctx.stroke();
+      var yg=PAD+gi*(H-2*PAD)/4;
+      ctx.beginPath();ctx.moveTo(PAD,yg);ctx.lineTo(W-PAD,yg);ctx.stroke();
     }
-    ctx2.fillStyle='#636875'; ctx2.font='8px Arial'; ctx2.textAlign='center';
-    [0,1,2,3,4,5,6].forEach(function(t){ctx2.fillText(t, PAD+t*scX2, H-PAD+10);});
+    // Axes
+    ctx.strokeStyle='#444';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(PAD,PAD-4);ctx.lineTo(PAD,H-PAD);ctx.lineTo(W-PAD,H-PAD);ctx.stroke();
+
+    // ── F-V smooth curve ──
+    // Rising: sine ease from 0 to PEF in first ~12% of FVC
+    // Descending: power-law decay F = pef * ((fvc-V)/(fvc-vPeak))^alpha
+    var vPeak = 0.13 * fvc;
+    var alpha = 0.72;
+    if(fef50 > 0 && pef > 0 && fef50 < pef) {
+      var base = (0.5*fvc - vPeak)/(fvc - vPeak);
+      if(base > 0 && base < 1) {
+        var a2 = Math.log(fef50/pef) / Math.log(base);
+        if(a2 > 0.2 && a2 < 2.0) alpha = a2;
+      }
+    }
+
+    var nPts = 120;
+    var crvPts = [];
+    for(var k=0;k<=nPts;k++){
+      var vol = (k/nPts)*fvc;
+      var flow;
+      if(vol < vPeak){
+        flow = pef * Math.sin((vol/vPeak)*(Math.PI/2));
+      } else {
+        var t2 = (fvc-vol)/(fvc-vPeak);
+        flow = pef * Math.pow(Math.max(0,t2), alpha);
+      }
+      crvPts.push([px(vol), py(Math.max(0,flow))]);
+    }
+
+    // Filled area under curve
+    ctx.beginPath();
+    ctx.fillStyle='rgba(40,170,164,0.10)';
+    crvPts.forEach(function(p,i){if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);});
+    ctx.lineTo(px(fvc),H-PAD);ctx.lineTo(PAD,H-PAD);ctx.closePath();ctx.fill();
+
+    // Main curve: bezier for rising edge + smooth path for descent
+    ctx.beginPath();
+    ctx.strokeStyle='#28aaa4';ctx.lineWidth=2.5;
+    ctx.moveTo(px(0),py(0));
+    // Bezier rising: steep S-curve to PEF
+    ctx.bezierCurveTo(px(vPeak*0.2),py(0), px(vPeak*0.75),py(pef*1.05), px(vPeak),py(pef));
+    // Descent: smooth path through measured points
+    var descPts = crvPts.filter(function(p,i){ return (i/nPts)*fvc >= vPeak; });
+    descPts.forEach(function(p){ ctx.lineTo(p[0],p[1]); });
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle='#555';ctx.font='9px Arial';ctx.textAlign='center';
+    ctx.fillText('Volumen (L)',W/2,H-2);
+    ctx.save();ctx.translate(9,H/2);ctx.rotate(-Math.PI/2);ctx.fillText('Flujo (L/s)',0,0);ctx.restore();
+    // Ticks
+    ctx.textAlign='center';
+    [0,fvc/2,fvc].forEach(function(v){if(v>0||v===0)ctx.fillText(v.toFixed(1),px(v),H-PAD+10);});
+    ctx.textAlign='right';
+    [0,maxF/2,maxF].forEach(function(v){ctx.fillText(v.toFixed(1),PAD-3,py(v)+3);});
+    // Title
+    ctx.fillStyle='#2a4e7a';ctx.font='bold 9px Arial';ctx.textAlign='center';
+    ctx.fillText('Curva F-V',W/2,PAD-5);
+  }
+
+  // ── V-T Chart ──────────────────────────────────────────────
+  var vtCvs = document.getElementById('spiro-vt-chart');
+  if(vtCvs) {
+    var ctx2 = vtCvs.getContext('2d');
+    var W=260, H=180, PAD=34;
+    ctx2.clearRect(0,0,W,H);
+    var maxT=6;
+    var scX2=(W-2*PAD)/maxT;
+    var scY2=(H-2*PAD)/Math.max(fvc,0.1);
+    function px2(t){ return PAD+t*scX2; }
+    function py2(v){ return H-PAD-v*scY2; }
+
+    // Grid
+    ctx2.strokeStyle='#f0f0f0';ctx2.lineWidth=0.7;
+    for(var gi2=1;gi2<=6;gi2++){
+      ctx2.beginPath();ctx2.moveTo(px2(gi2),PAD);ctx2.lineTo(px2(gi2),H-PAD);ctx2.stroke();
+    }
+    for(var gi3=1;gi3<5;gi3++){
+      ctx2.beginPath();ctx2.moveTo(PAD,py2(fvc*gi3/4));ctx2.lineTo(W-PAD,py2(fvc*gi3/4));ctx2.stroke();
+    }
+    // Axes
+    ctx2.strokeStyle='#444';ctx2.lineWidth=1.5;
+    ctx2.beginPath();ctx2.moveTo(PAD,PAD-4);ctx2.lineTo(PAD,H-PAD);ctx2.lineTo(W-PAD,H-PAD);ctx2.stroke();
+
+    // ── V-T smooth curve: V(t) = fvc*(1-exp(-k*t)) ──
+    var k_vt = 0.8;
+    if(fev1 > 0 && fvc > fev1) {
+      var kk = -Math.log(1 - fev1/fvc);
+      if(kk > 0.2 && kk < 5) k_vt = kk;
+    }
+
+    var nPts2 = 120;
+    var vtPts = [];
+    for(var k2=0;k2<=nPts2;k2++){
+      var t3 = (k2/nPts2)*maxT;
+      var vol2 = fvc*(1-Math.exp(-k_vt*t3));
+      vtPts.push([px2(t3),py2(vol2)]);
+    }
+
+    // Fill
+    ctx2.beginPath();
+    ctx2.fillStyle='rgba(42,78,122,0.08)';
+    vtPts.forEach(function(p,i){if(i===0)ctx2.moveTo(p[0],p[1]);else ctx2.lineTo(p[0],p[1]);});
+    ctx2.lineTo(W-PAD,H-PAD);ctx2.lineTo(PAD,H-PAD);ctx2.closePath();ctx2.fill();
+
+    // Smooth curve using bezier for initial steep rise
+    ctx2.beginPath();ctx2.strokeStyle='#2a4e7a';ctx2.lineWidth=2.5;
+    ctx2.moveTo(px2(0),py2(0));
+    // Steep initial rise (bezier tangent pointing up-right)
+    ctx2.bezierCurveTo(px2(0.3),py2(fev1*0.9), px2(1.2),py2(fvc*0.92), px2(2),py2(fvc*0.965));
+    // Then smooth plateau toward FVC
+    ctx2.bezierCurveTo(px2(3),py2(fvc*0.985), px2(4.5),py2(fvc*0.997), px2(maxT),py2(fvc));
+    ctx2.stroke();
+
+    // FEV1 reference lines
+    if(fev1 > 0){
+      ctx2.save();
+      ctx2.setLineDash([3,3]);
+      ctx2.strokeStyle='rgba(40,170,164,0.7)';ctx2.lineWidth=1;
+      ctx2.beginPath();ctx2.moveTo(px2(1),py2(0));ctx2.lineTo(px2(1),py2(fvc));ctx2.stroke();
+      ctx2.beginPath();ctx2.moveTo(PAD,py2(fev1));ctx2.lineTo(W-PAD,py2(fev1));ctx2.stroke();
+      ctx2.restore();
+      ctx2.fillStyle='#28aaa4';ctx2.font='bold 8px Arial';ctx2.textAlign='left';
+      ctx2.fillText('FEV1='+fev1.toFixed(2)+'L',px2(1)+2,py2(fev1)-3);
+    }
+
+    // Labels
+    ctx2.fillStyle='#555';ctx2.font='9px Arial';ctx2.textAlign='center';
+    ctx2.fillText('Tiempo (s)',W/2,H-2);
+    ctx2.save();ctx2.translate(9,H/2);ctx2.rotate(-Math.PI/2);ctx2.fillText('Volumen (L)',0,0);ctx2.restore();
+    ctx2.textAlign='center';
+    [0,1,2,3,4,5,6].forEach(function(t4){ctx2.fillText(t4,px2(t4),H-PAD+10);});
     ctx2.textAlign='right';
-    [0, fvc/2, fvc].forEach(function(v){ctx2.fillText(v.toFixed(1), PAD-3, H-PAD-v*scY2+3);});
+    [0,fvc/2,fvc].forEach(function(v){ctx2.fillText(v.toFixed(1),PAD-3,py2(v)+3);});
+    ctx2.fillStyle='#2a4e7a';ctx2.font='bold 9px Arial';ctx2.textAlign='center';
+    ctx2.fillText('Curva V-T',W/2,PAD-5);
   }
 }
 
@@ -2971,9 +3055,12 @@ function slotIndex(s){ return AG_SLOTS.indexOf(s); }
 function agCardHtml(a) {
   const clrs=['#1565c0','#2e7d32','#6a1b9a'];
   const bg=clrs[(parseInt(a.consultorio)||1)-1]||'#1565c0';
+  const meetBtn = (a.modalidad==='Virtual' && a.meetLink)
+    ? '<a href="'+a.meetLink+'" target="_blank" title="Unirse a Google Meet" style="display:inline-block;background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 5px;font-size:.82em;text-decoration:none;margin-left:4px">🎥 Meet</a>'
+    : '';
   return '<div style="background:'+bg+';color:#fff;border-radius:6px;padding:4px 7px;margin-bottom:2px;font-size:.79em">'
     +'<b>'+a.hora+' '+a.paciente+'</b>'
-    +'<div>'+a.tipoVisita+' · '+(a.secuencia||'')+(a.modalidad==='Virtual'?' · 📱 Virt.':'')+'</div>'
+    +'<div>'+a.tipoVisita+' · '+(a.secuencia||'')+(a.modalidad==='Virtual'?' · 📱':'')+meetBtn+'</div>'
     +(a.telefono?'<div>📞 '+a.telefono+'</div>':'')
     +(a.id?'<div style="margin-top:2px"><button onclick="event.stopPropagation();deleteAgendaItem(this.dataset.id)" data-id="'+a.id+'" style="background:rgba(255,255,255,.28);color:#fff;border:none;cursor:pointer;padding:1px 6px;border-radius:4px;font-size:.82em">✕ Cancelar</button></div>':'')
     +'</div>';
@@ -3052,12 +3139,22 @@ function saveAgendaItem() {
     email:document.getElementById('ag-email').value.trim(),
     notas:document.getElementById('ag-notas').value.trim()
   };
-  gasPost({action:'saveAgenda', item:item}, function(r) {
-    if(!r.ok){ alert('Error: '+(r.error||'')); return; }
-    document.getElementById('agenda-form-wrap').style.display='none';
-    ['ag-pac','ag-tel','ag-email','ag-hora','ag-notas'].forEach(id=>document.getElementById(id).value='');
-    loadAgenda();
-  });
+  function doSave(meetLink) {
+    if(meetLink) item.meetLink = meetLink;
+    gasPost({action:'saveAgenda', item:item}, function(r) {
+      if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+      document.getElementById('agenda-form-wrap').style.display='none';
+      ['ag-pac','ag-tel','ag-email','ag-hora','ag-notas'].forEach(id=>document.getElementById(id).value='');
+      loadAgenda();
+    });
+  }
+  if(item.modalidad === 'Virtual') {
+    gasPost({action:'createMeetEvent', item:item}, function(r) {
+      doSave(r && r.meetLink ? r.meetLink : '');
+    });
+  } else {
+    doSave('');
+  }
 }
 function deleteAgendaItem(id) {
   if(!confirm('¿Cancelar esta cita?')) return;
@@ -3612,7 +3709,7 @@ function printVisita() {
   if(ev.hc.padecimiento) html += '<h3>Padecimiento Actual</h3><p>'+ev.hc.padecimiento+'</p>';
 
   // Examen físico
-  if(ev.exams.fisico) {
+  if(pchk('chk-fisico') && ev.exams.fisico) {
     const f = ev.exams.fisico;
     html += '<h3>Examen Físico</h3><table><tr><td>Peso: '+f.peso+' kg</td><td>Talla: '+f.talla+' cm</td><td>IMC: '+f.imc+'</td><td>TA: '+f.ta+'</td><td>FC: '+f.fc+' lpm</td></tr>'
       +'<tr><td>SpO2: '+f.spo2+'%</td><td>Glucosa: '+f.glucosa+' mg/dL</td><td>% Grasa: '+f.grasa+'</td><td>Masa Musc: '+f.musculo+' kg</td><td>Temp: '+f.temp+'°C</td></tr></table>'
@@ -3620,7 +3717,7 @@ function printVisita() {
   }
 
   // Agudeza visual
-  if(ev.exams.visual) {
+  if(pchk('chk-visual') && ev.exams.visual) {
     const av = ev.exams.visual;
     html += '<h3>Agudeza Visual</h3><table><tr><th>Ojo</th><th>Lejos s/c</th><th>Lejos c/c</th><th>Cerca s/c</th><th>Cerca c/c</th></tr>'
       +'<tr><td>OD</td><td>'+av.odLsc+'</td><td>'+av.odLcc+'</td><td>'+av.odCsc+'</td><td>'+av.odCcc+'</td></tr>'
@@ -3628,7 +3725,7 @@ function printVisita() {
   }
 
   // Audiometría
-  if(ev.exams.audio) {
+  if(pchk('chk-audio') && ev.exams.audio) {
     const a = ev.exams.audio;
     html += '<h3>Audiometría</h3><table><tr><th>Oído</th>'+HZ.map(h=>'<th>'+h+' Hz</th>').join('')+'</tr>'
       +'<tr><td>OD</td>'+a.od.map(v=>'<td>'+v+'</td>').join('')+'</tr>'
@@ -3636,14 +3733,14 @@ function printVisita() {
   }
 
   // Espirometría
-  if(ev.exams.espiro) {
+  if(pchk('chk-espiro') && ev.exams.espiro) {
     const s = ev.exams.espiro;
     html += '<h3>Espirometría</h3><table><tr><th>FVC</th><th>FEV1</th><th>FEV1/FVC</th><th>PEF</th><th>FEF25-75</th><th>Interpretación</th></tr>'
       +'<tr><td>'+s.fvc+' L</td><td>'+s.fev1+' L</td><td>'+s.ratio+'%</td><td>'+s.pef+'</td><td>'+s.fef2575+'</td><td>'+s.interpretacion+'</td></tr></table>';
   }
 
   // Antidoping
-  if(ev.exams.antidoping) {
+  if(pchk('chk-antid') && ev.exams.antidoping) {
     const positivos = ANTIDP.filter(s => ev.exams.antidoping[s.c] === 'Positivo').map(s=>s.n);
     const negativos = ANTIDP.filter(s => ev.exams.antidoping[s.c] === 'Negativo').map(s=>s.n);
     if(negativos.length||positivos.length) {
@@ -3654,21 +3751,27 @@ function printVisita() {
   }
 
   // Laboratorio solicitado
-  if(ev.exams.laboratorio && ev.exams.laboratorio.length) {
+  if(pchk('chk-labsol') && ev.exams.laboratorio && ev.exams.laboratorio.length) {
     html += '<h3>Laboratorio Solicitado</h3><table><tr><th>Estudio</th><th>Resultado</th><th>Interpretación</th></tr>'
       + ev.exams.laboratorio.map(l=>'<tr><td>'+l.nombre+'</td><td>'+l.resultado+'</td><td>'+l.interpretacion+'</td></tr>').join('')+'</table>';
   }
 
   // Diagnóstico y conclusión
-  html += '<h3>Diagnóstico y Conclusión</h3>';
-  if(ev.conclusion.ciePrimary) html += '<p><strong>Diagnóstico principal:</strong> '+ev.conclusion.ciePrimary.c+' — '+ev.conclusion.ciePrimary.d+'</p>';
-  if(ev.conclusion.cieSecondary.length) html += '<p><strong>Secundarios:</strong> '+ev.conclusion.cieSecondary.map(x=>x.c+' '+x.d).join('; ')+'</p>';
-  html += '<p><strong>Aptitud:</strong> <span style="font-size:1.1em;font-weight:700">'+ev.conclusion.resultado+'</span></p>';
-  if(ev.conclusion.restricciones) {
-    const r = ev.conclusion.restricciones;
-    html += '<p><strong>Restricciones:</strong> '+[r.tipo, r.parte, r.lateralidad, r.params].filter(Boolean).join(' · ')+'</p>';
+  if(pchk('chk-cie') || pchk('chk-aptitud')) {
+    html += '<h3>Diagnóstico y Conclusión</h3>';
+    if(pchk('chk-cie')) {
+      if(ev.conclusion.ciePrimary) html += '<p><strong>Diagnóstico principal:</strong> '+ev.conclusion.ciePrimary.c+' — '+ev.conclusion.ciePrimary.d+'</p>';
+      if(ev.conclusion.cieSecondary.length) html += '<p><strong>Secundarios:</strong> '+ev.conclusion.cieSecondary.map(x=>x.c+' '+x.d).join('; ')+'</p>';
+    }
+    if(pchk('chk-aptitud')) {
+      html += '<p><strong>Aptitud:</strong> <span style="font-size:1.1em;font-weight:700">'+ev.conclusion.resultado+'</span></p>';
+      if(ev.conclusion.restricciones) {
+        const r = ev.conclusion.restricciones;
+        html += '<p><strong>Restricciones:</strong> '+[r.tipo, r.parte, r.lateralidad, r.params].filter(Boolean).join(' · ')+'</p>';
+      }
+      if(ev.conclusion.comentarios) html += '<p><strong>Recomendaciones:</strong> '+ev.conclusion.comentarios+'</p>';
+    }
   }
-  if(ev.conclusion.comentarios) html += '<p><strong>Recomendaciones:</strong> '+ev.conclusion.comentarios+'</p>';
 
   html += sigBox();
   printWin(html, 'Visita — '+(p.nombre||''));
@@ -3837,6 +3940,23 @@ function printRiesgoTrabajo() {
     +'</table>'
     +'<h3>Declaración del paciente</h3><p style="white-space:pre-line">'+v('rt-desc')+'</p>'
     +'<h3>Declaración del personal de salud</h3><p style="white-space:pre-line">'+v('rt-medidas')+'</p>'
+    +(function(){
+      function chkRT(id){ var el=document.getElementById(id); return el && el.checked; }
+      var incap = chkRT('rt-amerita-incap'), limit = chkRT('rt-amerita-limit'), ref = chkRT('rt-amerita-ref');
+      return '<h3 style="margin-top:14px">¿Amerita?</h3>'
+        +'<table style="width:100%;border-collapse:collapse">'
+        +'<tr>'
+        +'<td style="padding:7px 12px;border:1px solid #ddd;width:33%"><strong>Incapacidad</strong><br>'
+        +(incap?'<span style="color:#e53935;font-size:1.1em;font-weight:700">✔ SÍ</span>':'<span style="color:#555">— NO</span>')
+        +'</td>'
+        +'<td style="padding:7px 12px;border:1px solid #ddd;width:33%"><strong>Limitación funcional</strong><br>'
+        +(limit?'<span style="color:#e53935;font-size:1.1em;font-weight:700">✔ SÍ</span>':'<span style="color:#555">— NO</span>')
+        +'</td>'
+        +'<td style="padding:7px 12px;border:1px solid #ddd;width:34%"><strong>Referencia / Interconsulta</strong><br>'
+        +(ref?'<span style="color:#e53935;font-size:1.1em;font-weight:700">✔ SÍ</span>':'<span style="color:#555">— NO</span>')
+        +'</td>'
+        +'</tr></table>';
+    })()
     + sigBox();
   const emailBtn = supEmail ? '<button class="btn-email" onclick="alert(\'Para enviar al supervisor ('+supEmail+'), use la opción de correo en el sistema.\')">✉ Enviar a supervisor</button>' : '';
   printWin(html, 'Investigación de Riesgo de Trabajo', emailBtn);
@@ -5147,6 +5267,7 @@ function saveHistorialNota() {
 <!-- ══ COTIZACIONES ══════════════════════════════════════════ -->
 <div id="screen-cotiz" class="screen">
 <div class="sec-hdr no-print">
+  <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
   <h2>📝 Cotizaciones</h2>
 </div>
 
