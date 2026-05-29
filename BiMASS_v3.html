@@ -164,6 +164,10 @@ tr:hover td{background:#f0faf9}
         ¿Primera vez? Crea tu cuenta con <strong>"Registrarse"</strong> arriba o contacta al Director para que te apruebe el acceso.
       </div>
     </div>
+    <div style="margin-top:14px;text-align:center">
+      <button type="button" onclick="testGASConnection()" style="background:none;border:none;color:#888;font-size:.8em;cursor:pointer;text-decoration:underline">🔧 Diagnosticar conexión</button>
+    </div>
+    <div id="diag-panel" style="display:none;margin-top:10px;padding:12px;background:#f5f5f5;border-radius:8px;font-size:.82em;font-family:monospace;text-align:left;white-space:pre-wrap;word-break:break-all;max-height:180px;overflow-y:auto"></div>
   </div>
   <div id="auth-form-register" class="auth-form">
     <div id="err-reg" class="alert alert-d" style="display:none"></div>
@@ -1848,42 +1852,98 @@ function showAuthTab(t) {
   });
 }
 
+function testGASConnection() {
+  var panel = document.getElementById('diag-panel');
+  panel.style.display = 'block';
+  panel.textContent = '⏳ Iniciando diagnóstico...\n';
+  var log = function(msg){ panel.textContent += msg + '\n'; };
+  log('1. Verificando objeto google...');
+  if(typeof google === 'undefined' || !google.script) {
+    log('❌ google.script NO disponible.');
+    log('   → La app se abrió como archivo local, no desde GAS.');
+    log('   → Debes usar la URL de despliegue de GAS (script.google.com).');
+    return;
+  }
+  log('✓ google.script disponible.');
+  log('2. Enviando ping al servidor GAS...');
+  var done = false;
+  var t = setTimeout(function(){
+    if(!done){ done=true; log('❌ Sin respuesta del servidor (timeout 15s).');
+      log('   → Posible causa: script no autorizado. Abre la URL del app en tu navegador.'); }
+  }, 15000);
+  google.script.run
+    .withSuccessHandler(function(res){
+      if(done) return; done=true; clearTimeout(t);
+      log('✓ Servidor respondió: ' + String(res).slice(0,200));
+      try {
+        var r = JSON.parse(res);
+        if(r.ok) log('✓ GAS funcionando correctamente. Versión: ' + (r.v||'?'));
+        else log('⚠️ GAS respondió con error: ' + r.error);
+      } catch(e){ log('⚠️ Respuesta no JSON: ' + String(res).slice(0,100)); }
+    })
+    .withFailureHandler(function(e){
+      if(done) return; done=true; clearTimeout(t);
+      log('❌ Error GAS: ' + (e?e.message||String(e):'desconocido'));
+      log('   → Puede ser que el script necesite autorización de permisos.');
+      log('   → Ve a script.google.com → Desplegar → gestionar despliegues → abre la URL y autoriza.');
+    })
+    .serverAction(JSON.stringify({action:'ping'}));
+}
+
 function doLogin() {
   const email = document.getElementById('l-email').value.trim();
   const pass = document.getElementById('l-pass').value;
   const err = document.getElementById('err-login');
+  const btn = document.querySelector('#auth-form-login .btn-p');
   function showErr(msg) {
-    err.innerHTML = '❌ ' + msg;
-    err.style.display = 'block';
-    err.style.fontSize = '0.95em';
-    err.style.padding = '12px 16px';
-    err.scrollIntoView({behavior:'smooth', block:'nearest'});
+    err.innerHTML = '<strong>❌ Error:</strong> ' + msg;
+    err.style.cssText = 'display:block;font-size:1em;padding:14px 16px;margin-bottom:12px;background:#ffebee;color:#c62828;border-left:4px solid #c62828;border-radius:6px';
+    if(btn){ btn.disabled=false; btn.textContent='Ingresar'; }
   }
   err.style.display = 'none';
-  if(!email || !pass) { showErr('Ingresa tu correo electrónico y contraseña.'); return; }
-  gasPost({action:'login', email:email, password:pass}, function(r) {
-    if(!r.ok) { showErr(r.error||'Correo o contraseña incorrectos.'); return; }
-    if(!r.user) { showErr('Respuesta inesperada del servidor. Intenta de nuevo.'); return; }
-    try {
-      currentUser = r.user;
-      document.getElementById('navbar').style.display = 'flex';
-      document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
-      const adminRow = document.getElementById('home-admin-row');
-      if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
-      const cardInv = document.getElementById('card-inv');
-      if(cardInv) cardInv.style.display = canAccess('inventario') ? '' : 'none';
-      const isLabUser = currentUser.perfil === 'Laboratorio';
-      if(isLabUser) {
-        document.querySelectorAll('.home-grid .home-card').forEach(c => {
-          c.style.display = (c.id==='card-lab'||c.id==='card-xray') ? '' : 'none';
-        });
-      }
-      document.getElementById('home-greeting').textContent = 'Bienvenido, ' + currentUser.nombre.split(' ')[0];
-      showScreen('home');
-    } catch(e) {
-      showErr('Error al cargar el sistema: ' + e.message);
-    }
-  });
+  if(!email){ showErr('Escribe tu correo electrónico.'); return; }
+  if(!pass){ showErr('Escribe tu contraseña.'); return; }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Verificando...'; }
+  // No usar showLoader para login — mantener la UI visible
+  if(typeof google === 'undefined' || !google.script || !google.script.run) {
+    showErr('La app debe abrirse desde la URL de Google Apps Script, no como archivo local. Ve a script.google.com → tu proyecto → Desplegar → URL de la aplicación web.');
+    return;
+  }
+  var done = false;
+  var t = setTimeout(function(){
+    if(!done){ done=true; showErr('Tiempo de espera agotado (20s). Verifica que el script esté desplegado y autorizado en script.google.com.'); }
+  }, 20000);
+  google.script.run
+    .withSuccessHandler(function(res){
+      if(done) return; done=true; clearTimeout(t);
+      if(btn){ btn.disabled=false; btn.textContent='Ingresar'; }
+      var r;
+      try { r = JSON.parse(res); } catch(e){ showErr('Respuesta inválida del servidor: '+String(res).slice(0,80)); return; }
+      if(!r.ok){ showErr(r.error||'No se pudo iniciar sesión.'); return; }
+      if(!r.user){ showErr('El servidor respondió pero no devolvió datos de usuario.'); return; }
+      try {
+        currentUser = r.user;
+        document.getElementById('navbar').style.display = 'flex';
+        document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
+        const adminRow = document.getElementById('home-admin-row');
+        if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
+        const cardInv = document.getElementById('card-inv');
+        if(cardInv) cardInv.style.display = canAccess('inventario') ? '' : 'none';
+        const isLabUser = currentUser.perfil === 'Laboratorio';
+        if(isLabUser) {
+          document.querySelectorAll('.home-grid .home-card').forEach(c => {
+            c.style.display = (c.id==='card-lab'||c.id==='card-xray') ? '' : 'none';
+          });
+        }
+        document.getElementById('home-greeting').textContent = 'Bienvenido, ' + currentUser.nombre.split(' ')[0];
+        showScreen('home');
+      } catch(e){ showErr('Error al abrir el sistema: ' + e.message); }
+    })
+    .withFailureHandler(function(e){
+      if(done) return; done=true; clearTimeout(t);
+      showErr('Error del servidor GAS: ' + (e ? e.message||String(e) : 'desconocido') + '. Si es un despliegue nuevo, ábrelo en el navegador para autorizar permisos.');
+    })
+    .serverAction(JSON.stringify({action:'login', email:email, password:pass}));
 }
 
 function doRegister() {
