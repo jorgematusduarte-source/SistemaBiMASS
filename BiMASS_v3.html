@@ -1751,18 +1751,33 @@ function gasPost(data, cb) {
   showLoader(true);
   if(typeof google === 'undefined' || !google.script || !google.script.run) {
     showLoader(false);
-    cb({ok:false, error:'⚠️ Esta aplicación debe abrirse desde Google Apps Script.\n\nSi ves esto al abrir el archivo HTML directamente, ve a: script.google.com → Desplegar → Como aplicación web → URL.'});
+    cb({ok:false, error:'Esta aplicación debe abrirse desde la URL de Google Apps Script (no como archivo local). Ve a script.google.com → tu proyecto → Desplegar → Gestionar despliegues → copia la URL de la aplicación web.'});
     return;
   }
+  var done = false;
+  var timeout = setTimeout(function() {
+    if(!done) {
+      done = true;
+      showLoader(false);
+      cb({ok:false, error:'⏱ La solicitud tardó demasiado. Verifica tu conexión a internet y que el script de GAS esté autorizado. Si es un despliegue nuevo, abre la URL del app en el navegador para autorizar permisos.'});
+    }
+  }, 20000);
   google.script.run
     .withSuccessHandler(function(res){
+      if(done) return;
+      done = true;
+      clearTimeout(timeout);
       showLoader(false);
       try { cb(JSON.parse(res)); }
-      catch(e){ cb({ok:false,error:'Error de respuesta: '+e.message}); }
+      catch(e){ cb({ok:false,error:'Error de respuesta del servidor: '+e.message+' | Respuesta: '+String(res).slice(0,120)}); }
     })
     .withFailureHandler(function(err){
+      if(done) return;
+      done = true;
+      clearTimeout(timeout);
       showLoader(false);
-      cb({ok:false, error: err ? err.message||String(err) : 'Error desconocido'});
+      var msg = err ? (err.message||String(err)) : 'Error desconocido en el servidor';
+      cb({ok:false, error:'Error GAS: ' + msg});
     })
     .serverAction(JSON.stringify(data));
 }
@@ -1832,25 +1847,37 @@ function doLogin() {
   const email = document.getElementById('l-email').value.trim();
   const pass = document.getElementById('l-pass').value;
   const err = document.getElementById('err-login');
+  function showErr(msg) {
+    err.innerHTML = '❌ ' + msg;
+    err.style.display = 'block';
+    err.style.fontSize = '0.95em';
+    err.style.padding = '12px 16px';
+    err.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
   err.style.display = 'none';
-  if(!email || !pass) { err.textContent = 'Ingresa correo y contraseña'; err.style.display = 'block'; return; }
+  if(!email || !pass) { showErr('Ingresa tu correo electrónico y contraseña.'); return; }
   gasPost({action:'login', email:email, password:pass}, function(r) {
-    if(!r.ok) { err.textContent = r.error||'Error al iniciar sesión'; err.style.display = 'block'; return; }
-    currentUser = r.user;
-    document.getElementById('navbar').style.display = 'flex';
-    document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
-    const adminRow = document.getElementById('home-admin-row');
-    if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
-    const cardInv = document.getElementById('card-inv');
-    if(cardInv) cardInv.style.display = canAccess('inventario') ? '' : 'none';
-    const isLabUser = currentUser.perfil === 'Laboratorio';
-    if(isLabUser) {
-      document.querySelectorAll('.home-grid .home-card').forEach(c => {
-        c.style.display = (c.id==='card-lab'||c.id==='card-xray') ? '' : 'none';
-      });
+    if(!r.ok) { showErr(r.error||'Correo o contraseña incorrectos.'); return; }
+    if(!r.user) { showErr('Respuesta inesperada del servidor. Intenta de nuevo.'); return; }
+    try {
+      currentUser = r.user;
+      document.getElementById('navbar').style.display = 'flex';
+      document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
+      const adminRow = document.getElementById('home-admin-row');
+      if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
+      const cardInv = document.getElementById('card-inv');
+      if(cardInv) cardInv.style.display = canAccess('inventario') ? '' : 'none';
+      const isLabUser = currentUser.perfil === 'Laboratorio';
+      if(isLabUser) {
+        document.querySelectorAll('.home-grid .home-card').forEach(c => {
+          c.style.display = (c.id==='card-lab'||c.id==='card-xray') ? '' : 'none';
+        });
+      }
+      document.getElementById('home-greeting').textContent = 'Bienvenido, ' + currentUser.nombre.split(' ')[0];
+      showScreen('home');
+    } catch(e) {
+      showErr('Error al cargar el sistema: ' + e.message);
     }
-    document.getElementById('home-greeting').textContent = 'Bienvenido, ' + currentUser.nombre.split(' ')[0];
-    showScreen('home');
   });
 }
 
