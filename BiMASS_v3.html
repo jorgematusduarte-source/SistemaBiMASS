@@ -158,7 +158,12 @@ tr:hover td{background:#f0faf9}
     <div id="err-login" class="alert alert-d" style="display:none"></div>
     <div class="form-row"><div class="fg w100"><label>Correo electrónico</label><input id="l-email" type="email" placeholder="correo@ejemplo.com"></div></div>
     <div class="form-row"><div class="fg w100"><label>Contraseña</label><input id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div></div>
-    <button class="btn btn-p w100 btn-lg mt16" onclick="doLogin()">Ingresar</button>
+    <button class="btn btn-p w100 btn-lg mt16" onclick="doLogin()" type="button">Ingresar</button>
+    <div id="login-no-account" style="margin-top:14px;text-align:center;display:none">
+      <div class="alert alert-w" style="margin-bottom:8px;font-size:.85em">
+        ¿Primera vez? Crea tu cuenta con <strong>"Registrarse"</strong> arriba o contacta al Director para que te apruebe el acceso.
+      </div>
+    </div>
   </div>
   <div id="auth-form-register" class="auth-form">
     <div id="err-reg" class="alert alert-d" style="display:none"></div>
