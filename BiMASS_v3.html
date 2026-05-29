@@ -225,6 +225,11 @@ tr:hover td{background:#f0faf9}
       <div class="home-label">Imagenología</div>
       <div class="home-sub">Rayos X · Imágenes · Diagnóstico</div>
     </div>
+    <div class="home-card" id="card-cotiz" onclick="gotoMod('cotiz')">
+      <div class="home-icon">📝</div>
+      <div class="home-label">Cotizaciones</div>
+      <div class="home-sub">Propuestas · Seguimiento</div>
+    </div>
   </div>
   <div id="home-admin-row" style="display:none">
     <div class="home-grid mt20" style="max-width:380px;margin:20px auto 0">
@@ -281,6 +286,47 @@ tr:hover td{background:#f0faf9}
   <div class="form-row"><div class="fg w100"><label>Alergias conocidas</label><input id="np-alrg" type="text" placeholder="Ninguna conocida"></div></div>
   <div id="err-np" class="alert alert-d" style="display:none"></div>
   <button class="btn btn-s mt8" onclick="saveNewPatient()">Registrar y continuar →</button>
+</div>
+</div>
+
+<!-- HISTORIAL PACIENTE -->
+<div id="screen-hist" class="screen">
+<div class="sec-hdr no-print">
+  <button class="btn btn-o btn-sm" onclick="showScreen('patient')">← Regresar a paciente</button>
+  <h2 id="hist-pat-name">Historial del paciente</h2>
+  <button class="btn btn-p btn-sm" onclick="showVTypeScreen()">Iniciar atención →</button>
+</div>
+<div class="card no-print">
+  <div class="form-row">
+    <div class="fg" style="flex:3"><input id="hist-q" type="text" placeholder="Buscar por fecha, diagnóstico, tipo de visita..." oninput="filterHistorial()"></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">📋 Visitas previas</div>
+  <div id="hist-table"></div>
+</div>
+<!-- Modal ver visita -->
+<div id="hist-view-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;overflow-y:auto">
+  <div style="background:#fff;max-width:720px;margin:40px auto;border-radius:14px;padding:28px;position:relative">
+    <button onclick="document.getElementById('hist-view-modal').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4em;cursor:pointer">✕</button>
+    <h3 id="hvm-title" style="color:#2a4e7a;margin-top:0"></h3>
+    <div id="hvm-body"></div>
+  </div>
+</div>
+<!-- Modal editar visita (solo agregar notas) -->
+<div id="hist-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;overflow-y:auto">
+  <div style="background:#fff;max-width:600px;margin:40px auto;border-radius:14px;padding:28px;position:relative">
+    <button onclick="document.getElementById('hist-edit-modal').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4em;cursor:pointer">✕</button>
+    <h3 style="color:#2a4e7a;margin-top:0">✏️ Agregar nota a la visita</h3>
+    <div id="hem-prev-notas" style="margin-bottom:12px;font-size:.88em;color:#555"></div>
+    <label style="font-weight:600;font-size:.88em">Nueva nota (se agrega al historial, no se puede eliminar):</label>
+    <textarea id="hem-nota" rows="4" style="width:100%;margin-top:6px;border:1.5px solid #dde3ea;border-radius:8px;padding:8px;font-size:.9em" placeholder="Escriba la nota adicional..."></textarea>
+    <input type="hidden" id="hem-visit-id">
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-p" onclick="saveHistorialNota()">💾 Guardar nota</button>
+      <button class="btn btn-o" onclick="document.getElementById('hist-edit-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -349,7 +395,8 @@ tr:hover td{background:#f0faf9}
     </div>
   </div>
   <div class="card">
-    <div class="card-title">👨‍👩‍👧 Antecedentes heredofamiliares</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-ahf" checked onchange="toggleExam('ahf',this.checked)"><span>👨‍👩‍👧 Antecedentes heredofamiliares</span></div>
+    <div id="body-ahf" class="exam-body">
     <div class="form-row">
       <div class="fg"><label>DM</label><select id="ahf-dm"><option>Niega</option><option>Padre</option><option>Madre</option><option>Ambos</option><option>Abuelos</option></select></div>
       <div class="fg"><label>HTA</label><select id="ahf-hta"><option>Niega</option><option>Padre</option><option>Madre</option><option>Ambos</option></select></div>
@@ -357,9 +404,11 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Cáncer</label><select id="ahf-ca"><option>Niega</option><option>Padre</option><option>Madre</option><option>Ambos</option></select></div>
     </div>
     <div class="form-row"><div class="fg w100"><label>Otros antecedentes</label><input id="ahf-otros" type="text"></div></div>
+      </div>
   </div>
   <div class="card">
-    <div class="card-title">🧍 Antecedentes personales no patológicos</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-hnp" checked onchange="toggleExam('hnp',this.checked)"><span>🧍 Antecedentes personales no patológicos</span></div>
+    <div id="body-hnp" class="exam-body">
     <div class="form-row">
       <div class="fg"><label>Tabaquismo</label><select id="hnp-tab" onchange="toggleTab()"><option>Niega</option><option>Ex-fumador</option><option>Activo</option></select></div>
       <div class="fg" id="tab-det" style="display:none"><label>Cigarros/día</label><input id="hnp-tab-n" type="number" min="0"></div>
@@ -371,9 +420,11 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Alimentación</label><select id="hnp-alim"><option>Adecuada</option><option>Hipercalórica</option><option>Hipocalórica</option><option>Irregular</option></select></div>
       <div class="fg"><label>Horas sueño/noche</label><input id="hnp-sue" type="number" min="0" max="24" placeholder="7"></div>
     </div>
+      </div>
   </div>
   <div class="card">
-    <div class="card-title">🩺 Antecedentes personales patológicos</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-app" checked onchange="toggleExam('app',this.checked)"><span>🩺 Antecedentes personales patológicos</span></div>
+    <div id="body-app" class="exam-body">
     <div class="form-row">
       <div class="fg"><label>Exantemáticas</label><input id="app-exant" type="text" placeholder="Niega"></div>
       <div class="fg"><label>Quirúrgicos</label><input id="app-quirurgs" type="text" placeholder="Niega"></div>
@@ -392,9 +443,11 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Adicciones</label><input id="app-adic" type="text" placeholder="Niega"></div>
       <div class="fg"><label>Discapacidad</label><input id="app-discap" type="text" placeholder="Ninguna"></div>
     </div>
+      </div>
   </div>
   <div class="card" id="hc-laboral-wrap">
-    <div class="card-title">🏭 Historia laboral — Puesto actual</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-laboral" checked onchange="toggleExam('laboral',this.checked)"><span>🏭 Historia laboral — Puesto actual</span></div>
+    <div id="body-laboral" class="exam-body">
     <div class="form-row">
       <div class="fg"><label>Antigüedad en empresa</label><input id="hl-antig" type="text" placeholder="2 años"></div>
       <div class="fg"><label>Turno habitual</label><select id="hl-turno"><option value="">—</option><option>Matutino</option><option>Vespertino</option><option>Nocturno</option><option>Mixto</option><option>Rotativo</option></select></div>
@@ -419,9 +472,11 @@ tr:hover td{background:#f0faf9}
       </div>
       <button class="btn btn-o btn-sm" onclick="addPrevJob()">+ Agregar empleo anterior</button>
     </div>
+      </div>
   </div>
   <div class="card" id="hc-gine-wrap" style="display:none">
-    <div class="card-title">♀ Antecedentes ginecoobstétricos</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-gine" checked onchange="toggleExam('gine',this.checked)"><span>♀ Antecedentes ginecoobstétricos</span></div>
+    <div id="body-gine" class="exam-body">
     <div class="form-row">
       <div class="fg"><label>FUM</label><input id="gine-fum" type="date"></div>
       <div class="fg"><label>Menarca (edad)</label><input id="gine-menarq" type="text"></div>
@@ -438,9 +493,11 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Embarazo actual</label><select id="gine-emb" onchange="toggleSDG()"><option>No</option><option>Sí</option><option>Posible</option></select></div>
       <div class="fg" id="gine-sdg-wrap" style="display:none"><label>SDG</label><input id="gine-sdg" type="number" min="0" max="42"></div>
     </div>
+      </div>
   </div>
   <div class="card">
-    <div class="card-title">🧪 Laboratorio / Imagen previos</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-labprev" checked onchange="toggleExam('labprev',this.checked)"><span>🧪 Laboratorio / Imagen previos</span></div>
+    <div id="body-labprev" class="exam-body">
     <div id="lab-list"></div>
     <div class="form-row mt8">
       <div class="fg"><label>Tipo</label><select id="lab-tipo"><option>Laboratorio</option><option>Imagen</option></select></div>
@@ -449,13 +506,15 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Resultado</label><input id="lab-res" type="text"></div>
     </div>
     <button class="btn btn-o btn-sm" onclick="addLab()">+ Agregar</button>
+      </div>
   </div>
   <div class="card">
     <div class="card-title">📝 Padecimiento actual</div>
     <div class="fg w100"><textarea id="hc-pad" rows="4" placeholder="Motivo de consulta y padecimiento actual..."></textarea></div>
   </div>
   <div class="card" id="hc-riesgo-wrap">
-    <div class="card-title">⚠ Investigación de riesgo de trabajo</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-rt" checked onchange="toggleExam('rt',this.checked)"><span>⚠ Investigación de riesgo de trabajo</span></div>
+    <div id="body-rt" class="exam-body">
     <div class="form-row">
       <div class="fg"><label>Fecha del evento</label><input id="rt-fecha" type="date"></div>
       <div class="fg"><label>Hora del evento</label>
@@ -493,14 +552,41 @@ tr:hover td{background:#f0faf9}
         <input id="rt-ag-otro-txt" type="text" placeholder="Describir..." style="display:none;margin-top:4px;width:100%">
       </div>
       <div class="fg"><label>Asociado a</label><select id="rt-asociado"><option value="">—</option><option>Acto inseguro</option><option>Condición insegura</option><option>Ambos</option></select></div>
-      <div class="fg"><label>Parte del cuerpo afectada</label><input id="rt-parte-cuerpo" type="text" placeholder="Mano derecha, columna..."></div>
+      <div class="fg" style="position:relative">
+        <label>Parte del cuerpo afectada</label>
+        <div id="rt-partes-display" onclick="togglePartesDropdown()" style="min-height:34px;padding:6px 10px;border:1.5px solid #dde3ea;border-radius:8px;cursor:pointer;background:#fff;font-size:.9em;display:flex;align-items:center;flex-wrap:wrap;gap:4px">
+          <span id="rt-partes-placeholder" style="color:#aaa">Seleccionar partes...</span>
+        </div>
+        <input type="hidden" id="rt-parte-cuerpo">
+        <div id="rt-partes-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #28aaa4;border-radius:8px;z-index:200;padding:8px;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.12)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+          </div>
+          <div style="margin-top:6px;border-top:1px solid #eee;padding-top:6px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.85em">
+              <input type="checkbox" id="rt-p-otro" onchange="togglePartesOtro()"> Otro
+            </label>
+            <input id="rt-partes-otro-txt" type="text" placeholder="Especificar..." style="display:none;margin-top:4px;width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:6px;font-size:.85em" oninput="updateParteCuerpo()">
+          </div>
+          <button class="btn btn-p btn-sm" style="margin-top:6px;width:100%" onclick="togglePartesDropdown()">✓ Aceptar</button>
+        </div>
+      </div>
     </div>
     <div class="form-row"><div class="fg w100"><label>Declaración del paciente</label><textarea id="rt-desc" rows="3" placeholder="Describa detalladamente cómo ocurrió el accidente..."></textarea></div></div>
-    <div class="form-row"><div class="fg w100"><label>Declaración del personal de salud</label><textarea id="rt-medidas" rows="3"das / Tratamiento inmediato</label><textarea id="rt-medidas" rows="2"></textarea></div></div>
+    <div class="form-row"><div class="fg w100"><label>Declaración del personal de salud</label><textarea id="rt-medidas" rows="3" placeholder="Describe el por qué se encuentra probable relación causa-efecto entre la evaluación clínica y lo declarado por el paciente"></textarea></div></div>
+    <div class="form-row">
+      <div class="fg w100"><label style="font-weight:600">¿Amerita?</label>
+        <div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rt-amerita-incap"> <span>Incapacidad</span></label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rt-amerita-limit"> <span>Limitación funcional</span></label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rt-amerita-ref"> <span>Referencia/interconsulta</span></label>
+        </div>
+      </div>
+    </div>
     <div class="flex gap8 no-print">
       <button class="btn btn-o btn-sm" onclick="printRiesgoTrabajo()">🖨 Imprimir investigación</button>
       <button class="btn btn-sm no-print" style="background:#e53935;color:#fff;border:none" onclick="emailRiesgoTrabajo()">✉ Enviar a supervisor</button>
     </div>
+      </div>
   </div>
 </div>
 
@@ -529,15 +615,7 @@ tr:hover td{background:#f0faf9}
       </div>
       <div class="form-row"><div class="fg w100"><label>Exploración por sistemas</label><textarea id="ef-sistemas" rows="4" placeholder="Cabeza y cuello: normal&#10;Tórax: normal&#10;Abdomen: normal&#10;Extremidades: normales"></textarea></div></div>
     </div>
-    <div class="form-row">
-      <div class="fg w100"><label style="font-weight:600">¿Amerita?</label>
-        <div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rt-amerita-incap"> <span>Incapacidad</span></label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rt-amerita-limit"> <span>Limitación funcional</span></label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rt-amerita-ref"> <span>Referencia/interconsulta</span></label>
-        </div>
-      </div>
-    </div>
+
   </div>
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-visual" checked onchange="toggleExam('visual',this.checked)"><span>Agudeza visual</span></div>
@@ -612,6 +690,16 @@ tr:hover td{background:#f0faf9}
         <div class="fg"><label>FEF 25-75%</label><input id="sp-fef2575" type="number" step="0.01"></div>
       </div>
       <div class="form-row"><div class="fg w100"><label>Interpretación</label><select id="sp-interp"><option>Normal</option><option>Patrón obstructivo leve</option><option>Patrón obstructivo moderado</option><option>Patrón obstructivo severo</option><option>Patrón restrictivo</option><option>Patrón mixto</option><option>No valorable</option></select></div></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+        <div>
+          <div style="font-size:.78em;font-weight:600;color:#636875;margin-bottom:4px;text-align:center">Curva Flujo-Volumen (F-V)</div>
+          <canvas id="spiro-fv-chart" width="260" height="180" style="border:1px solid #dde3ea;border-radius:8px;background:#fff"></canvas>
+        </div>
+        <div>
+          <div style="font-size:.78em;font-weight:600;color:#636875;margin-bottom:4px;text-align:center">Curva Volumen-Tiempo (V-T)</div>
+          <canvas id="spiro-vt-chart" width="260" height="180" style="border:1px solid #dde3ea;border-radius:8px;background:#fff"></canvas>
+        </div>
+      </div>
       <button class="btn btn-o btn-sm no-print" onclick="printSpirometry()">🖨 Imprimir espirometría</button>
     </div>
   </div>
@@ -652,14 +740,17 @@ tr:hover td{background:#f0faf9}
 <!-- CONCLUSION TAB -->
 <div id="ctab-concl" class="ctab">
   <div class="card">
-    <div class="card-title">🔬 Diagnósticos CIE-10</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-cie" checked onchange="toggleExam('cie',this.checked)"><span>🔬 Diagnósticos CIE-10</span></div>
+    <div id="body-cie" class="exam-body">
     <div class="form-row"><div class="fg" style="flex:3"><label>Buscar diagnóstico</label><input id="cie-q" type="text" placeholder="Escriba código o descripción..." oninput="searchCIE()"></div></div>
     <div id="cie-suggestions" style="display:none;background:#fff;border:1px solid var(--brd);border-radius:8px;max-height:200px;overflow-y:auto;margin-bottom:8px"></div>
     <div class="mb8"><span class="muted" style="font-size:.78em">PRIMARIO: </span><span id="cie-primary-tag"></span></div>
     <div><span class="muted" style="font-size:.78em">SECUNDARIOS: </span><span id="cie-sec-tags"></span></div>
+      </div>
   </div>
   <div class="card">
-    <div class="card-title">✅ Aptitud laboral</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-aptitud" checked onchange="toggleExam('aptitud',this.checked)"><span>✅ Aptitud laboral</span></div>
+    <div id="body-aptitud" class="exam-body">
     <div class="form-row">
       <div class="fg w100"><label>Resultado</label>
         <select id="concl-res" onchange="toggleRestr()">
@@ -684,6 +775,7 @@ tr:hover td{background:#f0faf9}
       </div>
     </div>
     <div class="form-row mt8"><div class="fg w100"><label>Comentarios y recomendaciones</label><textarea id="concl-coments" rows="3"></textarea></div></div>
+      </div>
   </div>
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-incap" onchange="toggleExam('incap',this.checked)"><span>Incapacidad laboral</span></div>
@@ -711,8 +803,14 @@ tr:hover td{background:#f0faf9}
     <div id="body-rx" class="exam-body off">
       <div id="rx-meds-list"></div>
       <div class="form-row mt8">
-        <div class="fg" style="flex:2"><label>Medicamento</label><input id="rx-med" type="text"></div>
+        <div class="fg" style="flex:2;position:relative">
+          <label>Medicamento</label>
+          <input id="rx-med" type="text" placeholder="Buscar en inventario..." oninput="rxMedSuggest()" autocomplete="off">
+          <div id="rx-med-drop" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1.5px solid #28aaa4;border-radius:8px;max-height:180px;overflow-y:auto;box-shadow:0 4px 14px rgba(0,0,0,.12)"></div>
+          <span id="rx-med-stock" style="display:none;font-size:.75em;font-weight:700;color:#e53935;margin-top:2px">⚠ Faltante</span>
+        </div>
         <div class="fg"><label>Dosis</label><input id="rx-dosis" type="text" placeholder="500mg"></div>
+        <div class="fg"><label>Presentación</label><input id="rx-present" type="text" placeholder="Tableta, Cápsula, Caja..."></div>
         <div class="fg"><label>Frecuencia</label><input id="rx-freq" type="text" placeholder="c/8h"></div>
         <div class="fg"><label>Duración</label><input id="rx-dur" type="text" placeholder="5 días"></div>
         <div class="fg"><label>Cantidad</label><input id="rx-cant" type="number" min="1" value="1"></div>
@@ -725,11 +823,13 @@ tr:hover td{background:#f0faf9}
     </div>
   </div>
   <div class="card">
-    <div class="card-title">📄 Certificados</div>
+    <div class="exam-hdr"><input type="checkbox" id="chk-cert" checked onchange="toggleExam('cert',this.checked)"><span>📄 Certificados</span></div>
+    <div id="body-cert" class="exam-body">
     <div class="flex gap8">
       <button class="btn btn-o" onclick="printCert('laboral')">🖨 Cert. Laboral</button>
       <button class="btn btn-o" onclick="printCert('general')">🖨 Cert. General</button>
     </div>
+      </div>
   </div>
   <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-ref" onchange="toggleExam('ref',this.checked)"><span>Referencia / Interconsulta</span></div>
@@ -924,7 +1024,7 @@ tr:hover td{background:#f0faf9}
     <div class="fg"><label>Consultorio</label><select id="ag-cons"><option value="1">Consultorio 1</option><option value="2">Consultorio 2</option><option value="3">Consultorio 3</option></select></div>
   </div>
   <div class="form-row">
-    <div class="fg"><label>Tipo de visita</label><select id="ag-tipo"><option>Personal</option><option>Ocupacional</option><option>Corta</option><option>Checkup ingreso</option><option>Checkup periódico</option><option>Egreso</option><option>Especial</option></select></div>
+    <div class="fg"><label>Tipo de visita</label><select id="ag-tipo"><option>Personal</option><option>Ocupacional</option><option>Corta</option><option>Checkup ingreso</option><option>Checkup periódico</option><option>Checkup Egreso</option></select></div>
     <div class="fg"><label>Consulta</label><select id="ag-seq"><option value="Inicial">Inicial</option><option value="Subsecuente">Subsecuente</option></select></div>
     <div class="fg"><label>Modalidad</label><select id="ag-modal"><option>Presencial</option><option>Virtual</option></select></div>
   </div>
@@ -958,6 +1058,11 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Hasta</label><input id="suive-hasta" type="date"></div>
       <button class="btn btn-p btn-sm" onclick="buildReporteSUIVE()">Generar</button>
       <button class="btn btn-o btn-sm" onclick="exportReporte('suive')">⬇ Excel</button>
+      <button class="btn btn-o btn-sm" onclick="exportSuivePDF()">📄 PDF</button>
+    </div>
+    <div class="form-row mt8" style="align-items:center;gap:8px">
+      <div class="fg" style="flex:3"><input id="suive-email-dest" type="email" placeholder="Enviar reporte por correo..."></div>
+      <button class="btn btn-p btn-sm" onclick="emailSuive()">✉ Enviar</button>
     </div>
     <div id="suive-table"></div>
   </div>
@@ -994,7 +1099,7 @@ tr:hover td{background:#f0faf9}
       <div class="fg"><label>Desde</label><input id="cust-desde" type="date"></div>
       <div class="fg"><label>Hasta</label><input id="cust-hasta" type="date"></div>
       <div class="fg"><label>Empresa</label><input id="cust-empresa" type="text" placeholder="Opcional..."></div>
-      <div class="fg"><label>Tipo visita</label><select id="cust-tipo"><option value="">Todos</option><option>Personal</option><option>Ocupacional</option><option>Corta</option><option>Checkup ingreso</option><option>Checkup periódico</option><option>Egreso</option><option>Especial</option></select></div>
+      <div class="fg"><label>Tipo visita</label><select id="cust-tipo"><option value="">Todos</option><option>Personal</option><option>Ocupacional</option><option>Corta</option><option>Checkup ingreso</option><option>Checkup periódico</option><option>Checkup Egreso</option></select></div>
       <div class="fg"><label>Resultado</label><select id="cust-res"><option value="">Todos</option><option>Apto</option><option>Apto con restricciones</option><option>No apto temporal</option><option>No apto permanente</option></select></div>
     </div>
     <div class="card" style="background:#f5f7fa;margin-bottom:10px;padding:12px">
@@ -1074,7 +1179,321 @@ tr:hover td{background:#f0faf9}
 <div id="users-table-wrap"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+// ══════════════════════════════════════════════════════════════
+// MÓDULO COTIZACIONES
+// ══════════════════════════════════════════════════════════════
+var cotizCache = [];
+
+function initCotizForm() {
+  // Set today's date
+  var hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('cotiz-fecha').value = hoy;
+  // Add first empty row
+  var tbody = document.getElementById('cotiz-items-body');
+  if(tbody && tbody.rows.length === 0) addCotizRow();
+}
+
+function addCotizRow() {
+  var tbody = document.getElementById('cotiz-items-body');
+  var n = tbody.rows.length + 1;
+  var tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--brd)';
+  tr.innerHTML =
+    '<td style="padding:5px 8px;font-weight:600;color:var(--muted)">' + n + '</td>' +
+    '<td style="padding:4px 6px"><input type="text" placeholder="Descripción del servicio o producto" style="width:100%;padding:5px 8px;border-radius:5px;border:1px solid var(--brd)" class="cotiz-desc"></td>' +
+    '<td style="padding:4px 6px"><input type="number" min="1" value="1" style="width:100%;padding:5px 8px;border-radius:5px;border:1px solid var(--brd);text-align:center" class="cotiz-qty" oninput="calcCotizTotals()"></td>' +
+    '<td style="padding:4px 6px"><input type="number" min="0" step="0.01" value="0" placeholder="0.00" style="width:100%;padding:5px 8px;border-radius:5px;border:1px solid var(--brd);text-align:right" class="cotiz-precio" oninput="calcCotizTotals()"></td>' +
+    '<td style="padding:4px 6px;text-align:right;font-weight:600" class="cotiz-sub">$0.00</td>' +
+    '<td style="padding:4px 6px;text-align:center"><button onclick="removeCotizRow(this)" style="background:none;border:none;color:#e53935;font-size:1.1em;cursor:pointer">✕</button></td>';
+  tbody.appendChild(tr);
+  // Re-number
+  renumberCotizRows();
+  calcCotizTotals();
+}
+
+function removeCotizRow(btn) {
+  var tr = btn.closest('tr');
+  if(tr) tr.remove();
+  renumberCotizRows();
+  calcCotizTotals();
+}
+
+function renumberCotizRows() {
+  var tbody = document.getElementById('cotiz-items-body');
+  if(!tbody) return;
+  var rows = tbody.querySelectorAll('tr');
+  rows.forEach(function(tr, i) {
+    var first = tr.cells[0];
+    if(first) first.textContent = (i+1);
+  });
+}
+
+function calcCotizTotals() {
+  var tbody = document.getElementById('cotiz-items-body');
+  if(!tbody) return;
+  var rows = tbody.querySelectorAll('tr');
+  var subtotal = 0;
+  rows.forEach(function(tr) {
+    var qty   = parseFloat(tr.querySelector('.cotiz-qty')  ? tr.querySelector('.cotiz-qty').value  : 0) || 0;
+    var precio= parseFloat(tr.querySelector('.cotiz-precio')? tr.querySelector('.cotiz-precio').value: 0) || 0;
+    var sub   = qty * precio;
+    var subEl = tr.querySelector('.cotiz-sub');
+    if(subEl) subEl.textContent = '$' + sub.toFixed(2);
+    subtotal += sub;
+  });
+  var ivaChk  = document.getElementById('cotiz-iva-chk');
+  var ivaAmt  = (ivaChk && ivaChk.checked) ? subtotal * 0.16 : 0;
+  var total   = subtotal + ivaAmt;
+  var f = function(n){ return '$' + n.toFixed(2); };
+  var sd = document.getElementById('cotiz-subtotal-disp');
+  var id = document.getElementById('cotiz-iva-disp');
+  var td = document.getElementById('cotiz-total-disp');
+  if(sd) sd.textContent = f(subtotal);
+  if(id) { id.textContent = f(ivaAmt); id.style.color = ivaAmt>0 ? 'var(--azul)' : 'var(--muted)'; }
+  if(td) td.textContent = f(total);
+}
+
+function getCotizItemsData() {
+  var tbody = document.getElementById('cotiz-items-body');
+  if(!tbody) return [];
+  var items = [];
+  tbody.querySelectorAll('tr').forEach(function(tr) {
+    var descEl  = tr.querySelector('.cotiz-desc');
+    var qtyEl   = tr.querySelector('.cotiz-qty');
+    var precioEl= tr.querySelector('.cotiz-precio');
+    var desc  = descEl   ? descEl.value.trim()            : '';
+    var qty   = qtyEl    ? (parseFloat(qtyEl.value)||0)   : 0;
+    var precio= precioEl ? (parseFloat(precioEl.value)||0): 0;
+    if(desc || qty>0 || precio>0) {
+      items.push({desc:desc, qty:qty, precio:precio, sub: qty*precio});
+    }
+  });
+  return items;
+}
+
+function clearCotizForm() {
+  document.getElementById('cotiz-folio').value    = '';
+  document.getElementById('cotiz-empresa').value  = '';
+  document.getElementById('cotiz-atencion').value = '';
+  document.getElementById('cotiz-obs').value      = '';
+  document.getElementById('cotiz-director').value = '';
+  document.getElementById('cotiz-iva-chk').checked = false;
+  document.getElementById('cotiz-items-body').innerHTML = '';
+  addCotizRow();
+  calcCotizTotals();
+  var hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('cotiz-fecha').value = hoy;
+}
+
+function saveCotizacion() {
+  var empresa  = document.getElementById('cotiz-empresa').value.trim()  || 'NO APLICA';
+  var atencion = document.getElementById('cotiz-atencion').value.trim() || '';
+  var fecha    = document.getElementById('cotiz-fecha').value;
+  var obs      = document.getElementById('cotiz-obs').value.trim();
+  var director = document.getElementById('cotiz-director').value.trim();
+  var items    = getCotizItemsData();
+  if(!items.length || !items.some(function(i){ return i.desc; })) {
+    alert('Agrega al menos un concepto con descripción'); return;
+  }
+  var subtotal = items.reduce(function(a,b){ return a+b.sub; }, 0);
+  var ivaChk   = document.getElementById('cotiz-iva-chk').checked;
+  var ivaAmt   = ivaChk ? subtotal * 0.16 : 0;
+  var total    = subtotal + ivaAmt;
+  var cotiz = {
+    empresa:empresa, atencion:atencion, fecha:fecha,
+    items:items, subtotal:subtotal, iva:ivaChk,
+    ivaAmt:ivaAmt, total:total,
+    obs:obs, director:director, status:'Cotizado'
+  };
+  gasPost({action:'saveCotizacion', cotiz:cotiz}, function(r) {
+    if(r && r.ok) {
+      alert('✅ Cotización guardada: ' + r.id);
+      clearCotizForm();
+      loadCotizaciones();
+    } else {
+      alert('Error al guardar: ' + (r && r.error ? r.error : 'desconocido'));
+    }
+  });
+}
+
+function loadCotizaciones() {
+  gasPost({action:'loadCotizaciones'}, function(r) {
+    if(r && r.items) {
+      cotizCache = r.items;
+      renderCotizaciones(cotizCache);
+      // Set next folio hint
+      var yr = new Date().getFullYear();
+      var next = String(cotizCache.length + 1).padStart(3,'0');
+      document.getElementById('cotiz-folio').placeholder = 'BiM-'+yr+'-'+next+' (auto)';
+    }
+  });
+}
+
+function renderCotizaciones(items) {
+  var tbody = document.getElementById('cotiz-list-body');
+  if(!tbody) return;
+  if(!items || !items.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Sin cotizaciones registradas</td></tr>';
+    return;
+  }
+  var STATUS_STYLE = {
+    'Cotizado': 'background:#fff8e1;color:#f57f17;border:1px solid #ffe082',
+    'Vendido':  'background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7',
+    'Perdido':  'background:#ffebee;color:#c62828;border:1px solid #ef9a9a'
+  };
+  var html = '';
+  items.forEach(function(c, idx) {
+    var st    = c.status || 'Cotizado';
+    var stSty = STATUS_STYLE[st] || STATUS_STYLE['Cotizado'];
+    var monto = '$' + (parseFloat(c.total)||0).toFixed(2);
+    html += '<tr style="border-bottom:1px solid var(--brd)">' +
+      '<td style="padding:8px 10px;font-weight:700;color:var(--teal)">' + (c.id||'—') + '</td>' +
+      '<td style="padding:8px 10px">' + (c.fecha||'—') + '</td>' +
+      '<td style="padding:8px 10px">' + (c.atencion||'—') + '</td>' +
+      '<td style="padding:8px 10px">' + (c.empresa||'NO APLICA') + '</td>' +
+      '<td style="padding:8px 10px;text-align:right;font-weight:600">' + monto + '</td>' +
+      '<td style="padding:8px 10px;text-align:center">' +
+        '<select onchange="updateCotizStatus('' + c.id + '',this.value,'+idx+')" style="padding:3px 7px;border-radius:12px;font-size:.8em;font-weight:600;border:none;cursor:pointer;' + stSty + '">' +
+          '<option value="Cotizado"' + (st==='Cotizado'?' selected':'') + '>● Cotizado</option>' +
+          '<option value="Vendido"'  + (st==='Vendido' ?' selected':'') + '>● Vendido</option>'  +
+          '<option value="Perdido"'  + (st==='Perdido' ?' selected':'') + '>● Perdido</option>'  +
+        '</select>' +
+      '</td>' +
+      '<td style="padding:8px 10px;text-align:center;white-space:nowrap">' +
+        '<button title="Visualizar" onclick="viewCotizacion('+idx+')" style="background:none;border:none;cursor:pointer;font-size:1.15em;margin:0 2px">👁</button>' +
+        '<button title="Imprimir" onclick="printCotizacion('+idx+')" style="background:none;border:none;cursor:pointer;font-size:1.15em;margin:0 2px">🖨</button>' +
+        '<button title="Exportar PDF" onclick="exportCotizPDF('+idx+')" style="background:none;border:none;cursor:pointer;font-size:1.15em;margin:0 2px">📄</button>' +
+        '<button title="Exportar Excel" onclick="exportCotizExcel('+idx+')" style="background:none;border:none;cursor:pointer;font-size:1.15em;margin:0 2px">📊</button>' +
+      '</td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function filterCotizaciones() {
+  var q = (document.getElementById('cotiz-q').value || '').toLowerCase();
+  if(!q) { renderCotizaciones(cotizCache); return; }
+  var filtered = cotizCache.filter(function(c) {
+    return (c.id||'').toLowerCase().includes(q) ||
+           (c.empresa||'').toLowerCase().includes(q) ||
+           (c.atencion||'').toLowerCase().includes(q) ||
+           (c.fecha||'').includes(q) ||
+           (c.status||'').toLowerCase().includes(q);
+  });
+  renderCotizaciones(filtered);
+}
+
+function updateCotizStatus(id, status, idx) {
+  gasPost({action:'updateCotizStatus', id:id, status:status}, function(r) {
+    if(r && r.ok) {
+      if(typeof idx !== 'undefined' && cotizCache[idx]) cotizCache[idx].status = status;
+    } else {
+      alert('Error al actualizar status');
+      loadCotizaciones();
+    }
+  });
+}
+
+function buildCotizHTML(c, forPrint) {
+  var items = c.items || [];
+  var ivaRow = c.iva ? '<tr><td colspan="4" style="text-align:right;padding:5px 10px;color:#555">IVA 16%:</td><td style="text-align:right;padding:5px 10px;font-weight:600">$'+(parseFloat(c.ivaAmt)||0).toFixed(2)+'</td></tr>' : '';
+  var itemRows = items.map(function(it, i) {
+    return '<tr style="border-bottom:1px solid #e0e0e0">' +
+      '<td style="padding:6px 10px">'+(i+1)+'</td>' +
+      '<td style="padding:6px 10px">'+(it.desc||'')+'</td>' +
+      '<td style="padding:6px 10px;text-align:center">'+(it.qty||1)+'</td>' +
+      '<td style="padding:6px 10px;text-align:right">$'+(parseFloat(it.precio)||0).toFixed(2)+'</td>' +
+      '<td style="padding:6px 10px;text-align:right;font-weight:600">$'+(parseFloat(it.sub)||0).toFixed(2)+'</td></tr>';
+  }).join('');
+  var obs = c.obs ? '<div style="margin-top:16px;padding:10px 14px;background:#f5f5f5;border-radius:6px;font-size:.88em"><b>Observaciones:</b><br>'+(c.obs||'')+'</div>' : '';
+  return (
+    '<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #28aaa4;padding-bottom:14px;margin-bottom:16px">' +
+      '<div><div style="font-size:1.5em;font-weight:800;color:#28aaa4">BiMASS</div><div style="font-size:.8em;color:#555">Clínica BiMASS · Hermosillo, Sonora</div><div style="font-size:.8em;color:#555">Tel: 662 426 5969</div></div>' +
+      '<div style="text-align:right"><div style="font-size:1.1em;font-weight:700;color:#2a4e7a">COTIZACIÓN</div><div style="font-size:.9em;font-weight:700;color:#28aaa4">'+(c.id||'')+'</div><div style="font-size:.82em;color:#555">Fecha: '+(c.fecha||'')+'</div></div>' +
+    '</div>' +
+    '<div style="margin-bottom:14px"><b>En atención a:</b> '+(c.atencion||'—')+'<br><b>Empresa:</b> '+(c.empresa||'NO APLICA')+'</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:.88em;margin-bottom:10px">' +
+      '<thead><tr style="background:#2a4e7a;color:#fff"><th style="padding:7px 10px;text-align:left">Item</th><th style="padding:7px 10px;text-align:left">Descripción</th><th style="padding:7px 10px;text-align:center">Cant.</th><th style="padding:7px 10px;text-align:right">Precio unit.</th><th style="padding:7px 10px;text-align:right">Subtotal</th></tr></thead>' +
+      '<tbody>'+itemRows+'</tbody>' +
+      '<tfoot>' +
+        '<tr><td colspan="4" style="text-align:right;padding:5px 10px;color:#555">Subtotal:</td><td style="text-align:right;padding:5px 10px;font-weight:600">$'+(parseFloat(c.subtotal)||0).toFixed(2)+'</td></tr>' +
+        ivaRow +
+        '<tr style="background:#e8f5f4"><td colspan="4" style="text-align:right;padding:7px 10px;font-weight:700;color:#2a4e7a">TOTAL:</td><td style="text-align:right;padding:7px 10px;font-weight:800;font-size:1.1em;color:#28aaa4">$'+(parseFloat(c.total)||0).toFixed(2)+'</td></tr>' +
+      '</tfoot>' +
+    '</table>' +
+    obs +
+    '<div style="margin-top:30px;display:flex;justify-content:flex-end">' +
+      '<div style="text-align:center;min-width:200px">' +
+        '<div style="border-top:1px solid #333;padding-top:6px;font-size:.85em"><b>'+(c.director||'_________________________')+'</b></div>' +
+        '<div style="font-size:.78em;color:#555">Director Médico — BiMASS</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="margin-top:20px;text-align:center;font-size:.75em;color:#999;border-top:1px solid #eee;padding-top:10px">Cotización válida por 30 días a partir de la fecha de emisión. Precios en MXN.</div>' +
+    '</div>'
+  );
+}
+
+function viewCotizacion(idx) {
+  var c = cotizCache[idx];
+  if(!c) return;
+  var modal = document.getElementById('cotiz-modal');
+  var cont  = document.getElementById('cotiz-modal-content');
+  if(!modal || !cont) return;
+  cont.innerHTML = buildCotizHTML(c, false);
+  modal.style.display = 'block';
+}
+
+function printCotizacion(idx) {
+  var c = cotizCache[idx];
+  if(!c) return;
+  var html = buildCotizHTML(c, true);
+  printWin(html, 'Cotización ' + (c.id||''), '');
+}
+
+function exportCotizPDF(idx) {
+  // Opens print dialog pre-configured for save as PDF
+  var c = cotizCache[idx];
+  if(!c) return;
+  var html = buildCotizHTML(c, true);
+  var extraBtn = '';
+  printWin(html, 'Cotización ' + (c.id||''), extraBtn);
+}
+
+function exportCotizExcel(idx) {
+  var c = cotizCache[idx];
+  if(!c) return;
+  var items = c.items || [];
+  var rows = [['Folio','Fecha','Empresa','En atención a','']];
+  rows.push([c.id||'', c.fecha||'', c.empresa||'', c.atencion||'', '']);
+  rows.push(['','','','','']);
+  rows.push(['Item','Descripción','Cantidad','Precio Unitario','Subtotal']);
+  items.forEach(function(it, i) {
+    rows.push([i+1, it.desc||'', it.qty||1, (parseFloat(it.precio)||0).toFixed(2), (parseFloat(it.sub)||0).toFixed(2)]);
+  });
+  rows.push(['','','','Subtotal', (parseFloat(c.subtotal)||0).toFixed(2)]);
+  if(c.iva) rows.push(['','','','IVA 16%', (parseFloat(c.ivaAmt)||0).toFixed(2)]);
+  rows.push(['','','','TOTAL',   (parseFloat(c.total)||0).toFixed(2)]);
+  if(c.obs) { rows.push(['','','','','']); rows.push(['Observaciones:', c.obs]); }
+  var csv = rows.map(function(r){ return r.map(function(cell){ return '"'+String(cell).replace(/"/g,'""')+'"'; }).join(','); }).join('\r\n');
+  var uri = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  var a = document.createElement('a');
+  a.href = uri;
+  a.download = 'Cotizacion_' + (c.id||'BiMASS') + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// Initialize cotiz form when screen is shown
+var _origShowScreen = showScreen;
+showScreen = function(id) {
+  _origShowScreen(id);
+  if(id === 'cotiz') {
+    initCotizForm();
+  }
+};
+
+</script>
 <script>
 // ── LOGO SVG ─────────────────────────────────────────────
 const LOGO_SVG_PRINT = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="200 65 280 245" width="90" height="78"><path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#2a4e7a" transform="rotate(0,340,155)"/><path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#28aaa4" transform="rotate(60,340,155)"/><path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#7ecdc8" transform="rotate(120,340,155)"/><path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#5ab8b2" transform="rotate(180,340,155)"/><path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#b8b4dc" transform="rotate(240,340,155)"/><path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#8878b8" transform="rotate(300,340,155)"/><rect x="323" y="118" width="34" height="74" rx="11" fill="white"/><rect x="303" y="138" width="74" height="34" rx="11" fill="white"/><text x="340" y="293" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="52" font-weight="700" letter-spacing="2" fill="#636875">BiMASS</text></svg>';
@@ -1089,8 +1508,8 @@ const ANTIDP = [
   {c:'ETS',n:'Esteroides anabólicos'},{c:'ALC',n:'Alcohol'}
 ];
 const NORDIC_REGIONS = ['Cuello','Hombros','Codos','Muñecas/Manos','Región dorsal','Región lumbar','Caderas/Glúteos','Rodillas','Tobillos/Pies'];
-const VISIT_TYPES = ['Personal','Ocupacional','Corta','Checkup ingreso','Checkup periódico','Egreso','Especial'];
-const OCC_TYPES = ['Ocupacional','Checkup ingreso','Checkup periódico','Egreso','Corta'];
+const VISIT_TYPES = ['Personal','Ocupacional','Corta','Checkup ingreso','Checkup periódico','Checkup Egreso'];
+const OCC_TYPES = ['Ocupacional','Checkup ingreso','Checkup periódico','Checkup Egreso','Corta'];
 const CIE10 = [
   {c:'Z10.0',d:'Examen médico ocupacional'},{c:'Z00.0',d:'Examen médico general'},
   {c:'Z00.1',d:'Control médico del lactante'},{c:'Z10.1',d:'Examen de salud del escolar'},
@@ -1193,7 +1612,7 @@ function showScreen(id) {
     clinical:'Atención Clínica', inv:'Inventario', pos:'Punto de Venta',
     dev:'Devoluciones', agenda:'Agenda', reportes:'Reportes', usuarios:'Usuarios',
     hist:'Historial del paciente', lab:'Laboratorio', xray:'Imagenología',
-    audit:'Auditorías STPS', ausent:'Ausentismo'
+    audit:'Auditorías STPS', ausent:'Ausentismo', cotiz:'Cotizaciones'
   }[id] || '';
 }
 
@@ -1216,6 +1635,7 @@ function gotoMod(mod) {
     showScreen('usuarios'); loadUsers(); return;
   }
   if(mod === 'lab')  { showScreen('lab');  loadLabResults();  return; }
+  if(mod === 'cotiz'){ showScreen('cotiz'); loadCotizaciones(); return; }
   if(mod === 'xray') { showScreen('xray'); loadXrayResults(); return; }
 }
 
@@ -1378,9 +1798,143 @@ function selectPatient(idx) {
     if(r.ok && r.items && r.items.length > 0) {
       patHistorialData = r.items.sort((a,b)=>(b.ts||'').localeCompare(a.ts||''));
       renderPatHistorial(patHistorialData);
+      document.getElementById('hist-pat-name').textContent = '👤 ' + p.nombre;
       showScreen('hist');
     } else {
       showVTypeScreen();
+    }
+  });
+}
+
+function renderPatHistorial(items) {
+  const div = document.getElementById('hist-table');
+  if(!div) return;
+  if(!items || !items.length){ div.innerHTML='<div class="muted tc">Sin visitas registradas</div>'; return; }
+  let html = '<div class="tw"><table><thead><tr>'
+    +'<th>Fecha</th><th>Dx / Motivo</th><th>Tipo de visita</th><th>Aptitud laboral</th><th class="no-print">Acciones</th>'
+    +'</tr></thead><tbody>';
+  items.forEach(function(v,i){
+    const fecha = v.ts ? new Date(v.ts).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    const dx = (v.conclusion && v.conclusion.ciePrimary) ? (v.conclusion.ciePrimary.c+' '+v.conclusion.ciePrimary.d) : (v.hc && v.hc.padecimiento ? v.hc.padecimiento.slice(0,50) : '—');
+    const tipo = (v.hc && v.hc.tipoVisita) ? v.hc.tipoVisita : '—';
+    const aptitud = (v.conclusion && v.conclusion.resultado) ? v.conclusion.resultado : '—';
+    const auditor = (v._audit && v._audit.length) ? '<br><span style="font-size:.72em;color:#999">Últ. edición: '+v._audit[v._audit.length-1].medico+' '+v._audit[v._audit.length-1].fecha+'</span>' : '';
+    html += '<tr>'
+      +'<td>'+fecha+auditor+'</td>'
+      +'<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+dx+'">'+dx+'</td>'
+      +'<td>'+tipo+'</td>'
+      +'<td>'+aptitud+'</td>'
+      +'<td class="no-print" style="white-space:nowrap">'
+      +'<button class="btn btn-o btn-sm" style="padding:4px 8px" title="Visualizar" onclick="viewHistVisit('+i+')">👁</button> '
+      +'<button class="btn btn-sm" style="background:#2a4e7a;color:#fff;padding:4px 8px" title="Editar (agregar nota)" onclick="editHistVisit('+i+')">✏️</button>'
+      +'</td>'
+      +'</tr>';
+  });
+  html += '</tbody></table></div>';
+  div.innerHTML = html;
+}
+
+function filterHistorial() {
+  const q = (document.getElementById('hist-q').value||'').toLowerCase();
+  if(!q){ renderPatHistorial(patHistorialData); return; }
+  const filtered = patHistorialData.filter(function(v){
+    const dx = (v.conclusion && v.conclusion.ciePrimary) ? (v.conclusion.ciePrimary.c+' '+v.conclusion.ciePrimary.d).toLowerCase() : '';
+    const tipo = (v.hc && v.hc.tipoVisita||'').toLowerCase();
+    const fecha = v.ts ? new Date(v.ts).toLocaleDateString('es-MX') : '';
+    return dx.includes(q) || tipo.includes(q) || fecha.includes(q) || (v.hc && (v.hc.padecimiento||'').toLowerCase().includes(q));
+  });
+  renderPatHistorial(filtered);
+}
+
+function viewHistVisit(idx) {
+  const v = patHistorialData[idx];
+  if(!v) return;
+  const fecha = v.ts ? new Date(v.ts).toLocaleString('es-MX') : '—';
+  const modal = document.getElementById('hist-view-modal');
+  document.getElementById('hvm-title').textContent = '👁 Visita del ' + fecha;
+  let body = '';
+  // HC básico
+  if(v.hc) {
+    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px">Datos clínicos</h4>';
+    body += '<table style="width:100%;font-size:.85em;border-collapse:collapse">';
+    body += '<tr><td><b>Paciente:</b> '+(v.hc.nombre||'—')+'</td><td><b>Tipo visita:</b> '+(v.hc.tipoVisita||'—')+'</td></tr>';
+    body += '<tr><td><b>Empresa:</b> '+(v.hc.empresa||'—')+'</td><td><b>Puesto:</b> '+(v.hc.puesto||'—')+'</td></tr>';
+    if(v.hc.padecimiento) body += '<tr><td colspan="2"><b>Padecimiento:</b> '+v.hc.padecimiento+'</td></tr>';
+    body += '</table>';
+  }
+  // Examen físico
+  if(v.exams && v.exams.fisico) {
+    const f = v.exams.fisico;
+    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px;margin-top:12px">Examen físico</h4>';
+    body += '<table style="width:100%;font-size:.85em;border-collapse:collapse">';
+    body += '<tr><td><b>Peso:</b> '+f.peso+' kg</td><td><b>Talla:</b> '+f.talla+' cm</td><td><b>IMC:</b> '+f.imc+'</td><td><b>TA:</b> '+f.ta+'</td></tr>';
+    body += '<tr><td><b>FC:</b> '+f.fc+' lpm</td><td><b>FR:</b> '+f.fr+' rpm</td><td><b>Temp:</b> '+f.temp+'°C</td><td><b>SpO2:</b> '+f.spo2+'%</td></tr>';
+    if(f.sistemas) body += '<tr><td colspan="4"><b>Sistemas:</b> '+f.sistemas+'</td></tr>';
+    body += '</table>';
+  }
+  // Conclusión
+  if(v.conclusion) {
+    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px;margin-top:12px">Conclusión</h4>';
+    if(v.conclusion.ciePrimary) body += '<p style="font-size:.85em"><b>Dx principal:</b> '+v.conclusion.ciePrimary.c+' — '+v.conclusion.ciePrimary.d+'</p>';
+    if(v.conclusion.resultado) body += '<p style="font-size:.85em"><b>Aptitud laboral:</b> '+v.conclusion.resultado+'</p>';
+    if(v.conclusion.comentarios) body += '<p style="font-size:.85em"><b>Comentarios:</b> '+v.conclusion.comentarios+'</p>';
+  }
+  // Notas adicionales (audit trail)
+  if(v.notasAdicionales && v.notasAdicionales.length) {
+    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px;margin-top:12px">Notas adicionales</h4>';
+    v.notasAdicionales.forEach(function(n){
+      body += '<div style="background:#f5f7fa;border-left:3px solid #28aaa4;padding:8px 12px;margin-bottom:6px;font-size:.85em;border-radius:0 6px 6px 0">';
+      body += '<span style="color:#999;font-size:.85em">'+(n.medico||'')+(n.fecha?' — '+n.fecha:'')+'</span><br>';
+      body += '<span style="white-space:pre-line">'+n.texto+'</span></div>';
+    });
+  }
+  // Audit trail
+  if(v._audit && v._audit.length) {
+    body += '<p style="font-size:.75em;color:#aaa;margin-top:12px">Historial de guardado: ';
+    body += v._audit.map(function(a){ return a.medico+' '+a.fecha; }).join(' · ');
+    body += '</p>';
+  }
+  document.getElementById('hvm-body').innerHTML = body || '<p class="muted">Sin datos detallados</p>';
+  modal.style.display = 'block';
+}
+
+function editHistVisit(idx) {
+  const v = patHistorialData[idx];
+  if(!v) return;
+  const modal = document.getElementById('hist-edit-modal');
+  document.getElementById('hem-visit-id').value = v.id || '';
+  // Mostrar notas previas
+  let prevHtml = '';
+  if(v.notasAdicionales && v.notasAdicionales.length) {
+    prevHtml = '<div style="margin-bottom:8px"><b style="font-size:.88em">Notas anteriores:</b>';
+    v.notasAdicionales.forEach(function(n){
+      prevHtml += '<div style="background:#f5f7fa;border-left:3px solid #28aaa4;padding:6px 10px;margin:4px 0;font-size:.82em;border-radius:0 6px 6px 0">';
+      prevHtml += '<span style="color:#999">'+(n.medico||'')+(n.fecha?' — '+n.fecha:'')+'</span><br>';
+      prevHtml += '<span style="white-space:pre-line">'+n.texto+'</span></div>';
+    });
+    prevHtml += '</div>';
+  }
+  document.getElementById('hem-prev-notas').innerHTML = prevHtml;
+  document.getElementById('hem-nota').value = '';
+  modal.style.display = 'block';
+}
+
+function saveHistorialNota() {
+  const visitId = document.getElementById('hem-visit-id').value;
+  const texto = document.getElementById('hem-nota').value.trim();
+  if(!texto){ alert('Escriba una nota antes de guardar'); return; }
+  const ahora = new Date().toLocaleString('es-MX');
+  const nota = { medico: currentUser ? currentUser.nombre : 'Sistema', fecha: ahora, texto: texto };
+  gasPost({action:'addVisitNota', visitId:visitId, patientId:currentPatient?currentPatient.id:'', nota:nota}, function(r){
+    if(r.ok){
+      // Actualizar en memoria
+      const v = patHistorialData.find(function(x){ return x.id===visitId; });
+      if(v){ if(!v.notasAdicionales) v.notasAdicionales=[]; v.notasAdicionales.push(nota); }
+      document.getElementById('hist-edit-modal').style.display='none';
+      renderPatHistorial(patHistorialData);
+      alert('✅ Nota guardada correctamente');
+    } else {
+      alert('Error al guardar nota: '+(r.error||''));
     }
   });
 }
@@ -1783,9 +2337,114 @@ function drawAudioChart(canvasId, values, title, color) {
 
 // ── ESPIROMETRÍA ─────────────────────────────────────────
 function calcSpiro() {
-  const fvc = parseFloat(document.getElementById('sp-fvc').value)||0;
-  const fev = parseFloat(document.getElementById('sp-fev1').value)||0;
-  document.getElementById('sp-ratio').value = fvc>0 ? ((fev/fvc)*100).toFixed(1) : '';
+  const fvc  = parseFloat(document.getElementById('sp-fvc').value)||0;
+  const fev1 = parseFloat(document.getElementById('sp-fev1').value)||0;
+  const pef  = parseFloat(document.getElementById('sp-pef').value)||0;
+  const fef25= parseFloat(document.getElementById('sp-fef25').value)||0;
+  const fef50= parseFloat(document.getElementById('sp-fef50').value)||0;
+  const fef75= parseFloat(document.getElementById('sp-fef75').value)||0;
+  document.getElementById('sp-ratio').value = fvc>0 ? ((fev1/fvc)*100).toFixed(1) : '';
+  drawSpiroCharts(fvc, fev1, pef, fef25, fef50, fef75);
+}
+function drawSpiroCharts(fvc, fev1, pef, fef25, fef50, fef75) {
+  // ── F-V Chart (Flow-Volume) ──
+  var fvCanvas = document.getElementById('spiro-fv-chart');
+  if(fvCanvas && fvc > 0) {
+    var ctx = fvCanvas.getContext('2d');
+    var W=260, H=180, PAD=30;
+    ctx.clearRect(0,0,W,H);
+    // Grid
+    ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=1;
+    for(var i=0;i<=4;i++){var x=PAD+i*(W-2*PAD)/4;ctx.beginPath();ctx.moveTo(x,PAD);ctx.lineTo(x,H-PAD);ctx.stroke();}
+    for(var j=0;j<=4;j++){var y=PAD+j*(H-2*PAD)/4;ctx.beginPath();ctx.moveTo(PAD,y);ctx.lineTo(W-PAD,y);ctx.stroke();}
+    // Axes
+    ctx.strokeStyle='#555'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(PAD,PAD); ctx.lineTo(PAD,H-PAD); ctx.lineTo(W-PAD,H-PAD); ctx.stroke();
+    // Labels
+    ctx.fillStyle='#636875'; ctx.font='9px Arial'; ctx.textAlign='center';
+    ctx.fillText('Volumen (L)',W/2,H-4);
+    ctx.save(); ctx.translate(10,H/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('Flujo (L/s)',0,0); ctx.restore();
+    // Scale: x = 0..fvc, y = 0..pef (or estimate)
+    var maxFlow = pef > 0 ? pef : Math.max(fev1*3, 6);
+    var scX = (W-2*PAD)/Math.max(fvc,0.1);
+    var scY = (H-2*PAD)/Math.max(maxFlow,0.1);
+    // F-V curve: approximate as half-ellipse then linear descent
+    // Points: (0,0), (fev1*0.2, pef), (fev1, fef25), (fvc*0.5, fef50), (fvc*0.75, fef75), (fvc, 0)
+    var pts = [
+      [0, 0],
+      [fev1*0.15, maxFlow*0.9],
+      [fev1*0.3, pef>0?pef:maxFlow],
+      [fev1, fef25>0?fef25:maxFlow*0.6],
+      [fvc*0.5, fef50>0?fef50:maxFlow*0.4],
+      [fvc*0.75, fef75>0?fef75:maxFlow*0.2],
+      [fvc, 0]
+    ];
+    ctx.beginPath(); ctx.strokeStyle='#28aaa4'; ctx.lineWidth=2.5;
+    pts.forEach(function(p,i){
+      var x=PAD+p[0]*scX, y=H-PAD-p[1]*scY;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    // Fill
+    ctx.fillStyle='rgba(40,170,164,0.08)';
+    ctx.beginPath();
+    pts.forEach(function(p,i){
+      var x=PAD+p[0]*scX, y=H-PAD-p[1]*scY;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.lineTo(W-PAD,H-PAD); ctx.lineTo(PAD,H-PAD); ctx.closePath(); ctx.fill();
+    // Axis ticks
+    ctx.fillStyle='#636875'; ctx.font='8px Arial'; ctx.textAlign='center';
+    [0, fvc/2, fvc].forEach(function(v){if(v>0||v===0){ctx.fillText(v.toFixed(1), PAD+v*scX, H-PAD+10);}});
+    ctx.textAlign='right';
+    [0, maxFlow/2, maxFlow].forEach(function(v){ctx.fillText(v.toFixed(1), PAD-3, H-PAD-v*scY+3);});
+  }
+  // ── V-T Chart (Volume-Time) ──
+  var vtCanvas = document.getElementById('spiro-vt-chart');
+  if(vtCanvas && fvc > 0) {
+    var ctx2 = vtCanvas.getContext('2d');
+    var W=260, H=180, PAD=30;
+    ctx2.clearRect(0,0,W,H);
+    ctx2.strokeStyle='#f0f0f0'; ctx2.lineWidth=1;
+    for(var i=0;i<=4;i++){var x=PAD+i*(W-2*PAD)/4;ctx2.beginPath();ctx2.moveTo(x,PAD);ctx2.lineTo(x,H-PAD);ctx2.stroke();}
+    for(var j=0;j<=4;j++){var y=PAD+j*(H-2*PAD)/4;ctx2.beginPath();ctx2.moveTo(PAD,y);ctx2.lineTo(W-PAD,y);ctx2.stroke();}
+    ctx2.strokeStyle='#555'; ctx2.lineWidth=1.5;
+    ctx2.beginPath(); ctx2.moveTo(PAD,PAD); ctx2.lineTo(PAD,H-PAD); ctx2.lineTo(W-PAD,H-PAD); ctx2.stroke();
+    ctx2.fillStyle='#636875'; ctx2.font='9px Arial'; ctx2.textAlign='center';
+    ctx2.fillText('Tiempo (s)',W/2,H-4);
+    ctx2.save(); ctx2.translate(10,H/2); ctx2.rotate(-Math.PI/2);
+    ctx2.fillText('Volumen (L)',0,0); ctx2.restore();
+    var maxT = 6, scX2=(W-2*PAD)/maxT, scY2=(H-2*PAD)/Math.max(fvc,0.1);
+    // V-T curve: rises fast then plateaus (typical FVC maneuver)
+    // t=0 → V=0, t=1 → V=fev1, t=3 → V=fvc*0.95, t=6 → V=fvc
+    var vtPts = [[0,0],[0.1,0],[0.25,fev1*0.4],[0.5,fev1*0.75],[1,fev1],[2,fvc*0.9],[3,fvc*0.96],[4,fvc*0.98],[6,fvc]];
+    ctx2.beginPath(); ctx2.strokeStyle='#2a4e7a'; ctx2.lineWidth=2.5;
+    vtPts.forEach(function(p,i){
+      var x=PAD+p[0]*scX2, y=H-PAD-p[1]*scY2;
+      i===0 ? ctx2.moveTo(x,y) : ctx2.lineTo(x,y);
+    });
+    ctx2.stroke();
+    ctx2.fillStyle='rgba(42,78,122,0.08)';
+    ctx2.beginPath();
+    vtPts.forEach(function(p,i){
+      var x=PAD+p[0]*scX2, y=H-PAD-p[1]*scY2;
+      i===0 ? ctx2.moveTo(x,y) : ctx2.lineTo(x,y);
+    });
+    ctx2.lineTo(W-PAD,H-PAD); ctx2.lineTo(PAD,H-PAD); ctx2.closePath(); ctx2.fill();
+    // FEV1 marker
+    if(fev1>0){
+      ctx2.setLineDash([3,3]); ctx2.strokeStyle='#e53935'; ctx2.lineWidth=1;
+      ctx2.beginPath(); ctx2.moveTo(PAD+scX2,H-PAD); ctx2.lineTo(PAD+scX2,H-PAD-fev1*scY2); ctx2.lineTo(PAD,H-PAD-fev1*scY2); ctx2.stroke();
+      ctx2.setLineDash([]);
+      ctx2.fillStyle='#e53935'; ctx2.font='8px Arial'; ctx2.textAlign='left';
+      ctx2.fillText('FEV1='+fev1.toFixed(1)+'L', PAD+scX2+2, H-PAD-fev1*scY2-2);
+    }
+    ctx2.fillStyle='#636875'; ctx2.font='8px Arial'; ctx2.textAlign='center';
+    [0,1,2,3,4,5,6].forEach(function(t){ctx2.fillText(t, PAD+t*scX2, H-PAD+10);});
+    ctx2.textAlign='right';
+    [0, fvc/2, fvc].forEach(function(v){ctx2.fillText(v.toFixed(1), PAD-3, H-PAD-v*scY2+3);});
+  }
 }
 
 // ── CIE-10 ────────────────────────────────────────────────
@@ -1818,17 +2477,58 @@ function renderCIESec() {
 }
 
 // ── RECETA ────────────────────────────────────────────────
+function rxMedSuggest() {
+  const inp = document.getElementById('rx-med');
+  const drop = document.getElementById('rx-med-drop');
+  const stockWarn = document.getElementById('rx-med-stock');
+  if(!inp || !drop) return;
+  const q = inp.value.trim().toLowerCase();
+  if(stockWarn) stockWarn.style.display = 'none';
+  if(q.length < 2){ drop.style.display='none'; return; }
+  const meds = invCache.filter(function(i){
+    return i.categoria === 'Medicamento' && (i.nombre||'').toLowerCase().includes(q) && i.activo !== false;
+  }).slice(0,10);
+  if(!meds.length){ drop.style.display='none'; return; }
+  drop.innerHTML = '';
+  meds.forEach(function(m){
+    var div = document.createElement('div');
+    div.style.cssText = 'padding:7px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:.87em;display:flex;justify-content:space-between;align-items:center';
+    var stock = parseInt(m.stock)||0;
+    var stockColor = stock > 0 ? '#28aaa4' : '#e53935';
+    div.innerHTML = '<span><b>'+m.nombre+'</b></span><span style="font-size:.78em;color:'+stockColor+';font-weight:600">'+(stock>0?'Stock: '+stock:'Sin stock')+'</span>';
+    div.addEventListener('click', function(){
+      inp.value = m.nombre;
+      drop.style.display = 'none';
+      if(stockWarn) stockWarn.style.display = stock <= 0 ? 'block' : 'none';
+      // Auto-fill presentation if available
+      var presEl = document.getElementById('rx-present');
+      if(presEl && !presEl.value && m.unidad) presEl.value = m.unidad;
+    });
+    drop.appendChild(div);
+  });
+  drop.style.display = 'block';
+}
+// Close rx dropdown on outside click
+document.addEventListener('click', function(e){
+  var drop = document.getElementById('rx-med-drop');
+  if(drop && !drop.contains(e.target) && e.target.id !== 'rx-med') drop.style.display = 'none';
+});
 function addRxMed() {
   const med = document.getElementById('rx-med').value.trim();
   if(!med) return;
+  const stockWarn = document.getElementById('rx-med-stock');
+  if(stockWarn) stockWarn.style.display = 'none';
   rxMeds.push({
-    nombre:med, dosis:document.getElementById('rx-dosis').value.trim(),
+    nombre:med,
+    dosis:document.getElementById('rx-dosis').value.trim(),
+    presentacion:(document.getElementById('rx-present')||{value:''}).value.trim(),
     frecuencia:document.getElementById('rx-freq').value.trim(),
     duracion:document.getElementById('rx-dur').value.trim(),
     cantidad:parseInt(document.getElementById('rx-cant').value)||1,
     indicaciones:document.getElementById('rx-indicaciones').value.trim()
   });
   document.getElementById('rx-med').value=''; document.getElementById('rx-dosis').value='';
+  if(document.getElementById('rx-present')) document.getElementById('rx-present').value='';
   document.getElementById('rx-freq').value=''; document.getElementById('rx-dur').value='';
   document.getElementById('rx-indicaciones').value='';
   renderRxMeds();
@@ -1836,8 +2536,8 @@ function addRxMed() {
 function renderRxMeds() {
   const div = document.getElementById('rx-meds-list');
   if(!rxMeds.length){ div.innerHTML='<div class="muted">Sin medicamentos</div>'; return; }
-  div.innerHTML = '<div class="tw"><table><thead><tr><th>Medicamento</th><th>Dosis</th><th>Frecuencia</th><th>Duración</th><th>Cant</th><th></th></tr></thead><tbody>'
-    + rxMeds.map((m,i)=>'<tr><td>'+m.nombre+'</td><td>'+m.dosis+'</td><td>'+m.frecuencia+'</td><td>'+m.duracion+'</td><td>'+m.cantidad+'</td><td><button class="btn btn-d btn-sm" onclick="rxMeds.splice('+i+',1);renderRxMeds()">✕</button></td></tr>').join('')
+  div.innerHTML = '<div class="tw"><table><thead><tr><th>Medicamento</th><th>Dosis</th><th>Presentación</th><th>Frecuencia</th><th>Duración</th><th>Cant</th><th></th></tr></thead><tbody>'
+    + rxMeds.map((m,i)=>'<tr><td>'+m.nombre+'</td><td>'+m.dosis+'</td><td>'+(m.presentacion||'')+'</td><td>'+m.frecuencia+'</td><td>'+m.duracion+'</td><td>'+m.cantidad+'</td><td><button class="btn btn-d btn-sm" onclick="rxMeds.splice('+i+',1);renderRxMeds()">✕</button></td></tr>').join('')
     + '</tbody></table></div>';
 }
 
@@ -1898,6 +2598,11 @@ function collectVisit() {
 
 function saveVisit() {
   const ev = collectVisit();
+  // Audit trail: nombre médico + fecha/hora
+  const ahora = new Date().toLocaleString('es-MX');
+  const medico = currentUser ? currentUser.nombre : 'Sistema';
+  if(!ev._audit) ev._audit = [];
+  ev._audit.push({medico: medico, fecha: ahora, accion: 'guardado'});
   gasPost({action:'save', eval:ev}, function(r) {
     if(!r.ok){ alert('Error al guardar: '+(r.error||'')); return; }
     if(ev.docs && ev.docs.receta && ev.docs.receta.medicamentos && ev.docs.receta.medicamentos.length) {
@@ -2375,35 +3080,113 @@ function showRepTab(tab, btn) {
 function buildReporteSUIVE() {
   const desde = document.getElementById('suive-desde').value;
   const hasta = document.getElementById('suive-hasta').value;
-  evalsCache = []; // force reload
+  evalsCache = [];
   loadEvalsAndRender(function(evals) {
-    const filtered = evals.filter(e => {
+    const filtered = evals.filter(function(e) {
       if(!e.ts) return false;
       const ds = e.ts.slice(0,10);
-      const d = new Date(e.ts);
-      if(desde || hasta) {
-        if(desde && ds < desde) return false;
-        if(hasta && ds > hasta) return false;
-      } else {
-        if(d.getFullYear() !== anio) return false;
-        if(mes && d.getMonth()+1 !== mes) return false;
-      }
+      if(desde && ds < desde) return false;
+      if(hasta && ds > hasta) return false;
       return true;
     });
+    // Build SUIVE-format table: rows = diagnoses, cols = age groups + sex
+    const ageGroups = ['<1','1-4','5-9','10-14','15-19','20-24','25-44','45-64','65+'];
     const byDx = {};
-    filtered.forEach(e => {
-      const cie = e.conclusion && e.conclusion.ciePrimary ? e.conclusion.ciePrimary.c+' '+e.conclusion.ciePrimary.d : 'Sin diagnóstico';
-      byDx[cie] = (byDx[cie]||0)+1;
+    filtered.forEach(function(e) {
+      const cie = e.conclusion && e.conclusion.ciePrimary ? e.conclusion.ciePrimary.c+' — '+e.conclusion.ciePrimary.d : 'Sin diagnóstico';
+      const sexo = e.hc && e.hc.sexo ? e.hc.sexo : 'N/E';
+      const edad = e.hc && e.hc.fnac ? calcEdadNum(e.hc.fnac) : -1;
+      const ag = getAgeGroup(edad, ageGroups);
+      if(!byDx[cie]) {
+        byDx[cie] = {};
+        ageGroups.forEach(function(g){ byDx[cie][g+'_M']=0; byDx[cie][g+'_F']=0; });
+        byDx[cie]['Total']=0;
+      }
+      const key = ag + '_' + (sexo==='Femenino'?'F':'M');
+      if(byDx[cie][key]!==undefined) byDx[cie][key]++;
+      byDx[cie]['Total']++;
     });
-    lastRepData = Object.entries(byDx).map(([dx,n])=>({Diagnóstico:dx,Casos:n})).sort((a,b)=>b.Casos-a.Casos);
-    lastRepType = 'suive';
-    if(!lastRepData.length) {
-      document.getElementById('suive-table').innerHTML = '<div class="alert alert-i" style="margin-top:10px">Sin datos para el período seleccionado. Total de casos: 0</div>';
-    } else {
-      document.getElementById('suive-table').innerHTML = renderRepTable(lastRepData, ['Diagnóstico','Casos']);
+    // If no data, create empty SUIVE format
+    if(!Object.keys(byDx).length) {
+      byDx['—'] = {};
+      ageGroups.forEach(function(g){ byDx['—'][g+'_M']=0; byDx['—'][g+'_F']=0; });
+      byDx['—']['Total']=0;
     }
+    // Render table
+    const periodo = (desde||'inicio') + ' al ' + (hasta||'hoy');
+    let html = '<div style="font-size:.75em;color:#636875;margin-bottom:6px">Período: '+periodo+' · Total de casos: '+filtered.length+'</div>';
+    html += '<div class="tw" style="overflow-x:auto"><table style="min-width:900px"><thead>';
+    html += '<tr><th rowspan="2" style="min-width:200px">Diagnóstico (CIE-10)</th>';
+    ageGroups.forEach(function(g){ html += '<th colspan="2" style="text-align:center">'+g+'</th>'; });
+    html += '<th rowspan="2">Total</th></tr>';
+    html += '<tr>';
+    ageGroups.forEach(function(){ html += '<th style="font-size:.75em">M</th><th style="font-size:.75em">F</th>'; });
+    html += '</tr></thead><tbody>';
+    Object.entries(byDx).forEach(function([dx,counts]){
+      html += '<tr><td style="font-size:.82em">'+dx+'</td>';
+      ageGroups.forEach(function(g){
+        html += '<td style="text-align:center">'+counts[g+'_M']+'</td><td style="text-align:center">'+counts[g+'_F']+'</td>';
+      });
+      html += '<td style="text-align:center;font-weight:700">'+counts['Total']+'</td></tr>';
+    });
+    // Totals row
+    html += '<tr style="background:#f0f7ff;font-weight:700"><td>TOTAL</td>';
+    ageGroups.forEach(function(g){
+      const mTotal = Object.values(byDx).reduce(function(s,c){ return s+(c[g+'_M']||0); },0);
+      const fTotal = Object.values(byDx).reduce(function(s,c){ return s+(c[g+'_F']||0); },0);
+      html += '<td style="text-align:center">'+mTotal+'</td><td style="text-align:center">'+fTotal+'</td>';
+    });
+    const grandTotal = Object.values(byDx).reduce(function(s,c){ return s+(c['Total']||0); },0);
+    html += '<td style="text-align:center">'+grandTotal+'</td></tr>';
+    html += '</tbody></table></div>';
+    document.getElementById('suive-table').innerHTML = html;
+    // Store for export
+    lastRepData = filtered.length ? Object.entries(byDx).map(function([dx,c]){
+      var row = {'Diagnóstico CIE-10': dx};
+      ageGroups.forEach(function(g){ row[g+' M']=c[g+'_M']; row[g+' F']=c[g+'_F']; });
+      row['Total']=c['Total']; return row;
+    }) : [{'Diagnóstico CIE-10':'Sin datos para el período'}];
+    lastRepType = 'suive';
   });
 }
+function calcEdadNum(fnac) {
+  if(!fnac) return -1;
+  const d = new Date(fnac), a = new Date();
+  let edad = a.getFullYear()-d.getFullYear();
+  if(a.getMonth()-d.getMonth()<0||(a.getMonth()-d.getMonth()===0&&a.getDate()<d.getDate())) edad--;
+  return edad;
+}
+function getAgeGroup(edad, groups) {
+  if(edad<0) return '20-24';
+  if(edad<1) return '<1';
+  if(edad<=4) return '1-4';
+  if(edad<=9) return '5-9';
+  if(edad<=14) return '10-14';
+  if(edad<=19) return '15-19';
+  if(edad<=24) return '20-24';
+  if(edad<=44) return '25-44';
+  if(edad<=64) return '45-64';
+  return '65+';
+}
+function exportSuivePDF() {
+  const div = document.getElementById('suive-table');
+  if(!div || !div.innerHTML){ alert('Primero genera el reporte SUIVE'); return; }
+  const html = docHeader('Reporte SUIVE — Vigilancia Epidemiológica', 'Clínica BiMASS')
+    + '<p style="font-size:.8em;color:#636875">Sistema Único de Vigilancia Epidemiológica · Secretaría de Salud · RFC: CBI260129AM4</p>'
+    + div.innerHTML;
+  printWin(html, 'SUIVE — Clínica BiMASS');
+}
+function emailSuive() {
+  const dest = (document.getElementById('suive-email-dest')||{value:''}).value.trim();
+  if(!dest || !dest.includes('@')){ alert('Ingresa un correo válido'); return; }
+  if(!lastRepData || !lastRepData.length){ alert('Primero genera el reporte SUIVE'); return; }
+  const periodo = (document.getElementById('suive-desde').value||'—') + ' al ' + (document.getElementById('suive-hasta').value||'hoy');
+  gasPost({action:'sendSuiveEmail', dest:dest, periodo:periodo, data:lastRepData.slice(0,50)}, function(r){
+    if(r.ok) { document.getElementById('suive-email-dest').value=''; alert('✅ Reporte SUIVE enviado a '+dest); }
+    else alert('Error al enviar: '+(r.error||''));
+  });
+}
+
 function buildReporteVentas() {
   const desde = document.getElementById('vta-desde').value;
   const hasta = document.getElementById('vta-hasta').value;
@@ -2743,7 +3526,7 @@ function printWin(html, titulo, extraButtons) {
     +'<button class="btn-print" onclick="window.print()">🖨 Imprimir</button>'
     +btns
     +'</div>'
-    +'</body></html>');
+    +'\n</body></html>');
   w.document.close();
 }
 function docHeader(titulo, subtitulo) {
@@ -2766,10 +3549,11 @@ function printVisita() {
   const ev = collectVisit();
   const p = currentPatient||{};
   const u = currentUser||{};
+  function pchk(id){ const el=document.getElementById(id); return !el || el.checked; }
   let html = docHeader('Reporte de Visita Médica', ev.hc.tipoVisita||'')
     + '<p style="font-size:.82em;color:#666">Fecha: '+new Date().toLocaleString('es-MX')+'</p>';
 
-  // Ficha
+  // Ficha (siempre imprime)
   html += '<h3>Ficha de Identificación</h3><table><tr><td><strong>Paciente:</strong> '+ev.hc.nombre+'</td><td><strong>Sexo:</strong> '+ev.hc.sexo+'</td><td><strong>F. Nac:</strong> '+fmtDate(ev.hc.fnac)+'</td></tr>'
     +'<tr><td><strong>CURP:</strong> '+ev.hc.curp+'</td><td><strong>RFC:</strong> '+ev.hc.rfc+'</td><td><strong>Tel:</strong> '+ev.hc.telefono+'</td></tr>'
     +'<tr><td colspan="3"><strong>Domicilio:</strong> '+ev.hc.calle+' '+ev.hc.numero+', Col. '+ev.hc.colonia+'</td></tr>'
@@ -2777,11 +3561,51 @@ function printVisita() {
     +(ev.hc.alergias&&ev.hc.alergias!=='Ninguna conocida'?'<tr><td colspan="3" style="background:#ffebee;color:#e53935"><strong>⚠ ALERGIAS: '+ev.hc.alergias+'</strong></td></tr>':'')
     +'</table>';
 
+  // AHF
+  if(pchk('chk-ahf') && ev.hc.ahf && Object.values(ev.hc.ahf).some(x=>x)) {
+    const a = ev.hc.ahf;
+    html += '<h3>Antecedentes Heredofamiliares</h3><table>';
+    const ahfLbl = {dm:'DM',hta:'HTA',cardio:'Cardiopatía',cancer:'Cáncer',otros:'Otros'};
+    Object.entries(ahfLbl).forEach(([k,lbl]) => { if(a[k]) html += '<tr><td><b>'+lbl+':</b></td><td>'+a[k]+'</td></tr>'; });
+    html += '</table>';
+  }
+  // APNP
+  if(pchk('chk-hnp') && ev.hc.hnp) {
+    const h = ev.hc.hnp;
+    html += '<h3>Antecedentes Personales No Patológicos</h3><table>';
+    html += '<tr><td><b>Tabaquismo:</b> '+h.tabaquismo+(h.tabN?' ('+h.tabN+' cig/día)':'')+'</td>';
+    html += '<td><b>Alcoholismo:</b> '+h.alcoholismo+'</td><td><b>Act. física:</b> '+h.af+'</td></tr>';
+    html += '</table>';
+  }
   // APP
-  if(ev.hc.app && Object.values(ev.hc.app).some(x=>x)) {
+  if(pchk('chk-app') && ev.hc.app && Object.values(ev.hc.app).some(x=>x)) {
     const appLbl = {exant:'Exantemáticas',quirurgs:'Quirúrgicos',traum:'Traumáticos',transf:'Transfusionales',cronicos:'Crónicos degenerativos',hosp:'Hospitalizaciones',infect:'Infectocontagiosos',alrgias:'Alergias',adic:'Adicciones',discap:'Discapacidad'};
     html += '<h3>Antecedentes Personales Patológicos</h3><table>';
     Object.entries(appLbl).forEach(([k,lbl]) => { if(ev.hc.app[k]) html += '<tr><td style="width:45%"><strong>'+lbl+':</strong></td><td>'+ev.hc.app[k]+'</td></tr>'; });
+    html += '</table>';
+  }
+  // Historia laboral
+  if(pchk('chk-laboral') && ev.hc.laboral) {
+    const l = ev.hc.laboral;
+    html += '<h3>Historia Laboral — Puesto Actual</h3><table>';
+    html += '<tr><td><b>Antigüedad:</b> '+l.antiguedad+'</td><td><b>Turno:</b> '+l.turno+'</td><td><b>Hrs/sem:</b> '+l.hrs+'</td></tr>';
+    if(l.actividades) html += '<tr><td colspan="3"><b>Actividades:</b> '+l.actividades+'</td></tr>';
+    if(l.epp) html += '<tr><td colspan="3"><b>EPP:</b> '+l.epp+'</td></tr>';
+    if(l.riesgos) html += '<tr><td colspan="3"><b>Riesgos:</b> '+l.riesgos+'</td></tr>';
+    html += '</table>';
+  }
+  // Gine
+  if(pchk('chk-gine') && ev.hc.gine) {
+    const g = ev.hc.gine;
+    html += '<h3>Antecedentes Ginecoobstétricos</h3><table>';
+    html += '<tr><td><b>FUM:</b> '+fmtDate(g.fum)+'</td><td><b>Menarca:</b> '+g.menarq+'</td><td><b>Ritmo:</b> '+g.ritmo+'</td></tr>';
+    html += '<tr><td><b>G:</b> '+g.g+'</td><td><b>P:</b> '+g.p+'</td><td><b>C:</b> '+g.c+'</td><td><b>A:</b> '+g.a+'</td></tr>';
+    html += '</table>';
+  }
+  // Lab/Imagen previos
+  if(pchk('chk-labprev') && labItems && labItems.length) {
+    html += '<h3>Laboratorio / Imagen Previos</h3><table><tr><th>Tipo</th><th>Estudio</th><th>Fecha</th><th>Resultado</th></tr>';
+    labItems.forEach(function(li){ html += '<tr><td>'+li.tipo+'</td><td>'+li.estudio+'</td><td>'+fmtDate(li.fecha)+'</td><td>'+li.resultado+'</td></tr>'; });
     html += '</table>';
   }
   // Padecimiento
@@ -3017,12 +3841,121 @@ function printRiesgoTrabajo() {
   const emailBtn = supEmail ? '<button class="btn-email" onclick="alert(\'Para enviar al supervisor ('+supEmail+'), use la opción de correo en el sistema.\')">✉ Enviar a supervisor</button>' : '';
   printWin(html, 'Investigación de Riesgo de Trabajo', emailBtn);
 }
+// ── PARTES DEL CUERPO ────────────────────────────────────
+const RT_PARTES = [
+  'Cabeza','Cuello','Hombro derecho','Hombro izquierdo','Brazo derecho','Brazo izquierdo',
+  'Codo derecho','Codo izquierdo','Antebrazo derecho','Antebrazo izquierdo',
+  'Muñeca derecha','Muñeca izquierda','Mano derecha','Mano izquierda',
+  'Dedo(s) mano derecha','Dedo(s) mano izquierda','Tórax','Abdomen','Espalda alta',
+  'Espalda baja / Lumbar','Columna cervical','Columna torácica','Columna lumbar',
+  'Cadera derecha','Cadera izquierda','Muslo derecho','Muslo izquierdo',
+  'Rodilla derecha','Rodilla izquierda','Pierna derecha','Pierna izquierda',
+  'Tobillo derecho','Tobillo izquierdo','Pie derecho','Pie izquierdo',
+  'Dedo(s) pie derecho','Dedo(s) pie izquierdo','Ojos','Oídos','Nariz','Boca'
+];
+function initPartesDropdown() {
+  const grid = document.querySelector('#rt-partes-dropdown div');
+  if(!grid || grid.children.length > 0) return;
+  RT_PARTES.forEach(function(p) {
+    var lbl = document.createElement('label');
+    lbl.style.cssText = 'display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.83em;padding:2px 0';
+    var chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.value = p;
+    chk.addEventListener('change', updateParteCuerpo);
+    lbl.appendChild(chk);
+    lbl.appendChild(document.createTextNode(p));
+    grid.appendChild(lbl);
+  });
+}
+function togglePartesDropdown() {
+  const dd = document.getElementById('rt-partes-dropdown');
+  if(!dd) return;
+  if(dd.style.display === 'none') {
+    initPartesDropdown();
+    dd.style.display = 'block';
+  } else {
+    dd.style.display = 'none';
+  }
+}
+function togglePartesOtro() {
+  const chk = document.getElementById('rt-p-otro');
+  const txt = document.getElementById('rt-partes-otro-txt');
+  if(txt) txt.style.display = chk && chk.checked ? '' : 'none';
+  updateParteCuerpo();
+}
+function updateParteCuerpo() {
+  const dd = document.getElementById('rt-partes-dropdown');
+  if(!dd) return;
+  const checked = Array.from(dd.querySelectorAll('input[type=checkbox]:checked'))
+    .filter(function(c){ return c.id !== 'rt-p-otro'; })
+    .map(function(c){ return c.value; });
+  const otroChk = document.getElementById('rt-p-otro');
+  const otroTxt = document.getElementById('rt-partes-otro-txt');
+  if(otroChk && otroChk.checked && otroTxt && otroTxt.value.trim()) {
+    checked.push(otroTxt.value.trim());
+  }
+  const hiddenInput = document.getElementById('rt-parte-cuerpo');
+  const display = document.getElementById('rt-partes-display');
+  const placeholder = document.getElementById('rt-partes-placeholder');
+  const val = checked.join(', ');
+  if(hiddenInput) hiddenInput.value = val;
+  if(display) {
+    if(checked.length) {
+      if(placeholder) placeholder.style.display = 'none';
+      // Remove old chips
+      Array.from(display.querySelectorAll('.parte-chip')).forEach(function(c){ c.remove(); });
+      checked.forEach(function(p) {
+        var chip = document.createElement('span');
+        chip.className = 'parte-chip';
+        chip.style.cssText = 'background:#e0f7f5;color:#28aaa4;border-radius:10px;padding:2px 8px;font-size:.78em;font-weight:600';
+        chip.textContent = p;
+        display.appendChild(chip);
+      });
+    } else {
+      Array.from(display.querySelectorAll('.parte-chip')).forEach(function(c){ c.remove(); });
+      if(placeholder) placeholder.style.display = '';
+      if(hiddenInput) hiddenInput.value = '';
+    }
+  }
+}
+
 function emailRiesgoTrabajo() {
   function v(id){ const el=document.getElementById(id); return el?el.value:''; }
   const supEmail = v('rt-supervisor-email');
   if(!supEmail){ alert('No hay correo del supervisor registrado'); return; }
   const p = currentPatient||{};
-  gasPost({action:'sendRtEmail', dest:supEmail, paciente:p.nombre, empresa:v('hc-empresa'), fecha:v('rt-fecha'), tipo:v('rt-tipo'), desc:v('rt-desc')}, function(r) {
+  // Get agentes
+  const agentes = [];
+  if(document.getElementById('rt-ag-fis') && document.getElementById('rt-ag-fis').checked) agentes.push('Físico');
+  if(document.getElementById('rt-ag-qui') && document.getElementById('rt-ag-qui').checked) agentes.push('Químico');
+  if(document.getElementById('rt-ag-bio') && document.getElementById('rt-ag-bio').checked) agentes.push('Biológico');
+  if(document.getElementById('rt-ag-psi') && document.getElementById('rt-ag-psi').checked) agentes.push('Psicosocial');
+  if(document.getElementById('rt-ag-erg') && document.getElementById('rt-ag-erg').checked) agentes.push('Ergonómico');
+  const agOtro = v('rt-ag-otro-txt');
+  if(agOtro) agentes.push('Otros: '+agOtro);
+  const rec = {
+    paciente: p.nombre||'',
+    empresa: v('hc-empresa'),
+    puesto: v('hc-puesto'),
+    fecha: v('rt-fecha'),
+    hora: v('rt-hora'),
+    tipo: v('rt-tipo'),
+    probableRiesgo: v('rt-prob-riesgo'),
+    edad: v('rt-edad'),
+    sexo: v('rt-sexo'),
+    talla: v('rt-talla'),
+    peso: v('rt-peso'),
+    mano: v('rt-mano'),
+    turno: v('rt-turno'),
+    supervisor: v('rt-supervisor'),
+    agente: agentes.join(', '),
+    asociado: v('rt-asociado'),
+    parteCuerpo: v('rt-parte-cuerpo'),
+    desc: v('rt-desc'),
+    medidas: v('rt-medidas')
+  };
+  gasPost({action:'sendRtEmail', dest:supEmail, rec:rec}, function(r) {
     if(r.ok) alert('✅ Investigación enviada a '+supEmail);
     else alert('Error al enviar: '+(r.error||''));
   });
@@ -4210,6 +5143,131 @@ function saveHistorialNota() {
   </div>
 </div>
 </div>
+
+<!-- ══ COTIZACIONES ══════════════════════════════════════════ -->
+<div id="screen-cotiz" class="screen">
+<div class="sec-hdr no-print">
+  <h2>📝 Cotizaciones</h2>
+</div>
+
+<!-- ─── FORMULARIO NUEVA COTIZACIÓN ───────────────────────── -->
+<div class="card">
+  <div class="card-title">➕ Nueva cotización</div>
+  <div class="fg-row" style="flex-wrap:wrap;gap:14px;margin-bottom:12px">
+    <div class="fg" style="flex:1;min-width:140px">
+      <label class="lbl">Folio</label>
+      <input id="cotiz-folio" type="text" readonly style="background:var(--bg2);font-weight:700;color:var(--teal)" placeholder="Auto">
+    </div>
+    <div class="fg" style="flex:1;min-width:140px">
+      <label class="lbl">Fecha</label>
+      <input id="cotiz-fecha" type="date">
+    </div>
+    <div class="fg" style="flex:2;min-width:200px">
+      <label class="lbl">Empresa / Organización</label>
+      <input id="cotiz-empresa" type="text" placeholder="Nombre de la empresa (o NO APLICA)">
+    </div>
+  </div>
+  <div class="fg-row" style="gap:14px;margin-bottom:12px">
+    <div class="fg" style="flex:1">
+      <label class="lbl">En atención a</label>
+      <input id="cotiz-atencion" type="text" placeholder="Nombre del contacto o responsable">
+    </div>
+  </div>
+
+  <!-- Tabla de ítems -->
+  <div style="overflow-x:auto;margin-bottom:10px">
+    <table style="width:100%;border-collapse:collapse;font-size:.88em" id="cotiz-items-table">
+      <thead>
+        <tr style="background:var(--azul);color:#fff">
+          <th style="padding:7px 10px;text-align:left;border-radius:6px 0 0 0">Item</th>
+          <th style="padding:7px 10px;text-align:left">Descripción</th>
+          <th style="padding:7px 10px;text-align:center;width:80px">Cantidad</th>
+          <th style="padding:7px 10px;text-align:right;width:120px">Precio unit.</th>
+          <th style="padding:7px 10px;text-align:right;width:120px">Subtotal</th>
+          <th style="padding:7px 10px;text-align:center;width:50px;border-radius:0 6px 0 0">✕</th>
+        </tr>
+      </thead>
+      <tbody id="cotiz-items-body">
+        <!-- rows added dynamically -->
+      </tbody>
+    </table>
+  </div>
+  <button class="btn btn-o btn-sm" onclick="addCotizRow()" style="margin-bottom:14px">+ Agregar concepto</button>
+
+  <!-- Totales -->
+  <div style="display:flex;justify-content:flex-end">
+    <div style="min-width:280px">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--brd)">
+        <span class="muted">Subtotal</span>
+        <span id="cotiz-subtotal-disp" style="font-weight:600">$0.00</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--brd)">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="cotiz-iva-chk" onchange="calcCotizTotals()">
+          <span class="muted">IVA 16%</span>
+        </label>
+        <span id="cotiz-iva-disp" style="font-weight:600;color:var(--muted)">$0.00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0">
+        <span style="font-weight:700;font-size:1.05em">Total</span>
+        <span id="cotiz-total-disp" style="font-weight:800;font-size:1.1em;color:var(--teal)">$0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Observaciones y firma -->
+  <div class="fg-row" style="gap:14px;margin-top:10px">
+    <div class="fg" style="flex:2">
+      <label class="lbl">Observaciones</label>
+      <textarea id="cotiz-obs" rows="3" placeholder="Condiciones de pago, vigencia de la cotización, notas adicionales..."></textarea>
+    </div>
+    <div class="fg" style="flex:1">
+      <label class="lbl">Firma / Nombre del Director</label>
+      <input id="cotiz-director" type="text" placeholder="Dr. Nombre Apellido">
+      <div style="margin-top:6px;border-top:1px solid var(--brd);padding-top:6px;font-size:.78em;color:var(--muted);text-align:center">Director Médico — BiMASS</div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;display:flex;gap:10px">
+    <button class="btn btn-p" onclick="saveCotizacion()">💾 Guardar cotización</button>
+    <button class="btn btn-o" onclick="clearCotizForm()">✕ Limpiar</button>
+  </div>
+</div>
+
+<!-- ─── LISTA DE COTIZACIONES ──────────────────────────────── -->
+<div class="card" style="margin-top:16px">
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+    <span>📋 Cotizaciones guardadas</span>
+    <input id="cotiz-q" type="text" placeholder="Buscar..." style="max-width:220px;padding:5px 10px;font-size:.85em;border-radius:6px;border:1px solid var(--brd)" oninput="filterCotizaciones()">
+  </div>
+  <div id="cotiz-list-wrap" style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.86em" id="cotiz-list-table">
+      <thead>
+        <tr style="background:var(--bg2);color:var(--azul)">
+          <th style="padding:8px 10px;text-align:left">Folio</th>
+          <th style="padding:8px 10px;text-align:left">Fecha</th>
+          <th style="padding:8px 10px;text-align:left">En atención a</th>
+          <th style="padding:8px 10px;text-align:left">Empresa</th>
+          <th style="padding:8px 10px;text-align:right">Monto</th>
+          <th style="padding:8px 10px;text-align:center">Status</th>
+          <th style="padding:8px 10px;text-align:center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cotiz-list-body">
+        <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Cargando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal ver cotización -->
+<div id="cotiz-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;overflow-y:auto">
+  <div style="background:#fff;max-width:760px;margin:30px auto;border-radius:12px;padding:28px;position:relative">
+    <button onclick="document.getElementById('cotiz-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.4em;cursor:pointer;color:#888">✕</button>
+    <div id="cotiz-modal-content"></div>
+  </div>
+</div>
+</div><!-- end screen-cotiz -->
+
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
