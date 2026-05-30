@@ -1948,34 +1948,52 @@ function doLogin() {
 
 function doRegister() {
   const nombre = document.getElementById('r-nombre').value.trim();
-  const email = document.getElementById('r-email').value.trim();
-  const pass = document.getElementById('r-pass').value;
+  const email  = document.getElementById('r-email').value.trim();
+  const pass   = document.getElementById('r-pass').value;
   const err = document.getElementById('err-reg');
-  const ok = document.getElementById('ok-reg');
+  const ok  = document.getElementById('ok-reg');
+  const btn = document.querySelector('#auth-form-register .btn-p');
+  function showErr(msg) {
+    err.innerHTML = '<strong>❌</strong> ' + msg;
+    err.style.display = 'block'; ok.style.display = 'none';
+    if(btn){ btn.disabled=false; btn.textContent='Registrarse'; }
+  }
   err.style.display = 'none'; ok.style.display = 'none';
-  if(!nombre||!email||!pass) { err.textContent = 'Nombre, correo y contraseña son obligatorios'; err.style.display='block'; return; }
-  const ciudad = document.getElementById('r-ciudad').value.trim();
-  const dir = document.getElementById('r-direccion').value.trim();
-  gasPost({action:'register', user:{
-    nombre: nombre, email: email, password: pass,
-    cedula: document.getElementById('r-cedula').value.trim(),
-    especialidad: document.getElementById('r-esp').value.trim(),
-    telefono: document.getElementById('r-tel').value.trim(),
-    curp: document.getElementById('r-curp').value.trim().toUpperCase(),
-    rfc: document.getElementById('r-rfc').value.trim().toUpperCase(),
-    ciudad: ciudad,
-    direccion: (ciudad && dir) ? ciudad + ', ' + dir : (ciudad || dir)
-  }}, function(r) {
-    if(!r.ok) { err.textContent = r.error||'Error al registrar'; err.style.display='block'; return; }
-    if(r.pending) {
-      ok.innerHTML = '✅ Solicitud enviada correctamente.<br><span style="font-size:.9em">El Director recibirá un correo con un enlace para revisar tu solicitud. Te notificaremos por correo cuando sea aprobada.</span>';
+  if(!nombre||!email||!pass){ showErr('Nombre, correo y contraseña son obligatorios.'); return; }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Registrando...'; }
+  if(typeof google === 'undefined' || !google.script || !google.script.run) {
+    showErr('La app debe abrirse desde la URL de Google Apps Script, no como archivo local.');
+    return;
+  }
+  const ciudad = (document.getElementById('r-ciudad')||{}).value||'';
+  const dir    = (document.getElementById('r-direccion')||{}).value||'';
+  var done = false;
+  var t = setTimeout(function(){
+    if(!done){ done=true; showErr('Sin respuesta del servidor (20s). Verifica el despliegue en script.google.com.'); }
+  }, 20000);
+  google.script.run
+    .withSuccessHandler(function(res){
+      if(done) return; done=true; clearTimeout(t);
+      if(btn){ btn.disabled=false; btn.textContent='Registrarse'; }
+      var r; try{ r=JSON.parse(res); }catch(e){ showErr('Respuesta inválida: '+String(res).slice(0,80)); return; }
+      if(!r.ok){ showErr(r.error||'Error al registrarse.'); return; }
+      ok.innerHTML = r.pending
+        ? '✅ Solicitud enviada. El Director recibirá un correo para aprobar tu acceso.'
+        : '✅ Cuenta creada. Ya puedes iniciar sesión.';
       ok.style.display = 'block';
-    } else {
-      ok.textContent = 'Registro exitoso. Ya puedes iniciar sesión.';
-      ok.style.display = 'block';
-      setTimeout(()=>showAuthTab('login'), 2000);
-    }
-  });
+      if(!r.pending) setTimeout(function(){ showAuthTab('login'); }, 2000);
+    })
+    .withFailureHandler(function(e){
+      if(done) return; done=true; clearTimeout(t);
+      showErr('Error GAS: '+(e?e.message||String(e):'desconocido'));
+    })
+    .serverAction(JSON.stringify({action:'register', user:{
+      nombre:nombre, email:email, password:pass,
+      cedula:(document.getElementById('r-cedula')||{}).value||'',
+      especialidad:(document.getElementById('r-esp')||{}).value||'',
+      ciudad:ciudad, direccion:dir,
+      telefono:(document.getElementById('r-tel')||{}).value||''
+    }}));
 }
 
 function doLogout() {
@@ -5085,6 +5103,55 @@ function exportAusent() {
   a.download = 'BiMASS_Ausentismo_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
 }
 document.addEventListener('DOMContentLoaded', function() {
+  // Auto-check GAS connection status on load
+  (function checkGASStatus() {
+    var banner = document.getElementById('gas-status-banner');
+    if(!banner) return;
+    if(typeof google === 'undefined' || !google.script || !google.script.run) {
+      banner.style.display = 'block';
+      banner.style.background = '#c62828';
+      banner.style.color = '#fff';
+      banner.innerHTML = '⛔ ARCHIVO LOCAL — Esta app debe abrirse desde la URL de Google Apps Script. ' +
+        'Ve a <strong>script.google.com</strong> → Desplegar → obtén la URL de la aplicación web.';
+      return;
+    }
+    banner.style.display = 'block';
+    banner.style.background = '#e3f2fd';
+    banner.style.color = '#1565c0';
+    banner.textContent = '⏳ Verificando conexión con servidor BiMASS...';
+    var done = false;
+    var t = setTimeout(function(){
+      if(!done){ done=true;
+        banner.style.background='#fff3e0'; banner.style.color='#e65100';
+        banner.textContent='⚠️ El servidor GAS no responde. Verifica el despliegue o la autorización de permisos.';
+      }
+    }, 10000);
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(done) return; done=true; clearTimeout(t);
+        try{
+          var r = JSON.parse(res);
+          if(r.ok){
+            banner.style.background='#e8f5e9'; banner.style.color='#2e7d32';
+            banner.textContent='✅ Servidor BiMASS conectado — puedes iniciar sesión o registrarte.';
+            setTimeout(function(){ banner.style.display='none'; }, 3000);
+          } else {
+            banner.style.background='#fff3e0'; banner.style.color='#e65100';
+            banner.textContent='⚠️ GAS responde pero con error: ' + (r.error||'desconocido');
+          }
+        }catch(e){
+          banner.style.background='#fff3e0'; banner.style.color='#e65100';
+          banner.textContent='⚠️ Respuesta inesperada del servidor.';
+        }
+      })
+      .withFailureHandler(function(e){
+        if(done) return; done=true; clearTimeout(t);
+        banner.style.background='#ffebee'; banner.style.color='#c62828';
+        banner.textContent='❌ Error de conexión GAS: '+(e?e.message||String(e):'desconocido')+
+          ' — Ve a script.google.com y autoriza los permisos del script.';
+      })
+      .serverAction(JSON.stringify({action:'ping'}));
+  })();
   // Set today on agenda filter
   const agDate = document.getElementById('ag-filter-date');
   if(agDate) agDate.value = new Date().toISOString().slice(0,10);
