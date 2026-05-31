@@ -11,7 +11,8 @@ body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:#333;min
 .navbar{background:var(--azul);color:#fff;display:flex;align-items:center;gap:10px;padding:0 20px;height:56px;box-shadow:var(--shad);position:sticky;top:0;z-index:100}
 .brand{font-size:1.1em;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:8px}
 .nav-mod{font-size:.85em;opacity:.7;flex:1;padding-left:8px}
-.nav-user{font-size:.82em;opacity:.85}
+.nav-user{font-size:.82em;opacity:.85;display:flex;flex-direction:column;align-items:flex-end;line-height:1.3}
+.nav-user .nav-u-sub{font-size:.78em;opacity:.75}
 .btn-out{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.82em}
 .screen{display:none;padding:20px 16px;max-width:940px;margin:0 auto}
 .screen.active{display:block}
@@ -54,6 +55,8 @@ body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:#333;min
 .btn-o{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
 .btn-d{background:var(--danger);color:#fff}
 .btn-sm{padding:4px 11px;font-size:.78em}
+.portal-slot{padding:8px 14px;border:2px solid var(--teal);border-radius:8px;cursor:pointer;font-size:.88em;font-weight:600;color:var(--teal);background:transparent;transition:all .15s}
+.portal-slot:hover,.portal-slot.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
 .btn-lg{padding:12px 26px;font-size:.98em}
 .tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
 .tab-btn{padding:7px 14px;border:1.5px solid var(--brd);border-radius:20px;background:#fff;color:var(--gris);cursor:pointer;font-size:.82em;font-weight:600;transition:all .15s}
@@ -130,6 +133,7 @@ tr:hover td{background:#f0faf9}
   </div>
   <span class="nav-mod" id="nav-mod"></span>
   <span class="nav-user" id="nav-user"></span>
+  <span class="nav-user nav-u-sub" id="nav-centro" style="display:none"></span>
   <button class="btn-out" onclick="doLogout()">Salir</button>
 </nav>
 
@@ -192,7 +196,103 @@ tr:hover td{background:#f0faf9}
     <div class="form-row">
       <div class="fg w100"><label>Dirección</label><input id="r-direccion" type="text" placeholder="Calle, número, colonia..."></div>
     </div>
+    <div style="border-top:1px solid var(--brd);margin:14px 0 10px;padding-top:12px">
+      <div style="font-size:.8em;font-weight:600;color:var(--gris);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Documentos opcionales</div>
+      <div class="form-row">
+        <div class="fg">
+          <label>📷 Foto cédula profesional <span style="color:var(--gris);font-weight:400">(opcional)</span></label>
+          <input id="r-cedula-file" type="file" accept="image/*" style="font-size:.85em">
+          <div id="r-cedula-preview" style="display:none;margin-top:6px"><img id="r-cedula-img" style="max-width:100%;max-height:120px;border-radius:6px;border:1px solid var(--brd)"></div>
+        </div>
+        <div class="fg">
+          <label>📄 Constancia de situación fiscal <span style="color:var(--gris);font-weight:400">(PDF, opcional)</span></label>
+          <input id="r-constancia-file" type="file" accept=".pdf,application/pdf" style="font-size:.85em">
+          <div id="r-constancia-name" style="display:none;font-size:.82em;color:var(--teal);margin-top:4px"></div>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-s w100 btn-lg mt16" onclick="doRegister()">Solicitar acceso</button>
+  </div>
+</div>
+</div>
+<div style="text-align:center;margin-top:14px;font-size:.82em">
+  <span style="color:var(--gris)">¿Paciente? </span>
+  <a id="portal-link" href="#" onclick="showScreen('portal');initPortal();return false;" style="color:var(--teal);font-weight:600">📅 Agenda tu cita aquí</a>
+</div>
+
+<!-- PORTAL AUTOAGENDA -->
+<div id="screen-portal" class="screen">
+<div style="max-width:520px;margin:30px auto">
+  <div style="text-align:center;margin-bottom:24px">
+    <svg viewBox="280 80 120 130" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+      <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#2a4e7a" transform="rotate(0,340,155)"/>
+      <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#28aaa4" transform="rotate(60,340,155)"/>
+      <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#7ecdc8" transform="rotate(120,340,155)"/>
+      <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#5ab8b2" transform="rotate(180,340,155)"/>
+      <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#b8b4dc" transform="rotate(240,340,155)"/>
+      <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#8878b8" transform="rotate(300,340,155)"/>
+      <rect x="323" y="118" width="34" height="74" rx="11" fill="white"/>
+      <rect x="303" y="138" width="74" height="34" rx="11" fill="white"/>
+    </svg>
+    <h2 style="color:var(--azul);margin:8px 0 2px;font-size:1.3em">Agenda tu cita</h2>
+    <p style="color:var(--gris);font-size:.88em;margin:0">Clínica BiMASS · Hermosillo, Sonora</p>
+  </div>
+
+  <div class="card" style="padding:24px">
+    <div id="portal-err" class="alert alert-d" style="display:none"></div>
+    <div id="portal-ok"  class="alert alert-ok" style="display:none"></div>
+
+    <!-- Step 1: Fecha y hora -->
+    <div id="portal-step1">
+      <div style="font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);margin-bottom:12px">Paso 1 — Selecciona fecha y hora</div>
+      <div class="form-row">
+        <div class="fg w100">
+          <label>Fecha de la cita *</label>
+          <input type="date" id="portal-fecha" onchange="loadPortalSlots()" min="" style="font-size:1em">
+        </div>
+      </div>
+      <div id="portal-slots-wrap" style="display:none;margin-top:12px">
+        <label style="display:block;margin-bottom:8px">Horario disponible *</label>
+        <div id="portal-slots-grid" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
+      <div id="portal-slots-loading" style="display:none;color:var(--gris);font-size:.88em;padding:8px 0">⏳ Cargando horarios disponibles…</div>
+      <div id="portal-slots-empty" style="display:none;color:var(--muted);font-size:.88em;padding:8px 0">😔 No hay horarios disponibles para esta fecha. Por favor selecciona otro día.</div>
+    </div>
+
+    <!-- Step 2: Datos del paciente -->
+    <div id="portal-step2" style="display:none;margin-top:16px;border-top:1px solid var(--brd);padding-top:16px">
+      <div style="font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);margin-bottom:12px">Paso 2 — Tus datos</div>
+      <div class="form-row">
+        <div class="fg w100"><label>Nombre completo *</label><input id="portal-nombre" type="text" placeholder="Nombre y apellidos"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Teléfono *</label><input id="portal-tel" type="tel" placeholder="662 000 0000"></div>
+        <div class="fg"><label>Correo electrónico *</label><input id="portal-email" type="email" placeholder="correo@ejemplo.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg w100">
+          <label>Modalidad de consulta *</label>
+          <select id="portal-modalidad">
+            <option value="Presencial">🏥 Presencial (en clínica)</option>
+            <option value="Virtual">🌐 Virtual (Google Meet)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg w100"><label>Empresa / Organización <span style="color:var(--gris);font-weight:400">(opcional)</span></label><input id="portal-empresa" type="text" placeholder="Nombre de tu empresa o institución"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg w100"><label>Motivo de consulta *</label><textarea id="portal-motivo" rows="3" placeholder="Describe brevemente el motivo de tu visita…" style="width:100%;resize:vertical"></textarea></div>
+      </div>
+      <div id="portal-virtual-note" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.85em;color:#2e7d32">
+        📹 <strong>Cita virtual:</strong> Recibirás un enlace de Google Meet en tu correo electrónico al confirmar tu cita.
+      </div>
+      <button class="btn btn-p w100 btn-lg mt16" onclick="submitPortal()" id="portal-submit-btn">📅 Confirmar cita</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:14px">
+    <a href="#" onclick="showScreen('auth');return false;" style="color:var(--gris);font-size:.82em">← Volver al inicio de sesión</a>
   </div>
 </div>
 </div>
@@ -263,10 +363,277 @@ tr:hover td{background:#f0faf9}
         <div class="home-label">Usuarios</div>
         <div class="home-sub">Accesos · Perfiles · Contraseñas</div>
       </div>
+      <div class="home-card card-mgmt" onclick="gotoMod('crm')">
+        <div class="home-icon">🤝</div>
+        <div class="home-label">CRM</div>
+        <div class="home-sub">Clientes · Contratos · Seguimiento</div>
+      </div>
     </div>
   </div>
 </div>
 </div>
+
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- CRM — Customer Relationship Management              -->
+<!-- ════════════════════════════════════════════════════ -->
+<div id="screen-crm" class="screen">
+<div class="sec-hdr no-print">
+  <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
+  <h2>🤝 CRM — Gestión de Clientes</h2>
+</div>
+
+<!-- DASHBOARD ALERTAS -->
+<div id="crm-alerts-bar" style="display:none;background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:.88em"></div>
+
+<!-- TABS -->
+<div class="tabs" style="margin-bottom:0">
+  <button class="tab-btn active" onclick="showCRMTab('empresas',this)">🏢 Empresas</button>
+  <button class="tab-btn" onclick="showCRMTab('contactos',this)">👤 Contactos</button>
+  <button class="tab-btn" onclick="showCRMTab('actividades',this)">📋 Actividades</button>
+  <button class="tab-btn" onclick="showCRMTab('contratos',this)">📄 Contratos</button>
+  <button class="tab-btn" onclick="showCRMTab('pipeline',this)">📈 Pipeline</button>
+</div>
+
+<!-- TAB: EMPRESAS -->
+<div id="crm-tab-empresas" class="rtab active">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="crm-emp-q" type="text" placeholder="Buscar empresa..." style="padding:6px 12px;border-radius:6px;border:1px solid var(--brd);font-size:.88em;width:200px" oninput="renderCRMEmpresas()">
+        <select id="crm-emp-status" style="padding:6px 10px;border-radius:6px;border:1px solid var(--brd);font-size:.88em" onchange="renderCRMEmpresas()">
+          <option value="">Todos los estados</option>
+          <option value="Prospecto">Prospecto</option>
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
+          <option value="Pausado">Pausado</option>
+        </select>
+      </div>
+      <button class="btn btn-p btn-sm" onclick="openCRMEmpresaForm()">+ Nueva empresa</button>
+    </div>
+    <div id="crm-empresas-list"></div>
+  </div>
+</div>
+
+<!-- TAB: CONTACTOS -->
+<div id="crm-tab-contactos" class="rtab">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <input id="crm-cont-q" type="text" placeholder="Buscar contacto o empresa..." style="padding:6px 12px;border-radius:6px;border:1px solid var(--brd);font-size:.88em;width:240px" oninput="renderCRMContactos()">
+      <button class="btn btn-p btn-sm" onclick="openCRMContactoForm()">+ Nuevo contacto</button>
+    </div>
+    <div id="crm-contactos-list"></div>
+  </div>
+</div>
+
+<!-- TAB: ACTIVIDADES -->
+<div id="crm-tab-actividades" class="rtab">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="crm-act-q" type="text" placeholder="Buscar..." style="padding:6px 12px;border-radius:6px;border:1px solid var(--brd);font-size:.88em;width:200px" oninput="renderCRMActividades()">
+        <select id="crm-act-tipo" style="padding:6px 10px;border-radius:6px;border:1px solid var(--brd);font-size:.88em" onchange="renderCRMActividades()">
+          <option value="">Todos los tipos</option>
+          <option value="Llamada">Llamada</option>
+          <option value="Reunión">Reunión</option>
+          <option value="Correo">Correo</option>
+          <option value="Visita">Visita</option>
+          <option value="Propuesta">Propuesta</option>
+          <option value="Seguimiento">Seguimiento</option>
+        </select>
+      </div>
+      <button class="btn btn-p btn-sm" onclick="openCRMActividadForm()">+ Registrar actividad</button>
+    </div>
+    <div id="crm-actividades-list"></div>
+  </div>
+</div>
+
+<!-- TAB: CONTRATOS -->
+<div id="crm-tab-contratos" class="rtab">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <input id="crm-cont2-q" type="text" placeholder="Buscar empresa o servicio..." style="padding:6px 12px;border-radius:6px;border:1px solid var(--brd);font-size:.88em;width:240px" oninput="renderCRMContratos()">
+      <button class="btn btn-p btn-sm" onclick="openCRMContratoForm()">+ Nuevo contrato</button>
+    </div>
+    <div id="crm-contratos-list"></div>
+  </div>
+</div>
+
+<!-- TAB: PIPELINE -->
+<div id="crm-tab-pipeline" class="rtab">
+  <div class="card">
+    <div class="card-title">📈 Pipeline comercial</div>
+    <div id="crm-pipeline-board" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;min-height:200px"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-title">📊 Resumen</div>
+    <div id="crm-pipeline-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px"></div>
+  </div>
+</div>
+
+<!-- MODAL EMPRESA CRM -->
+<div id="crm-emp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+  <div class="card" style="width:520px;max-width:95vw;padding:24px;margin:0 auto 40px">
+    <h3 id="crm-emp-modal-title" style="margin:0 0 16px;color:#2a4e7a">🏢 Empresa cliente</h3>
+    <input type="hidden" id="crm-emp-id">
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Razón social *</label><input id="crm-emp-nombre" type="text"></div>
+      <div class="fg"><label>RFC</label><input id="crm-emp-rfc" type="text" style="text-transform:uppercase"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Giro / Industria</label><input id="crm-emp-giro" type="text" placeholder="Manufactura, Minería..."></div>
+      <div class="fg"><label>Estado</label>
+        <select id="crm-emp-estado">
+          <option value="Prospecto">Prospecto</option>
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
+          <option value="Pausado">Pausado</option>
+        </select>
+      </div>
+      <div class="fg"><label># Empleados</label><input id="crm-emp-empleados" type="number" min="1" placeholder="100"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Dirección</label><input id="crm-emp-dir" type="text"></div>
+      <div class="fg"><label>Teléfono</label><input id="crm-emp-tel" type="tel"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Origen del lead</label>
+        <select id="crm-emp-origen">
+          <option value="">—</option>
+          <option value="Referido">Referido</option>
+          <option value="Cold call">Cold call</option>
+          <option value="Redes sociales">Redes sociales</option>
+          <option value="Expo / evento">Expo / evento</option>
+          <option value="Portal web">Portal web</option>
+          <option value="STPS / Gobierno">STPS / Gobierno</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="fg"><label>Fecha primer contacto</label><input id="crm-emp-fcont" type="date"></div>
+      <div class="fg"><label>Responsable BiMASS</label><input id="crm-emp-resp" type="text" placeholder="Dr. Matus"></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Notas / Contexto</label><textarea id="crm-emp-notas" rows="3" placeholder="Información relevante, necesidades detectadas..."></textarea></div>
+    <div id="err-crm-emp" class="alert alert-d" style="display:none;margin-top:10px"></div>
+    <div class="flex gap8 mt8">
+      <button class="btn btn-p" onclick="saveCRMEmpresa()">💾 Guardar</button>
+      <button class="btn btn-o" onclick="document.getElementById('crm-emp-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTACTO CRM -->
+<div id="crm-cont-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+  <div class="card" style="width:480px;max-width:95vw;padding:24px;margin:0 auto 40px">
+    <h3 style="margin:0 0 16px;color:#2a4e7a">👤 Contacto</h3>
+    <input type="hidden" id="crm-cont-id">
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Nombre completo *</label><input id="crm-cont-nombre" type="text"></div>
+      <div class="fg"><label>Cargo *</label><input id="crm-cont-cargo" type="text" placeholder="Gerente RRHH"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Empresa *</label>
+        <select id="crm-cont-empresa"><option value="">— Seleccionar —</option></select>
+      </div>
+      <div class="fg"><label>Departamento</label><input id="crm-cont-depto" type="text" placeholder="RRHH, SSPA..."></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Email</label><input id="crm-cont-email" type="email"></div>
+      <div class="fg"><label>Teléfono</label><input id="crm-cont-tel" type="tel"></div>
+      <div class="fg"><label>WhatsApp</label><input id="crm-cont-wa" type="tel"></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Notas</label><textarea id="crm-cont-notas" rows="2"></textarea></div>
+    <div id="err-crm-cont" class="alert alert-d" style="display:none;margin-top:10px"></div>
+    <div class="flex gap8 mt8">
+      <button class="btn btn-p" onclick="saveCRMContacto()">💾 Guardar</button>
+      <button class="btn btn-o" onclick="document.getElementById('crm-cont-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACTIVIDAD CRM -->
+<div id="crm-act-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+  <div class="card" style="width:480px;max-width:95vw;padding:24px;margin:0 auto 40px">
+    <h3 style="margin:0 0 16px;color:#2a4e7a">📋 Registrar actividad</h3>
+    <input type="hidden" id="crm-act-id">
+    <div class="form-row">
+      <div class="fg"><label>Tipo *</label>
+        <select id="crm-act-tipo-sel">
+          <option value="Llamada">📞 Llamada</option>
+          <option value="Reunión">🤝 Reunión</option>
+          <option value="Correo">✉️ Correo</option>
+          <option value="Visita">🏢 Visita</option>
+          <option value="Propuesta">📋 Propuesta</option>
+          <option value="Seguimiento">🔔 Seguimiento</option>
+        </select>
+      </div>
+      <div class="fg" style="flex:2"><label>Empresa *</label>
+        <select id="crm-act-empresa"><option value="">— Seleccionar —</option></select>
+      </div>
+      <div class="fg"><label>Fecha *</label><input id="crm-act-fecha" type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Contacto</label><input id="crm-act-contacto" type="text" placeholder="Nombre del contacto"></div>
+      <div class="fg"><label>Resultado</label>
+        <select id="crm-act-resultado">
+          <option value="Positivo">✅ Positivo</option>
+          <option value="Neutral">➡️ Neutral</option>
+          <option value="Negativo">❌ Negativo</option>
+          <option value="Pendiente">⏳ Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Descripción / Notas *</label><textarea id="crm-act-desc" rows="3" placeholder="¿Qué se habló? ¿Próximos pasos?"></textarea></div>
+    <div class="fg" style="margin-top:8px"><label>Próximo seguimiento</label><input id="crm-act-seguimiento" type="date"></div>
+    <div id="err-crm-act" class="alert alert-d" style="display:none;margin-top:10px"></div>
+    <div class="flex gap8 mt8">
+      <button class="btn btn-p" onclick="saveCRMActividad()">💾 Guardar</button>
+      <button class="btn btn-o" onclick="document.getElementById('crm-act-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTRATO CRM -->
+<div id="crm-contrato-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+  <div class="card" style="width:520px;max-width:95vw;padding:24px;margin:0 auto 40px">
+    <h3 style="margin:0 0 16px;color:#2a4e7a">📄 Contrato de servicio</h3>
+    <input type="hidden" id="crm-ctrato-id">
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Empresa *</label>
+        <select id="crm-ctrato-empresa"><option value="">— Seleccionar —</option></select>
+      </div>
+      <div class="fg"><label>No. Contrato</label><input id="crm-ctrato-num" type="text" placeholder="CTR-001-2026"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Servicios contratados *</label>
+        <textarea id="crm-ctrato-servicios" rows="2" placeholder="Exámenes periódicos, audiometrías, espirometrías..."></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Fecha inicio *</label><input id="crm-ctrato-inicio" type="date"></div>
+      <div class="fg"><label>Fecha vencimiento *</label><input id="crm-ctrato-venc" type="date"></div>
+      <div class="fg"><label>Monto anual ($)</label><input id="crm-ctrato-monto" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Estado</label>
+        <select id="crm-ctrato-estado">
+          <option value="Activo">Activo</option>
+          <option value="Negociación">En negociación</option>
+          <option value="Vencido">Vencido</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+      </div>
+      <div class="fg"><label>Responsable</label><input id="crm-ctrato-resp" type="text" placeholder="Dr. Matus"></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Notas</label><textarea id="crm-ctrato-notas" rows="2"></textarea></div>
+    <div id="err-crm-contrato" class="alert alert-d" style="display:none;margin-top:10px"></div>
+    <div class="flex gap8 mt8">
+      <button class="btn btn-p" onclick="saveCRMContrato()">💾 Guardar</button>
+      <button class="btn btn-o" onclick="document.getElementById('crm-contrato-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end screen-crm -->
 
 <!-- PATIENT SEARCH -->
 <div id="screen-patient" class="screen">
@@ -530,12 +897,6 @@ tr:hover td{background:#f0faf9}
     <div class="fg w100"><textarea id="hc-pad" rows="4" placeholder="Motivo de consulta y padecimiento actual..."></textarea></div>
   </div>
   <div class="card">
-    <div class="exam-hdr"><input type="checkbox" id="chk-soap-s" checked onchange="toggleExam('soap-s',this.checked)"><span>🗒 Nota subjetiva — S (NOM-024)</span></div>
-    <div id="body-soap-s" class="exam-body">
-      <div class="fg w100"><textarea id="soap-s" rows="3" placeholder="¿Qué refiere el paciente? Síntomas, evolución, intensidad, factores que agravan o alivian..."></textarea></div>
-    </div>
-  </div>
-  <div class="card">
     <div class="exam-hdr"><input type="checkbox" id="chk-labprev" checked onchange="toggleExam('labprev',this.checked)"><span>🧪 Laboratorio / Imagen previos</span></div>
     <div id="body-labprev" class="exam-body">
     <div id="lab-list"></div>
@@ -794,12 +1155,6 @@ tr:hover td{background:#f0faf9}
   <div class="card">
     <div class="card-title">📝 Observaciones adicionales al diagnóstico</div>
     <div class="fg w100"><textarea id="obs-diag" rows="4" placeholder="Observaciones del médico sobre el análisis diagnóstico, hallazgos relevantes, consideraciones clínicas adicionales..."></textarea></div>
-  </div>
-  <div class="card">
-    <div class="exam-hdr"><input type="checkbox" id="chk-soap-a" checked onchange="toggleExam('soap-a',this.checked)"><span>🗒 Nota de análisis — A (NOM-024)</span></div>
-    <div id="body-soap-a" class="exam-body">
-      <div class="fg w100"><textarea id="soap-a" rows="3" placeholder="Impresión diagnóstica, diagnósticos diferenciales, análisis clínico..."></textarea></div>
-    </div>
   </div>
 </div>
 
@@ -1276,9 +1631,97 @@ tr:hover td{background:#f0faf9}
   </div>
 </div>
 <div id="users-table-wrap"></div>
+
+<!-- ── CATÁLOGO DE EMPRESAS ─────────────────────────── -->
+<div class="card" style="margin-top:18px" id="empresas-section">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+    🏢 Centros de trabajo
+    <button class="btn btn-p btn-sm" onclick="toggleAddEmpresaForm()">+ Nuevo centro</button>
+  </div>
+  <div id="add-empresa-form" style="display:none;margin-bottom:12px">
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Nombre de la empresa *</label><input id="emp-nombre" type="text" placeholder="Empresa ABC S.A. de C.V."></div>
+      <div class="fg"><label>RFC *</label><input id="emp-rfc" type="text" placeholder="ABC123456XYZ" style="text-transform:uppercase"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg" style="flex:2"><label>Dirección *</label><input id="emp-dir" type="text" placeholder="Calle, núm, colonia, ciudad"></div>
+      <div class="fg"><label>Código postal *</label><input id="emp-cp" type="text" placeholder="83000"></div>
+      <div class="fg"><label>Teléfono *</label><input id="emp-tel" type="tel" placeholder="6621234567"></div>
+    </div>
+    <div id="err-empresa" class="alert alert-d" style="display:none"></div>
+    <div class="flex gap8 mt8">
+      <button class="btn btn-p" onclick="doSaveEmpresa()">💾 Guardar empresa</button>
+      <button class="btn btn-o" onclick="document.getElementById('add-empresa-form').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+  <div id="empresas-list"><div style="color:var(--muted);font-size:.88em">Cargando...</div></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+<!-- ── MODAL APROBAR USUARIO ─────────────────────────── -->
+<div id="approve-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center">
+  <div class="card" style="width:420px;max-width:95vw;padding:24px">
+    <h3 style="margin:0 0 16px;color:#2a4e7a">✓ Aprobar acceso</h3>
+    <div id="approve-user-info" style="background:var(--bg2);padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:.9em"></div>
+    <div class="fg" style="margin-bottom:12px">
+      <label>Perfil *</label>
+      <select id="approve-perfil">
+        <option value="Personal de salud">Personal de salud</option>
+        <option value="Admin médico">Admin médico</option>
+        <option value="Personal Admin">Personal Admin</option>
+        <option value="Director">Director</option>
+        <option value="Laboratorio">Laboratorio</option>
+        <option value="Imagenología">Imagenología</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:16px">
+      <label>Centro de trabajo *</label>
+      <select id="approve-centro">
+        <option value="Clínica BiMASS">Clínica BiMASS</option>
+      </select>
+    </div>
+    <div id="err-approve" class="alert alert-d" style="display:none"></div>
+    <div class="flex gap8">
+      <button class="btn btn-p" onclick="doApproveUser()">✓ Aprobar y notificar</button>
+      <button class="btn btn-o" onclick="document.getElementById('approve-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL EDITAR USUARIO ─────────────────────────── -->
+<div id="edit-user-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center">
+  <div class="card" style="width:440px;max-width:95vw;padding:24px">
+    <h3 style="margin:0 0 16px;color:#2a4e7a">✏️ Editar usuario</h3>
+    <div id="edit-user-info" style="background:var(--bg2);padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:.9em"></div>
+    <input type="hidden" id="edit-user-id">
+    <div class="fg" style="margin-bottom:12px">
+      <label>Perfil</label>
+      <select id="edit-perfil">
+        <option value="Personal de salud">Personal de salud</option>
+        <option value="Admin médico">Admin médico</option>
+        <option value="Personal Admin">Personal Admin</option>
+        <option value="Director">Director</option>
+        <option value="Laboratorio">Laboratorio</option>
+        <option value="Imagenología">Imagenología</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:16px">
+      <label>Centro de trabajo</label>
+      <select id="edit-centro">
+        <option value="Clínica BiMASS">Clínica BiMASS</option>
+      </select>
+    </div>
+    <div id="err-edit-user" class="alert alert-d" style="display:none"></div>
+    <div class="flex gap8">
+      <button class="btn btn-p" onclick="doEditUser()">💾 Guardar cambios</button>
+      <button class="btn btn-o" onclick="document.getElementById('edit-user-modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
 // ══════════════════════════════════════════════════════════════
 // MÓDULO COTIZACIONES
 // ══════════════════════════════════════════════════════════════
@@ -1607,16 +2050,16 @@ function showCotizSavedPanel(id, cotiz) {
     + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
     + '<button class="btn btn-p" onclick="printCotizByObj(' + JSON.stringify(cotiz) + ')" style="display:flex;align-items:center;justify-content:center;gap:6px">🖨 Imprimir</button>'
     + '<button class="btn btn-o" onclick="viewCotizByObj(' + JSON.stringify(cotiz) + ')" style="display:flex;align-items:center;justify-content:center;gap:6px">👁 Previsualizar</button>'
-    + '<button class="btn btn-o" onclick="emailCotizById('' + id + '')" style="display:flex;align-items:center;justify-content:center;gap:6px">✉ Enviar correo</button>'
+    + '<button class="btn btn-o" onclick="emailCotizById(\'' + id + '\')" style="display:flex;align-items:center;justify-content:center;gap:6px">✉ Enviar correo</button>'
     + '<div style="display:flex;align-items:center;gap:8px">'
     + '<span style="font-size:.82em;font-weight:600;color:var(--gris)">Status:</span>'
     + statusSel
     + '</div>'
     + '</div>';
   if(isAdmin) {
-    content.innerHTML += '<button class="btn btn-p w100" onclick="applyCotizSavedStatus('' + id + '')" style="margin-top:6px">💾 Actualizar status</button>';
+    content.innerHTML += '<button class="btn btn-p w100" onclick="applyCotizSavedStatus(\'' + id + '\')" style="margin-top:6px">💾 Actualizar status</button>';
   }
-  content.innerHTML += '<button class="btn btn-o w100" onclick="document.getElementById('cotiz-saved-modal').style.display='none'" style="margin-top:8px">Cerrar</button>';
+  content.innerHTML += '<button class="btn btn-o w100" onclick="document.getElementById(\'cotiz-saved-modal\').style.display=\'none\'" style="margin-top:8px">Cerrar</button>';
   modal.style.display = 'flex';
 }
 
@@ -1801,7 +2244,7 @@ function showScreen(id) {
     clinical:'Atención Clínica', inv:'Inventario', pos:'Punto de Venta',
     dev:'Devoluciones', agenda:'Agenda', reportes:'Reportes', usuarios:'Usuarios',
     hist:'Historial del paciente', lab:'Laboratorio', xray:'Imagenología',
-    audit:'Auditorías STPS', ausent:'Ausentismo', cotiz:'Cotizaciones'
+    audit:'Auditorías STPS', ausent:'Ausentismo', cotiz:'Cotizaciones', crm:'CRM'
   }[id] || '';
 }
 
@@ -1826,6 +2269,7 @@ function gotoMod(mod) {
   if(mod === 'lab')  { showScreen('lab');  loadLabResults();  return; }
   if(mod === 'cotiz'){ showScreen('cotiz'); loadCotizaciones(); initCotizForm(); return; }
   if(mod === 'xray') { showScreen('xray'); loadXrayResults(); return; }
+  if(mod === 'crm')  { showScreen('crm');  loadCRM(); return; }
 }
 
 // ── PERMISOS ─────────────────────────────────────────────
@@ -1925,6 +2369,13 @@ function doLogin() {
         currentUser = r.user;
         document.getElementById('navbar').style.display = 'flex';
         document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
+        var navCentro = document.getElementById('nav-centro');
+        if(currentUser.centroTrabajo) {
+          navCentro.textContent = '🏢 ' + currentUser.centroTrabajo;
+          navCentro.style.display = 'inline';
+        } else {
+          navCentro.style.display = 'none';
+        }
         const adminRow = document.getElementById('home-admin-row');
         if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
         const cardInv = document.getElementById('card-inv');
@@ -1946,59 +2397,116 @@ function doLogin() {
     .serverAction(JSON.stringify({action:'login', email:email, password:pass}));
 }
 
+// File preview handlers for registration
+(function(){
+  function initRegFilePreviews(){
+    var cedulaInput = document.getElementById('r-cedula-file');
+    var constanciaInput = document.getElementById('r-constancia-file');
+    if(cedulaInput) cedulaInput.addEventListener('change', function(){
+      var preview = document.getElementById('r-cedula-preview');
+      var img = document.getElementById('r-cedula-img');
+      if(this.files && this.files[0]){
+        var reader = new FileReader();
+        reader.onload = function(e){ img.src = e.target.result; preview.style.display='block'; };
+        reader.readAsDataURL(this.files[0]);
+      } else { preview.style.display='none'; }
+    });
+    if(constanciaInput) constanciaInput.addEventListener('change', function(){
+      var nameDiv = document.getElementById('r-constancia-name');
+      if(this.files && this.files[0]){
+        nameDiv.textContent = '📄 ' + this.files[0].name;
+        nameDiv.style.display = 'block';
+      } else { nameDiv.style.display='none'; }
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initRegFilePreviews);
+  } else {
+    initRegFilePreviews();
+  }
+})();
+
+function readFileAsBase64(inputId) {
+  return new Promise(function(resolve) {
+    var input = document.getElementById(inputId);
+    if(!input || !input.files || !input.files[0]){ resolve(null); return; }
+    var file = input.files[0];
+    if(file.size > 5 * 1024 * 1024){ resolve(null); return; } // skip if >5MB
+    var reader = new FileReader();
+    reader.onload = function(e){
+      resolve({ name: file.name, type: file.type, data: e.target.result.split(',')[1] });
+    };
+    reader.onerror = function(){ resolve(null); };
+    reader.readAsDataURL(file);
+  });
+}
+
 function doRegister() {
   const nombre = document.getElementById('r-nombre').value.trim();
   const email  = document.getElementById('r-email').value.trim();
   const pass   = document.getElementById('r-pass').value;
   const err = document.getElementById('err-reg');
   const ok  = document.getElementById('ok-reg');
-  const btn = document.querySelector('#auth-form-register .btn-p');
-  function showErr(msg) {
+  const btn = document.querySelector('#auth-form-register .btn-s');
+  function showRegErr(msg) {
     err.innerHTML = '<strong>❌</strong> ' + msg;
     err.style.display = 'block'; ok.style.display = 'none';
-    if(btn){ btn.disabled=false; btn.textContent='Registrarse'; }
+    if(btn){ btn.disabled=false; btn.textContent='Solicitar acceso'; }
   }
   err.style.display = 'none'; ok.style.display = 'none';
-  if(!nombre||!email||!pass){ showErr('Nombre, correo y contraseña son obligatorios.'); return; }
+  if(!nombre||!email||!pass){ showRegErr('Nombre, correo y contraseña son obligatorios.'); return; }
   if(btn){ btn.disabled=true; btn.textContent='⏳ Registrando...'; }
   if(typeof google === 'undefined' || !google.script || !google.script.run) {
-    showErr('La app debe abrirse desde la URL de Google Apps Script, no como archivo local.');
+    showRegErr('La app debe abrirse desde la URL de Google Apps Script, no como archivo local.');
     return;
   }
   const ciudad = (document.getElementById('r-ciudad')||{}).value||'';
   const dir    = (document.getElementById('r-direccion')||{}).value||'';
-  var done = false;
-  var t = setTimeout(function(){
-    if(!done){ done=true; showErr('Sin respuesta del servidor (20s). Verifica el despliegue en script.google.com.'); }
-  }, 20000);
-  google.script.run
-    .withSuccessHandler(function(res){
-      if(done) return; done=true; clearTimeout(t);
-      if(btn){ btn.disabled=false; btn.textContent='Registrarse'; }
-      var r; try{ r=JSON.parse(res); }catch(e){ showErr('Respuesta inválida: '+String(res).slice(0,80)); return; }
-      if(!r.ok){ showErr(r.error||'Error al registrarse.'); return; }
-      ok.innerHTML = r.pending
-        ? '✅ Solicitud enviada. El Director recibirá un correo para aprobar tu acceso.'
-        : '✅ Cuenta creada. Ya puedes iniciar sesión.';
-      ok.style.display = 'block';
-      if(!r.pending) setTimeout(function(){ showAuthTab('login'); }, 2000);
-    })
-    .withFailureHandler(function(e){
-      if(done) return; done=true; clearTimeout(t);
-      showErr('Error GAS: '+(e?e.message||String(e):'desconocido'));
-    })
-    .serverAction(JSON.stringify({action:'register', user:{
-      nombre:nombre, email:email, password:pass,
-      cedula:(document.getElementById('r-cedula')||{}).value||'',
-      especialidad:(document.getElementById('r-esp')||{}).value||'',
-      ciudad:ciudad, direccion:dir,
-      telefono:(document.getElementById('r-tel')||{}).value||''
-    }}));
+  // Read optional files then send
+  Promise.all([
+    readFileAsBase64('r-cedula-file'),
+    readFileAsBase64('r-constancia-file')
+  ]).then(function(files){
+    var cedulaFile = files[0];
+    var constanciaFile = files[1];
+    var done = false;
+    var t = setTimeout(function(){
+      if(!done){ done=true; showRegErr('Sin respuesta del servidor (30s). Verifica el despliegue en script.google.com.'); }
+    }, 30000);
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(done) return; done=true; clearTimeout(t);
+        if(btn){ btn.disabled=false; btn.textContent='Solicitar acceso'; }
+        var r; try{ r=JSON.parse(res); }catch(e){ showRegErr('Respuesta inválida: '+String(res).slice(0,80)); return; }
+        if(!r.ok){ showRegErr(r.error||'Error al registrarse.'); return; }
+        ok.innerHTML = r.pending
+          ? '✅ Solicitud enviada. El Director recibirá un correo para aprobar tu acceso.'
+          : '✅ Cuenta creada. Ya puedes iniciar sesión.';
+        ok.style.display = 'block';
+        if(!r.pending) setTimeout(function(){ showAuthTab('login'); }, 2000);
+      })
+      .withFailureHandler(function(e){
+        if(done) return; done=true; clearTimeout(t);
+        showRegErr('Error GAS: '+(e?e.message||String(e):'desconocido'));
+      })
+      .serverAction(JSON.stringify({action:'register', user:{
+        nombre:nombre, email:email, password:pass,
+        cedula:(document.getElementById('r-cedula')||{}).value||'',
+        especialidad:(document.getElementById('r-esp')||{}).value||'',
+        curp:(document.getElementById('r-curp')||{}).value||'',
+        rfc:(document.getElementById('r-rfc')||{}).value||'',
+        ciudad:ciudad, direccion:dir,
+        telefono:(document.getElementById('r-tel')||{}).value||'',
+        cedulaFile: cedulaFile,
+        constanciaFile: constanciaFile
+      }}));
+  });
 }
 
 function doLogout() {
   currentUser = null; currentPatient = null;
   document.getElementById('navbar').style.display = 'none';
+  document.getElementById('nav-centro').style.display = 'none';
   document.getElementById('l-email').value = '';
   document.getElementById('l-pass').value = '';
   showScreen('auth');
@@ -3403,7 +3911,7 @@ function agCardHtml(a) {
     ? '<a href="'+a.meetLink+'" target="_blank" title="Unirse a Google Meet" onclick="event.stopPropagation()" style="display:inline-block;background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 5px;font-size:.82em;text-decoration:none;margin-left:4px">🎥 Meet</a>'
     : '';
   const safeId = a.id ? String(a.id).replace(/'/g,"\'") : '';
-  return '<div style="background:'+bg+';color:#fff;border-radius:6px;padding:4px 7px;margin-bottom:2px;font-size:.79em;cursor:pointer" onclick="showAgDetail(''+safeId+'')">'
+  return '<div style="background:'+bg+';color:#fff;border-radius:6px;padding:4px 7px;margin-bottom:2px;font-size:.79em;cursor:pointer" onclick="showAgDetail(\''+safeId+'\')">'
     +'<b>'+a.hora+' '+a.paciente+'</b>'
     +'<div>'+a.tipoVisita+' · '+(a.secuencia||'')+(a.modalidad==='Virtual'?' · 📱':'')+meetBtn+'</div>'
     +(a.telefono?'<div>📞 '+a.telefono+'</div>':'')
@@ -3442,8 +3950,8 @@ function showAgDetail(id) {
     + (a.notas?'<tr style="background:#f5f7fa"><td style="padding:7px 10px;font-weight:700;color:#555">Notas</td><td style="padding:7px 10px;font-style:italic">'+a.notas+'</td></tr>':'')
     + '</table>'
     + (a.id?'<div style="margin-top:16px;display:flex;gap:10px">'
-        +'<button class="btn btn-p" onclick="iniciarCitaDesdeAgenda(''+a.id+'')" style="flex:1">🩺 Iniciar atención</button>'
-        +'<button class="btn btn-o" style="color:#e53935;border-color:#e53935" onclick="deleteAgendaItem(''+a.id+'');document.getElementById('ag-detail-modal').style.display='none'">✕ Cancelar cita</button>'
+        +'<button class="btn btn-p" onclick="iniciarCitaDesdeAgenda(\''+a.id+'\')" style="flex:1">🩺 Iniciar atención</button>'
+        +'<button class="btn btn-o" style="color:#e53935;border-color:#e53935" onclick="deleteAgendaItem(\''+a.id+'\');document.getElementById(\'ag-detail-modal\').style.display=\'none\'">✕ Cancelar cita</button>'
         +'</div>':'');
   modal.style.display = 'flex';
 }
@@ -3686,9 +4194,11 @@ function buildReporteVentas() {
       const d = v.ts.slice(0,10);
       return (!desde || d >= desde) && (!hasta || d <= hasta);
     });
+    lastRepType = 'ventas';
     if(!filtered.length) {
-      lastRepData = []; lastRepType = 'ventas';
-      document.getElementById('ventas-table').innerHTML = '<div class="alert alert-i" style="margin-top:10px">Sin ventas para el período seleccionado.</div>';
+      lastRepData = [];
+      document.getElementById('ventas-table').innerHTML = renderRepTable([], ['Fecha','Hora','Folio','Artículos','Unidades','Total','Vendedor']);
+      // legacy fallback text removed para el período seleccionado.</div>';
       return;
     }
     // Full detail per ticket
@@ -3718,6 +4228,7 @@ function buildReporteOcup() {
   const empresa = document.getElementById('ocup-empresa').value.trim().toLowerCase();
   const desde = document.getElementById('ocup-desde').value;
   const hasta = document.getElementById('ocup-hasta').value;
+  document.getElementById('ocup-table').innerHTML = '<div style="padding:14px;color:var(--muted)">⏳ Cargando...</div>';
   loadEvalsAndRender(function(evals) {
     const filtered = evals.filter(e => {
       const d = (e.ts||'').slice(0,10);
@@ -3813,8 +4324,9 @@ function loadEvalsAndRender(cb) {
   });
 }
 function renderRepTable(data, cols) {
-  if(!data.length) return '<div class="muted tc">Sin datos para el filtro seleccionado</div>';
-  return '<div class="tw"><table><thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'
+  var thead = '<div class="tw"><table><thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>';
+  if(!data.length) return thead + '<tr><td colspan="'+cols.length+'" style="text-align:center;color:var(--muted);padding:18px">Sin registros para el período seleccionado</td></tr></tbody></table></div>';
+  return thead
     + data.map(row => '<tr>'+cols.map(c=>'<td>'+(row[c]||'')+'</td>').join('')+'</tr>').join('')
     + '</tbody></table></div>';
 }
@@ -3843,34 +4355,128 @@ function printReporte() {
 }
 
 // ── USUARIOS ─────────────────────────────────────────────
+var empresasCache = [];
+
+function loadEmpresas(cb) {
+  gasPost({action:'loadEmpresas'}, function(r) {
+    empresasCache = r.ok ? (r.items||[]) : [];
+    // Populate centro dropdowns
+    ['approve-centro','edit-centro'].forEach(function(selId) {
+      var sel = document.getElementById(selId);
+      if(!sel) return;
+      // Keep Clínica BiMASS as first option
+      sel.innerHTML = '<option value="Clínica BiMASS">Clínica BiMASS</option>';
+      empresasCache.forEach(function(e) {
+        sel.innerHTML += '<option value="'+e.nombre+'">'+e.nombre+'</option>';
+      });
+    });
+    if(cb) cb(empresasCache);
+    renderEmpresasList();
+  });
+}
+
+function renderEmpresasList() {
+  var el = document.getElementById('empresas-list');
+  if(!el) return;
+  if(!empresasCache.length) { el.innerHTML='<div style="color:var(--muted);font-size:.88em;padding:8px 0">Sin empresas registradas. Agrega la primera con "+ Nuevo centro".</div>'; return; }
+  el.innerHTML = '<div class="tw"><table><thead><tr><th>Empresa</th><th>RFC</th><th>Dirección</th><th>CP</th><th>Teléfono</th></tr></thead><tbody>'
+    + empresasCache.map(e => '<tr><td>'+e.nombre+'</td><td>'+e.rfc+'</td><td>'+e.direccion+'</td><td>'+e.cp+'</td><td>'+e.telefono+'</td></tr>').join('')
+    + '</tbody></table></div>';
+}
+
+function toggleAddEmpresaForm() {
+  var f = document.getElementById('add-empresa-form');
+  f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+function doSaveEmpresa() {
+  var nombre = document.getElementById('emp-nombre').value.trim();
+  var rfc    = document.getElementById('emp-rfc').value.trim().toUpperCase();
+  var dir    = document.getElementById('emp-dir').value.trim();
+  var cp     = document.getElementById('emp-cp').value.trim();
+  var tel    = document.getElementById('emp-tel').value.trim();
+  var err    = document.getElementById('err-empresa');
+  err.style.display = 'none';
+  if(!nombre||!rfc||!dir||!cp||!tel) { err.textContent='Todos los campos son obligatorios'; err.style.display='block'; return; }
+  gasPost({action:'saveEmpresa', empresa:{nombre:nombre,rfc:rfc,direccion:dir,cp:cp,telefono:tel}}, function(r) {
+    if(!r.ok) { err.textContent=r.error||'Error al guardar'; err.style.display='block'; return; }
+    ['emp-nombre','emp-rfc','emp-dir','emp-cp','emp-tel'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('add-empresa-form').style.display='none';
+    loadEmpresas();
+  });
+}
+
 function loadUsers() {
+  loadEmpresas();
   gasPost({action:'listUsers'}, function(r) {
     if(!r.ok){ document.getElementById('users-table-wrap').innerHTML='<div class="alert alert-d">'+r.error+'</div>'; return; }
     const users = r.users||[];
-    document.getElementById('users-table-wrap').innerHTML = '<div class="card tw"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Perfil</th><th>Estado</th><th>Cédula</th><th>Acciones</th></tr></thead><tbody>'
+    document.getElementById('users-table-wrap').innerHTML = '<div class="card tw"><table><thead><tr><th>Nombre</th><th>Email</th><th>Perfil</th><th>Centro de trabajo</th><th>Estado</th><th>Cédula</th><th>Acciones</th></tr></thead><tbody>'
       + users.map(u =>
         '<tr><td>'+u.nombre+'</td><td>'+u.email+'</td>'
-        +'<td><select onchange="changeRole(\''+u.id+'\',this.value)" style="font-size:.8em;padding:3px">'
-        +'<option value="Director"'+(u.perfil==='Director'?' selected':'')+'">Director</option>'
-        +'<option value="Admin médico"'+(u.perfil==='Admin médico'?' selected':'')+'>Admin médico</option>'
-        +'<option value="Personal de salud"'+(u.perfil==='Personal de salud'?' selected':'')+'>Personal de salud</option>'
-        +'<option value="Personal Admin"'+(u.perfil==='Personal Admin'?' selected':'')+'>Personal Admin</option>'
-        +'<option value="Laboratorio"'+(u.perfil==='Laboratorio'?' selected':'')+'>Laboratorio</option>'
-        +'<option value="Imagenología"'+(u.perfil==='Imagenología'?' selected':'')+'>Imagenología</option>'
-        +'</select></td>'
+        +'<td>'+( u.perfil||'—')+'</td>'
+        +'<td>'+(u.centroTrabajo||'—')+'</td>'
         +'<td><span class="badge '+(u.aprobado?'b-ok':'b-w')+'">'+(u.aprobado?'Aprobado':'Pendiente')+'</span></td>'
-        +'<td>'+u.cedula+'</td>'
-        +'<td><div class="flex gap8">'
-        +(!u.aprobado?'<button class="btn btn-p btn-sm" onclick="approveU(\''+u.id+'\',true)">✓ Aprobar</button>':'')
-        +'<button class="btn btn-d btn-sm" onclick="approveU(\''+u.id+'\',false)">✕ Denegar</button>'
+        +'<td>'+(u.cedula||'—')+(u.cedulaFileUrl?'&nbsp;<a href="'+u.cedulaFileUrl+'" target="_blank" title="Ver foto cédula">📷</a>':'')+(u.constanciaFileUrl?'&nbsp;<a href="'+u.constanciaFileUrl+'" target="_blank" title="Ver constancia fiscal">📄</a>':'')+'</td>'
+        +'<td><div class="flex gap8" style="flex-wrap:wrap">'
+        +(!u.aprobado?'<button class="btn btn-p btn-sm" onclick="openApproveModal(\''+u.id+'\',\''+u.nombre.replace(/'/g,'')+'\',\''+u.email+'\')">✓ Aprobar</button>':'')
+        +'<button class="btn btn-o btn-sm" onclick="openEditUserModal(\''+u.id+'\',\''+u.nombre.replace(/'/g,'')+'\',\''+(u.perfil||'')+'\',\''+(u.centroTrabajo||'')+'\')">✏️ Editar</button>'
+        +'<button class="btn btn-d btn-sm" onclick="denyUser(\''+u.id+'\')">✕ Denegar</button>'
         +'</div></td></tr>'
       ).join('')+'</tbody></table></div>';
   });
 }
-function approveU(id, approved) {
-  if(!confirm(approved ? '¿Aprobar acceso a este usuario?' : '¿Denegar acceso?')) return;
-  gasPost({action:'approveUser', userId:id, approved:approved, perfil:''}, function(r) {
+var pendingApproveId = '';
+function openApproveModal(id, nombre, email) {
+  pendingApproveId = id;
+  document.getElementById('approve-user-info').innerHTML = '<strong>'+nombre+'</strong><br><span style="color:var(--muted)">'+email+'</span>';
+  document.getElementById('err-approve').style.display='none';
+  // Populate centro de trabajo options
+  var sel = document.getElementById('approve-centro');
+  sel.innerHTML = '<option value="Clínica BiMASS">Clínica BiMASS</option>';
+  empresasCache.forEach(function(e) { sel.innerHTML += '<option value="'+e.nombre+'">'+e.nombre+'</option>'; });
+  document.getElementById('approve-modal').style.display = 'flex';
+}
+function doApproveUser() {
+  var perfil = document.getElementById('approve-perfil').value;
+  var centro = document.getElementById('approve-centro').value;
+  var err = document.getElementById('err-approve');
+  err.style.display='none';
+  if(!centro){ err.textContent='Selecciona un centro de trabajo'; err.style.display='block'; return; }
+  gasPost({action:'approveUser', userId:pendingApproveId, approved:true, perfil:perfil, centroTrabajo:centro}, function(r) {
+    if(!r.ok){ err.textContent=r.error||'Error al aprobar'; err.style.display='block'; return; }
+    document.getElementById('approve-modal').style.display='none';
+    loadUsers();
+  });
+}
+function denyUser(id) {
+  if(!confirm('¿Denegar acceso a este usuario?')) return;
+  gasPost({action:'approveUser', userId:id, approved:false, perfil:'', centroTrabajo:''}, function(r) {
     if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+    loadUsers();
+  });
+}
+function openEditUserModal(id, nombre, perfil, centro) {
+  document.getElementById('edit-user-id').value = id;
+  document.getElementById('edit-user-info').innerHTML = '<strong>'+nombre+'</strong>';
+  var psel = document.getElementById('edit-perfil');
+  if(psel) { Array.from(psel.options).forEach(o => o.selected = o.value===perfil); }
+  var csel = document.getElementById('edit-centro');
+  csel.innerHTML = '<option value="Clínica BiMASS">Clínica BiMASS</option>';
+  empresasCache.forEach(function(e) { csel.innerHTML += '<option value="'+e.nombre+'">'+e.nombre+'</option>'; });
+  if(csel) { Array.from(csel.options).forEach(o => o.selected = o.value===centro); }
+  document.getElementById('err-edit-user').style.display='none';
+  document.getElementById('edit-user-modal').style.display='flex';
+}
+function doEditUser() {
+  var id = document.getElementById('edit-user-id').value;
+  var perfil = document.getElementById('edit-perfil').value;
+  var centro = document.getElementById('edit-centro').value;
+  var err = document.getElementById('err-edit-user');
+  err.style.display='none';
+  gasPost({action:'updateUser', userId:id, perfil:perfil, centroTrabajo:centro}, function(r) {
+    if(!r.ok){ err.textContent=r.error||'Error al guardar'; err.style.display='block'; return; }
+    document.getElementById('edit-user-modal').style.display='none';
     loadUsers();
   });
 }
@@ -4124,33 +4730,34 @@ function printVisita() {
     +'</table>';
 
   // AHF
-  if(pchk('chk-ahf') && ev.hc.ahf && Object.values(ev.hc.ahf).some(x=>x)) {
-    const a = ev.hc.ahf;
-    html += '<h3>Antecedentes Heredofamiliares</h3><table>';
+  if(pchk('chk-ahf')) {
+    const a = ev.hc.ahf||{};
     const ahfLbl = {dm:'DM',hta:'HTA',cardio:'Cardiopatía',cancer:'Cáncer',otros:'Otros'};
-    Object.entries(ahfLbl).forEach(([k,lbl]) => { if(a[k]) html += '<tr><td><b>'+lbl+':</b></td><td>'+a[k]+'</td></tr>'; });
-    html += '</table>';
+    const ahfRows = Object.entries(ahfLbl).filter(([k])=>a[k]).map(([k,lbl])=>'<tr><td><b>'+lbl+':</b></td><td>'+a[k]+'</td></tr>').join('');
+    html += '<h3>Antecedentes Heredofamiliares</h3><table>'
+      +(ahfRows||'<tr><td style="color:#777;font-style:italic">Sin antecedentes heredofamiliares de relevancia</td></tr>')+'</table>';
   }
   // APNP
-  if(pchk('chk-hnp') && ev.hc.hnp) {
-    const h = ev.hc.hnp;
+  if(pchk('chk-hnp')) {
+    const h = ev.hc.hnp||{};
     html += '<h3>Antecedentes Personales No Patológicos</h3><table>';
-    html += '<tr><td><b>Tabaquismo:</b> '+h.tabaquismo+(h.tabN?' ('+h.tabN+' cig/día)':'')+'</td>';
-    html += '<td><b>Alcoholismo:</b> '+h.alcoholismo+'</td><td><b>Act. física:</b> '+h.af+'</td></tr>';
+    html += '<tr><td><b>Tabaquismo:</b> '+(h.tabaquismo||'No')+(h.tabN?' ('+h.tabN+' cig/día)':'')+'</td>';
+    html += '<td><b>Alcoholismo:</b> '+(h.alcoholismo||'No')+'</td><td><b>Act. física:</b> '+(h.af||'No')+'</td></tr>';
     html += '</table>';
   }
   // APP
-  if(pchk('chk-app') && ev.hc.app && Object.values(ev.hc.app).some(x=>x)) {
+  if(pchk('chk-app')) {
     const appLbl = {exant:'Exantemáticas',quirurgs:'Quirúrgicos',traum:'Traumáticos',transf:'Transfusionales',cronicos:'Crónicos degenerativos',hosp:'Hospitalizaciones',infect:'Infectocontagiosos',alrgias:'Alergias',adic:'Adicciones',discap:'Discapacidad'};
-    html += '<h3>Antecedentes Personales Patológicos</h3><table>';
-    Object.entries(appLbl).forEach(([k,lbl]) => { if(ev.hc.app[k]) html += '<tr><td style="width:45%"><strong>'+lbl+':</strong></td><td>'+ev.hc.app[k]+'</td></tr>'; });
-    html += '</table>';
+    const app = ev.hc.app||{};
+    const appRows = Object.entries(appLbl).filter(([k])=>app[k]).map(([k,lbl])=>'<tr><td style="width:45%"><strong>'+lbl+':</strong></td><td>'+app[k]+'</td></tr>').join('');
+    html += '<h3>Antecedentes Personales Patológicos</h3><table>'
+      +(appRows||'<tr><td style="color:#777;font-style:italic">Sin antecedentes personales patológicos de relevancia</td></tr>')+'</table>';
   }
   // Historia laboral
   if(pchk('chk-laboral') && ev.hc.laboral) {
     const l = ev.hc.laboral;
     html += '<h3>Historia Laboral — Puesto Actual</h3><table>';
-    html += '<tr><td><b>Antigüedad:</b> '+l.antiguedad+'</td><td><b>Turno:</b> '+l.turno+'</td><td><b>Hrs/sem:</b> '+l.hrs+'</td></tr>';
+    html += '<tr><td><b>Antigüedad:</b> '+(l.antiguedad||'—')+'</td><td><b>Turno:</b> '+(l.turno||'—')+'</td><td><b>Hrs/sem:</b> '+(l.hrs||'—')+'</td></tr>';
     if(l.actividades) html += '<tr><td colspan="3"><b>Actividades:</b> '+l.actividades+'</td></tr>';
     if(l.epp) html += '<tr><td colspan="3"><b>EPP:</b> '+l.epp+'</td></tr>';
     if(l.riesgos) html += '<tr><td colspan="3"><b>Riesgos:</b> '+l.riesgos+'</td></tr>';
@@ -4160,15 +4767,20 @@ function printVisita() {
   if(pchk('chk-gine') && ev.hc.gine) {
     const g = ev.hc.gine;
     html += '<h3>Antecedentes Ginecoobstétricos</h3><table>';
-    html += '<tr><td><b>FUM:</b> '+fmtDate(g.fum)+'</td><td><b>Menarca:</b> '+g.menarq+'</td><td><b>Ritmo:</b> '+g.ritmo+'</td></tr>';
-    html += '<tr><td><b>G:</b> '+g.g+'</td><td><b>P:</b> '+g.p+'</td><td><b>C:</b> '+g.c+'</td><td><b>A:</b> '+g.a+'</td></tr>';
+    html += '<tr><td><b>FUM:</b> '+fmtDate(g.fum)+'</td><td><b>Menarca:</b> '+(g.menarq||'—')+'</td><td><b>Ritmo:</b> '+(g.ritmo||'—')+'</td></tr>';
+    html += '<tr><td><b>G:</b> '+(g.g||'0')+'</td><td><b>P:</b> '+(g.p||'0')+'</td><td><b>C:</b> '+(g.c||'0')+'</td><td><b>A:</b> '+(g.a||'0')+'</td></tr>';
     html += '</table>';
   }
   // Lab/Imagen previos
-  if(pchk('chk-labprev') && labItems && labItems.length) {
-    html += '<h3>Laboratorio / Imagen Previos</h3><table><tr><th>Tipo</th><th>Estudio</th><th>Fecha</th><th>Resultado</th></tr>';
-    labItems.forEach(function(li){ html += '<tr><td>'+li.tipo+'</td><td>'+li.estudio+'</td><td>'+fmtDate(li.fecha)+'</td><td>'+li.resultado+'</td></tr>'; });
-    html += '</table>';
+  if(pchk('chk-labprev')) {
+    html += '<h3>Laboratorio / Imagen Previos</h3>';
+    if(labItems && labItems.length) {
+      html += '<table><tr><th>Tipo</th><th>Estudio</th><th>Fecha</th><th>Resultado</th></tr>';
+      labItems.forEach(function(li){ html += '<tr><td>'+li.tipo+'</td><td>'+li.estudio+'</td><td>'+fmtDate(li.fecha)+'</td><td>'+li.resultado+'</td></tr>'; });
+      html += '</table>';
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin estudios previos registrados</p>';
+    }
   }
   // Padecimiento
   if(ev.hc.padecimiento) html += '<h3>Padecimiento Actual</h3><p>'+ev.hc.padecimiento+'</p>';
@@ -4185,51 +4797,79 @@ function printVisita() {
   }
 
   // Examen físico
-  if(pchk('chk-fisico') && ev.exams.fisico) {
-    const f = ev.exams.fisico;
-    html += '<h3>Examen Físico</h3><table><tr><td>Peso: '+f.peso+' kg</td><td>Talla: '+f.talla+' cm</td><td>IMC: '+f.imc+'</td><td>TA: '+f.ta+'</td><td>FC: '+f.fc+' lpm</td></tr>'
-      +'<tr><td>SpO2: '+f.spo2+'%</td><td>Glucosa: '+f.glucosa+' mg/dL</td><td>% Grasa: '+f.grasa+'</td><td>Masa Musc: '+f.musculo+' kg</td><td>Temp: '+f.temp+'°C</td></tr></table>'
-      +(f.sistemas?'<p style="font-size:.85em;white-space:pre-line">'+f.sistemas+'</p>':'');
+  if(pchk('chk-fisico')) {
+    const f = ev.exams.fisico||{};
+    html += '<h3>Examen Físico</h3>';
+    if(f.peso||f.talla||f.ta) {
+      html += '<table><tr><td>Peso: '+(f.peso||'—')+' kg</td><td>Talla: '+(f.talla||'—')+' cm</td><td>IMC: '+(f.imc||'—')+'</td><td>TA: '+(f.ta||'—')+'</td><td>FC: '+(f.fc||'—')+' lpm</td></tr>'
+        +'<tr><td>SpO2: '+(f.spo2||'—')+'%</td><td>Glucosa: '+(f.glucosa||'—')+' mg/dL</td><td>% Grasa: '+(f.grasa||'—')+'</td><td>Masa Musc: '+(f.musculo||'—')+' kg</td><td>Temp: '+(f.temp||'—')+'°C</td></tr></table>'
+        +(f.sistemas?'<p style="font-size:.85em;white-space:pre-line">'+f.sistemas+'</p>':'');
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin hallazgos registrados</p>';
+    }
   }
 
   // Agudeza visual
-  if(pchk('chk-visual') && ev.exams.visual) {
-    const av = ev.exams.visual;
-    html += '<h3>Agudeza Visual</h3><table><tr><th>Ojo</th><th>Lejos s/c</th><th>Lejos c/c</th><th>Cerca s/c</th><th>Cerca c/c</th></tr>'
-      +'<tr><td>OD</td><td>'+av.odLsc+'</td><td>'+av.odLcc+'</td><td>'+av.odCsc+'</td><td>'+av.odCcc+'</td></tr>'
-      +'<tr><td>OI</td><td>'+av.oiLsc+'</td><td>'+av.oiLcc+'</td><td>'+av.oiCsc+'</td><td>'+av.oiCcc+'</td></tr></table>';
+  if(pchk('chk-visual')) {
+    const av = ev.exams.visual||{};
+    html += '<h3>Agudeza Visual</h3>';
+    if(av.odLsc||av.oiLsc) {
+      html += '<table><tr><th>Ojo</th><th>Lejos s/c</th><th>Lejos c/c</th><th>Cerca s/c</th><th>Cerca c/c</th></tr>'
+        +'<tr><td>OD</td><td>'+(av.odLsc||'—')+'</td><td>'+(av.odLcc||'—')+'</td><td>'+(av.odCsc||'—')+'</td><td>'+(av.odCcc||'—')+'</td></tr>'
+        +'<tr><td>OI</td><td>'+(av.oiLsc||'—')+'</td><td>'+(av.oiLcc||'—')+'</td><td>'+(av.oiCsc||'—')+'</td><td>'+(av.oiCcc||'—')+'</td></tr></table>';
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin datos de agudeza visual</p>';
+    }
   }
 
   // Audiometría
-  if(pchk('chk-audio') && ev.exams.audio) {
-    const a = ev.exams.audio;
-    html += '<h3>Audiometría</h3><table><tr><th>Oído</th>'+HZ.map(h=>'<th>'+h+' Hz</th>').join('')+'</tr>'
-      +'<tr><td>OD</td>'+a.od.map(v=>'<td>'+v+'</td>').join('')+'</tr>'
-      +'<tr><td>OI</td>'+a.oi.map(v=>'<td>'+v+'</td>').join('')+'</tr></table>';
+  if(pchk('chk-audio')) {
+    const a = ev.exams.audio||{};
+    html += '<h3>Audiometría</h3>';
+    if(a.od && a.od.some(v=>v)) {
+      html += '<table><tr><th>Oído</th>'+HZ.map(h=>'<th>'+h+' Hz</th>').join('')+'</tr>'
+        +'<tr><td>OD</td>'+a.od.map(v=>'<td>'+(v||'—')+'</td>').join('')+'</tr>'
+        +'<tr><td>OI</td>'+(a.oi||[]).map(v=>'<td>'+(v||'—')+'</td>').join('')+'</tr></table>';
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin datos de audiometría</p>';
+    }
   }
 
   // Espirometría
-  if(pchk('chk-espiro') && ev.exams.espiro) {
-    const s = ev.exams.espiro;
-    html += '<h3>Espirometría</h3><table><tr><th>FVC</th><th>FEV1</th><th>FEV1/FVC</th><th>PEF</th><th>FEF25-75</th><th>Interpretación</th></tr>'
-      +'<tr><td>'+s.fvc+' L</td><td>'+s.fev1+' L</td><td>'+s.ratio+'%</td><td>'+s.pef+'</td><td>'+s.fef2575+'</td><td>'+s.interpretacion+'</td></tr></table>';
+  if(pchk('chk-espiro')) {
+    const s = ev.exams.espiro||{};
+    html += '<h3>Espirometría</h3>';
+    if(s.fvc||s.fev1) {
+      html += '<table><tr><th>FVC</th><th>FEV1</th><th>FEV1/FVC</th><th>PEF</th><th>FEF25-75</th><th>Interpretación</th></tr>'
+        +'<tr><td>'+(s.fvc||'—')+' L</td><td>'+(s.fev1||'—')+' L</td><td>'+(s.ratio||'—')+'%</td><td>'+(s.pef||'—')+'</td><td>'+(s.fef2575||'—')+'</td><td>'+(s.interpretacion||'—')+'</td></tr></table>';
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin datos de espirometría</p>';
+    }
   }
 
   // Antidoping
-  if(pchk('chk-antid') && ev.exams.antidoping) {
-    const positivos = ANTIDP.filter(s => ev.exams.antidoping[s.c] === 'Positivo').map(s=>s.n);
-    const negativos = ANTIDP.filter(s => ev.exams.antidoping[s.c] === 'Negativo').map(s=>s.n);
+  if(pchk('chk-antid')) {
+    const antidData = ev.exams.antidoping||{};
+    const positivos = ANTIDP.filter(s => antidData[s.c] === 'Positivo').map(s=>s.n);
+    const negativos = ANTIDP.filter(s => antidData[s.c] === 'Negativo').map(s=>s.n);
+    html += '<h3>Antidoping</h3>';
     if(negativos.length||positivos.length) {
-      html += '<h3>Antidoping</h3>';
       if(negativos.length) html += '<p><strong>Negativos:</strong> '+negativos.join(', ')+'</p>';
       if(positivos.length) html += '<p style="color:#e53935"><strong>⚠ Positivos:</strong> '+positivos.join(', ')+'</p>';
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin resultados registrados</p>';
     }
   }
 
   // Laboratorio solicitado
-  if(pchk('chk-labsol') && ev.exams.laboratorio && ev.exams.laboratorio.length) {
-    html += '<h3>Laboratorio Solicitado</h3><table><tr><th>Estudio</th><th>Resultado</th><th>Interpretación</th></tr>'
-      + ev.exams.laboratorio.map(l=>'<tr><td>'+l.nombre+'</td><td>'+l.resultado+'</td><td>'+l.interpretacion+'</td></tr>').join('')+'</table>';
+  if(pchk('chk-labsol')) {
+    html += '<h3>Laboratorio Solicitado</h3>';
+    if(ev.exams.laboratorio && ev.exams.laboratorio.length) {
+      html += '<table><tr><th>Estudio</th><th>Resultado</th><th>Interpretación</th></tr>'
+        + ev.exams.laboratorio.map(l=>'<tr><td>'+l.nombre+'</td><td>'+(l.resultado||'—')+'</td><td>'+(l.interpretacion||'—')+'</td></tr>').join('')+'</table>';
+    } else {
+      html += '<p style="color:#777;font-style:italic">Sin estudios de laboratorio solicitados</p>';
+    }
   }
 
   // Diagnóstico y conclusión
@@ -5635,6 +6275,589 @@ function saveHistorialNota() {
   });
 }
 
+
+// ══════════════════════════════════════════════════════
+// CRM — Customer Relationship Management
+// ══════════════════════════════════════════════════════
+var crmData = {empresas:[], contactos:[], actividades:[], contratos:[]};
+
+function loadCRM() {
+  gasPost({action:'loadCRM'}, function(r) {
+    if(!r.ok) { console.error('CRM load error:', r.error); return; }
+    crmData = {
+      empresas:   r.empresas   || [],
+      contactos:  r.contactos  || [],
+      actividades:r.actividades|| [],
+      contratos:  r.contratos  || []
+    };
+    renderCRMEmpresas();
+    renderCRMContactos();
+    renderCRMActividades();
+    renderCRMContratos();
+    renderCRMPipeline();
+    checkCRMAlerts();
+    populateCRMSelects();
+  });
+}
+
+function showCRMTab(tab, btn) {
+  document.querySelectorAll('#screen-crm .rtab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#screen-crm .tab-btn').forEach(b => b.classList.remove('active'));
+  var el = document.getElementById('crm-tab-'+tab);
+  if(el) el.classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+function populateCRMSelects() {
+  var opts = '<option value="">— Seleccionar —</option>' + crmData.empresas.map(e =>
+    '<option value="'+e.nombre+'">'+e.nombre+'</option>').join('');
+  ['crm-cont-empresa','crm-act-empresa','crm-ctrato-empresa'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if(el) el.innerHTML = opts;
+  });
+}
+
+function checkCRMAlerts() {
+  var bar = document.getElementById('crm-alerts-bar');
+  if(!bar) return;
+  var hoy = new Date();
+  var alerts = [];
+  // Contratos próximos a vencer (30 días)
+  crmData.contratos.forEach(function(c) {
+    if(c.estado !== 'Activo') return;
+    var venc = new Date(c.fechaVenc);
+    var diff = Math.ceil((venc - hoy) / (1000*60*60*24));
+    if(diff >= 0 && diff <= 30) alerts.push('⚠️ Contrato <strong>'+c.empresa+'</strong> vence en '+diff+' días ('+c.fechaVenc+')');
+    if(diff < 0) alerts.push('🔴 Contrato <strong>'+c.empresa+'</strong> VENCIDO el '+c.fechaVenc);
+  });
+  // Actividades con seguimiento pendiente
+  crmData.actividades.forEach(function(a) {
+    if(!a.fechaSeguimiento) return;
+    var seg = new Date(a.fechaSeguimiento);
+    var diff = Math.ceil((seg - hoy) / (1000*60*60*24));
+    if(diff >= 0 && diff <= 7) alerts.push('🔔 Seguimiento con <strong>'+a.empresa+'</strong> en '+diff+' día(s) — '+a.tipo);
+    if(diff < 0) alerts.push('❗ Seguimiento PENDIENTE con <strong>'+a.empresa+'</strong> ('+a.fechaSeguimiento+')');
+  });
+  if(alerts.length) {
+    bar.innerHTML = '<strong>Alertas CRM:</strong> ' + alerts.join(' &nbsp;|&nbsp; ');
+    bar.style.display = 'block';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+// ── EMPRESAS ─────────────────────────────────────────
+function renderCRMEmpresas() {
+  var q = (document.getElementById('crm-emp-q')||{value:''}).value.toLowerCase();
+  var st = (document.getElementById('crm-emp-status')||{value:''}).value;
+  var list = crmData.empresas.filter(e =>
+    (!q || e.nombre.toLowerCase().includes(q) || (e.rfc||'').toLowerCase().includes(q)) &&
+    (!st || e.estado === st)
+  );
+  var el = document.getElementById('crm-empresas-list');
+  if(!el) return;
+  var STATUS_COLOR = {Activo:'#43a047',Prospecto:'#fb8c00',Inactivo:'#9e9e9e',Pausado:'#1565c0'};
+  if(!list.length) { el.innerHTML='<div style="color:var(--muted);padding:16px">Sin empresas registradas.</div>'; return; }
+  el.innerHTML = '<div class="tw"><table><thead><tr><th>Empresa</th><th>RFC</th><th>Giro</th><th>Empleados</th><th>Estado</th><th>Responsable</th><th>Acciones</th></tr></thead><tbody>'
+    + list.map(e =>
+      '<tr><td><strong>'+e.nombre+'</strong>'+(e.notas?'<br><span style="font-size:.78em;color:var(--muted)">'+e.notas.slice(0,60)+'</span>':'')+'</td>'
+      +'<td>'+(e.rfc||'—')+'</td><td>'+(e.giro||'—')+'</td><td>'+(e.empleados||'—')+'</td>'
+      +'<td><span style="background:'+(STATUS_COLOR[e.estado]||'#666')+';color:#fff;border-radius:12px;padding:2px 10px;font-size:.8em;font-weight:600">'+e.estado+'</span></td>'
+      +'<td>'+(e.responsable||'—')+'</td>'
+      +'<td><div class="flex gap8">'
+      +'<button class="btn btn-o btn-sm" onclick="editCRMEmpresa(\''+e.id+'\')">✏️</button>'
+      +'<button class="btn btn-p btn-sm" onclick="newActividadForEmpresa(\''+e.nombre+'\')">+ Actividad</button>'
+      +'</div></td></tr>'
+    ).join('') + '</tbody></table></div>';
+}
+
+function openCRMEmpresaForm(emp) {
+  ['crm-emp-id','crm-emp-nombre','crm-emp-rfc','crm-emp-giro','crm-emp-empleados',
+   'crm-emp-dir','crm-emp-tel','crm-emp-fcont','crm-emp-resp','crm-emp-notas'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('crm-emp-modal-title').textContent = '🏢 Nueva empresa cliente';
+  document.getElementById('crm-emp-estado').value = 'Prospecto';
+  document.getElementById('crm-emp-origen').value = '';
+  document.getElementById('crm-emp-fcont').value = new Date().toISOString().slice(0,10);
+  document.getElementById('err-crm-emp').style.display='none';
+  if(emp) {
+    document.getElementById('crm-emp-modal-title').textContent = '✏️ Editar empresa';
+    document.getElementById('crm-emp-id').value = emp.id||'';
+    document.getElementById('crm-emp-nombre').value = emp.nombre||'';
+    document.getElementById('crm-emp-rfc').value = emp.rfc||'';
+    document.getElementById('crm-emp-giro').value = emp.giro||'';
+    document.getElementById('crm-emp-empleados').value = emp.empleados||'';
+    document.getElementById('crm-emp-dir').value = emp.direccion||'';
+    document.getElementById('crm-emp-tel').value = emp.telefono||'';
+    document.getElementById('crm-emp-fcont').value = emp.fechaContacto||'';
+    document.getElementById('crm-emp-resp').value = emp.responsable||'';
+    document.getElementById('crm-emp-notas').value = emp.notas||'';
+    document.getElementById('crm-emp-estado').value = emp.estado||'Prospecto';
+    document.getElementById('crm-emp-origen').value = emp.origen||'';
+  }
+  document.getElementById('crm-emp-modal').style.display='flex';
+}
+
+function editCRMEmpresa(id) {
+  var emp = crmData.empresas.find(e => e.id===id);
+  if(emp) openCRMEmpresaForm(emp);
+}
+
+function saveCRMEmpresa() {
+  var nombre = document.getElementById('crm-emp-nombre').value.trim();
+  var err = document.getElementById('err-crm-emp');
+  err.style.display='none';
+  if(!nombre){ err.textContent='El nombre de la empresa es obligatorio'; err.style.display='block'; return; }
+  var rec = {
+    id: document.getElementById('crm-emp-id').value || Date.now().toString(),
+    nombre: nombre,
+    rfc: document.getElementById('crm-emp-rfc').value.trim().toUpperCase(),
+    giro: document.getElementById('crm-emp-giro').value.trim(),
+    empleados: document.getElementById('crm-emp-empleados').value,
+    direccion: document.getElementById('crm-emp-dir').value.trim(),
+    telefono: document.getElementById('crm-emp-tel').value.trim(),
+    estado: document.getElementById('crm-emp-estado').value,
+    origen: document.getElementById('crm-emp-origen').value,
+    fechaContacto: document.getElementById('crm-emp-fcont').value,
+    responsable: document.getElementById('crm-emp-resp').value.trim(),
+    notas: document.getElementById('crm-emp-notas').value.trim(),
+    tipo: 'empresa', ts: new Date().toISOString()
+  };
+  gasPost({action:'saveCRMRecord', rec:rec}, function(r) {
+    if(!r.ok){ err.textContent=r.error||'Error al guardar'; err.style.display='block'; return; }
+    document.getElementById('crm-emp-modal').style.display='none';
+    loadCRM();
+  });
+}
+
+function newActividadForEmpresa(nombre) {
+  openCRMActividadForm();
+  setTimeout(function(){
+    var sel = document.getElementById('crm-act-empresa');
+    if(sel) Array.from(sel.options).forEach(o => o.selected = o.value===nombre);
+  },100);
+  showCRMTab('actividades', document.querySelector('#screen-crm .tab-btn:nth-child(3)'));
+}
+
+// ── CONTACTOS ────────────────────────────────────────
+function renderCRMContactos() {
+  var q = (document.getElementById('crm-cont-q')||{value:''}).value.toLowerCase();
+  var list = crmData.contactos.filter(c =>
+    !q || c.nombre.toLowerCase().includes(q) || (c.empresa||'').toLowerCase().includes(q)
+  );
+  var el = document.getElementById('crm-contactos-list');
+  if(!el) return;
+  if(!list.length) { el.innerHTML='<div style="color:var(--muted);padding:16px">Sin contactos registrados.</div>'; return; }
+  el.innerHTML = '<div class="tw"><table><thead><tr><th>Nombre</th><th>Empresa</th><th>Cargo</th><th>Email</th><th>Teléfono</th><th>WhatsApp</th><th></th></tr></thead><tbody>'
+    + list.map(c =>
+      '<tr><td><strong>'+c.nombre+'</strong></td><td>'+(c.empresa||'—')+'</td><td>'+(c.cargo||'—')+'</td>'
+      +'<td>'+(c.email?'<a href="mailto:'+c.email+'">'+c.email+'</a>':'—')+'</td>'
+      +'<td>'+(c.telefono||'—')+'</td>'
+      +'<td>'+(c.whatsapp?'<a href="https://wa.me/52'+c.whatsapp.replace(/\D/g,'')+'" target="_blank">'+c.whatsapp+'</a>':'—')+'</td>'
+      +'<td><button class="btn btn-o btn-sm" onclick="editCRMContacto(\''+c.id+'\')">✏️</button></td></tr>'
+    ).join('') + '</tbody></table></div>';
+}
+
+function openCRMContactoForm(cont) {
+  ['crm-cont-id','crm-cont-nombre','crm-cont-cargo','crm-cont-depto','crm-cont-email','crm-cont-tel','crm-cont-wa','crm-cont-notas'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  populateCRMSelects();
+  document.getElementById('err-crm-cont').style.display='none';
+  if(cont){
+    document.getElementById('crm-cont-id').value=cont.id||'';
+    document.getElementById('crm-cont-nombre').value=cont.nombre||'';
+    document.getElementById('crm-cont-cargo').value=cont.cargo||'';
+    document.getElementById('crm-cont-depto').value=cont.departamento||'';
+    document.getElementById('crm-cont-email').value=cont.email||'';
+    document.getElementById('crm-cont-tel').value=cont.telefono||'';
+    document.getElementById('crm-cont-wa').value=cont.whatsapp||'';
+    document.getElementById('crm-cont-notas').value=cont.notas||'';
+    setTimeout(function(){
+      var sel=document.getElementById('crm-cont-empresa');
+      if(sel) Array.from(sel.options).forEach(o=>o.selected=o.value===cont.empresa);
+    },50);
+  }
+  document.getElementById('crm-cont-modal').style.display='flex';
+}
+function editCRMContacto(id){ var c=crmData.contactos.find(x=>x.id===id); if(c) openCRMContactoForm(c); }
+
+function saveCRMContacto() {
+  var nombre=document.getElementById('crm-cont-nombre').value.trim();
+  var empresa=document.getElementById('crm-cont-empresa').value;
+  var cargo=document.getElementById('crm-cont-cargo').value.trim();
+  var err=document.getElementById('err-crm-cont');
+  err.style.display='none';
+  if(!nombre||!empresa||!cargo){err.textContent='Nombre, empresa y cargo son obligatorios';err.style.display='block';return;}
+  var rec={
+    id:document.getElementById('crm-cont-id').value||Date.now().toString(),
+    nombre:nombre, empresa:empresa, cargo:cargo,
+    departamento:document.getElementById('crm-cont-depto').value.trim(),
+    email:document.getElementById('crm-cont-email').value.trim(),
+    telefono:document.getElementById('crm-cont-tel').value.trim(),
+    whatsapp:document.getElementById('crm-cont-wa').value.trim(),
+    notas:document.getElementById('crm-cont-notas').value.trim(),
+    tipo:'contacto', ts:new Date().toISOString()
+  };
+  gasPost({action:'saveCRMRecord',rec:rec},function(r){
+    if(!r.ok){err.textContent=r.error||'Error';err.style.display='block';return;}
+    document.getElementById('crm-cont-modal').style.display='none';
+    loadCRM();
+  });
+}
+
+// ── ACTIVIDADES ──────────────────────────────────────
+function renderCRMActividades() {
+  var q=(document.getElementById('crm-act-q')||{value:''}).value.toLowerCase();
+  var tp=(document.getElementById('crm-act-tipo')||{value:''}).value;
+  var list=crmData.actividades.filter(a=>
+    (!q||(a.empresa||'').toLowerCase().includes(q)||(a.descripcion||'').toLowerCase().includes(q)) &&
+    (!tp||a.tipo===tp)
+  ).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  var el=document.getElementById('crm-actividades-list');
+  if(!el) return;
+  var TIPO_ICON={Llamada:'📞',Reunión:'🤝',Correo:'✉️',Visita:'🏢',Propuesta:'📋',Seguimiento:'🔔'};
+  var RES_COLOR={Positivo:'#43a047',Neutral:'#fb8c00',Negativo:'#e53935',Pendiente:'#1565c0'};
+  if(!list.length){el.innerHTML='<div style="color:var(--muted);padding:16px">Sin actividades registradas.</div>';return;}
+  el.innerHTML='<div class="tw"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Empresa</th><th>Contacto</th><th>Resultado</th><th>Descripción</th><th>Seguimiento</th><th></th></tr></thead><tbody>'
+    +list.map(a=>
+      '<tr><td>'+a.fecha+'</td>'
+      +'<td>'+(TIPO_ICON[a.tipo]||'📋')+' '+a.tipo+'</td>'
+      +'<td>'+a.empresa+'</td>'
+      +'<td>'+(a.contacto||'—')+'</td>'
+      +'<td><span style="color:'+(RES_COLOR[a.resultado]||'#666')+';font-weight:600">'+a.resultado+'</span></td>'
+      +'<td style="max-width:220px;font-size:.85em">'+(a.descripcion||'').slice(0,100)+'</td>'
+      +'<td>'+(a.fechaSeguimiento||'—')+'</td>'
+      +'<td><button class="btn btn-o btn-sm" onclick="editCRMActividad(\''+a.id+'\')">✏️</button></td></tr>'
+    ).join('')+'</tbody></table></div>';
+}
+
+function openCRMActividadForm(act) {
+  ['crm-act-id','crm-act-contacto','crm-act-desc','crm-act-seguimiento'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('crm-act-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('crm-act-resultado').value='Pendiente';
+  document.getElementById('crm-act-tipo-sel').value='Llamada';
+  populateCRMSelects();
+  document.getElementById('err-crm-act').style.display='none';
+  if(act){
+    document.getElementById('crm-act-id').value=act.id||'';
+    document.getElementById('crm-act-tipo-sel').value=act.tipo||'Llamada';
+    document.getElementById('crm-act-fecha').value=act.fecha||'';
+    document.getElementById('crm-act-contacto').value=act.contacto||'';
+    document.getElementById('crm-act-resultado').value=act.resultado||'Pendiente';
+    document.getElementById('crm-act-desc').value=act.descripcion||'';
+    document.getElementById('crm-act-seguimiento').value=act.fechaSeguimiento||'';
+    setTimeout(function(){
+      var sel=document.getElementById('crm-act-empresa');
+      if(sel) Array.from(sel.options).forEach(o=>o.selected=o.value===act.empresa);
+    },50);
+  }
+  document.getElementById('crm-act-modal').style.display='flex';
+}
+function editCRMActividad(id){ var a=crmData.actividades.find(x=>x.id===id); if(a) openCRMActividadForm(a); }
+
+function saveCRMActividad(){
+  var empresa=document.getElementById('crm-act-empresa').value;
+  var desc=document.getElementById('crm-act-desc').value.trim();
+  var fecha=document.getElementById('crm-act-fecha').value;
+  var err=document.getElementById('err-crm-act');
+  err.style.display='none';
+  if(!empresa||!desc||!fecha){err.textContent='Empresa, fecha y descripción son obligatorios';err.style.display='block';return;}
+  var rec={
+    id:document.getElementById('crm-act-id').value||Date.now().toString(),
+    tipo:document.getElementById('crm-act-tipo-sel').value,
+    empresa:empresa, fecha:fecha,
+    contacto:document.getElementById('crm-act-contacto').value.trim(),
+    resultado:document.getElementById('crm-act-resultado').value,
+    descripcion:desc,
+    fechaSeguimiento:document.getElementById('crm-act-seguimiento').value,
+    tipo_rec:'actividad', ts:new Date().toISOString()
+  };
+  gasPost({action:'saveCRMRecord',rec:rec},function(r){
+    if(!r.ok){err.textContent=r.error||'Error';err.style.display='block';return;}
+    document.getElementById('crm-act-modal').style.display='none';
+    loadCRM();
+  });
+}
+
+// ── CONTRATOS ────────────────────────────────────────
+function renderCRMContratos(){
+  var q=(document.getElementById('crm-cont2-q')||{value:''}).value.toLowerCase();
+  var list=crmData.contratos.filter(c=>!q||(c.empresa||'').toLowerCase().includes(q)||(c.servicios||'').toLowerCase().includes(q));
+  var el=document.getElementById('crm-contratos-list');
+  if(!el) return;
+  var hoy=new Date();
+  var STATUS_COLOR={Activo:'#43a047',Negociación:'#1565c0',Vencido:'#e53935',Cancelado:'#9e9e9e'};
+  if(!list.length){el.innerHTML='<div style="color:var(--muted);padding:16px">Sin contratos registrados.</div>';return;}
+  el.innerHTML='<div class="tw"><table><thead><tr><th>Empresa</th><th>No. Contrato</th><th>Servicios</th><th>Inicio</th><th>Vencimiento</th><th>Monto anual</th><th>Estado</th><th></th></tr></thead><tbody>'
+    +list.map(c=>{
+      var venc=c.fechaVenc?new Date(c.fechaVenc):null;
+      var diff=venc?Math.ceil((venc-hoy)/(1000*60*60*24)):'';
+      var alerta=typeof diff==='number'&&diff<=30&&diff>=0?'⚠️ ':diff<0?'🔴 ':'';
+      return '<tr><td><strong>'+c.empresa+'</strong></td>'
+        +'<td>'+(c.numContrato||'—')+'</td>'
+        +'<td style="max-width:180px;font-size:.85em">'+(c.servicios||'').slice(0,80)+'</td>'
+        +'<td>'+(c.fechaInicio||'—')+'</td>'
+        +'<td>'+alerta+(c.fechaVenc||'—')+'</td>'
+        +'<td>'+(c.monto?'$'+parseFloat(c.monto).toLocaleString('es-MX',{minimumFractionDigits:2}):'—')+'</td>'
+        +'<td><span style="background:'+(STATUS_COLOR[c.estado]||'#666')+';color:#fff;border-radius:12px;padding:2px 10px;font-size:.8em;font-weight:600">'+c.estado+'</span></td>'
+        +'<td><button class="btn btn-o btn-sm" onclick="editCRMContrato(\''+c.id+'\')">✏️</button></td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+function openCRMContratoForm(ct){
+  ['crm-ctrato-id','crm-ctrato-num','crm-ctrato-servicios','crm-ctrato-inicio','crm-ctrato-venc','crm-ctrato-monto','crm-ctrato-resp','crm-ctrato-notas'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('crm-ctrato-estado').value='Activo';
+  populateCRMSelects();
+  document.getElementById('err-crm-contrato').style.display='none';
+  if(ct){
+    document.getElementById('crm-ctrato-id').value=ct.id||'';
+    document.getElementById('crm-ctrato-num').value=ct.numContrato||'';
+    document.getElementById('crm-ctrato-servicios').value=ct.servicios||'';
+    document.getElementById('crm-ctrato-inicio').value=ct.fechaInicio||'';
+    document.getElementById('crm-ctrato-venc').value=ct.fechaVenc||'';
+    document.getElementById('crm-ctrato-monto').value=ct.monto||'';
+    document.getElementById('crm-ctrato-estado').value=ct.estado||'Activo';
+    document.getElementById('crm-ctrato-resp').value=ct.responsable||'';
+    document.getElementById('crm-ctrato-notas').value=ct.notas||'';
+    setTimeout(function(){
+      var sel=document.getElementById('crm-ctrato-empresa');
+      if(sel) Array.from(sel.options).forEach(o=>o.selected=o.value===ct.empresa);
+    },50);
+  }
+  document.getElementById('crm-contrato-modal').style.display='flex';
+}
+function editCRMContrato(id){ var c=crmData.contratos.find(x=>x.id===id); if(c) openCRMContratoForm(c); }
+
+function saveCRMContrato(){
+  var empresa=document.getElementById('crm-ctrato-empresa').value;
+  var inicio=document.getElementById('crm-ctrato-inicio').value;
+  var venc=document.getElementById('crm-ctrato-venc').value;
+  var err=document.getElementById('err-crm-contrato');
+  err.style.display='none';
+  if(!empresa||!inicio||!venc){err.textContent='Empresa, fecha inicio y vencimiento son obligatorios';err.style.display='block';return;}
+  var rec={
+    id:document.getElementById('crm-ctrato-id').value||Date.now().toString(),
+    empresa:empresa,
+    numContrato:document.getElementById('crm-ctrato-num').value.trim(),
+    servicios:document.getElementById('crm-ctrato-servicios').value.trim(),
+    fechaInicio:inicio, fechaVenc:venc,
+    monto:document.getElementById('crm-ctrato-monto').value,
+    estado:document.getElementById('crm-ctrato-estado').value,
+    responsable:document.getElementById('crm-ctrato-resp').value.trim(),
+    notas:document.getElementById('crm-ctrato-notas').value.trim(),
+    tipo_rec:'contrato', ts:new Date().toISOString()
+  };
+  gasPost({action:'saveCRMRecord',rec:rec},function(r){
+    if(!r.ok){err.textContent=r.error||'Error';err.style.display='block';return;}
+    document.getElementById('crm-contrato-modal').style.display='none';
+    loadCRM();
+  });
+}
+
+// ── PIPELINE ─────────────────────────────────────────
+function renderCRMPipeline(){
+  var board=document.getElementById('crm-pipeline-board');
+  var summary=document.getElementById('crm-pipeline-summary');
+  if(!board) return;
+  var stages=['Prospecto','Propuesta','Negociación','Activo'];
+  var STAGE_COLOR={Prospecto:'#fb8c00',Propuesta:'#1565c0',Negociación:'#6a1b9a',Activo:'#43a047'};
+  board.innerHTML = stages.map(function(s){
+    var emps=crmData.empresas.filter(e=>e.estado===s);
+    var contratos=crmData.contratos.filter(c=>c.estado===s);
+    var total=contratos.reduce((sum,c)=>sum+parseFloat(c.monto||0),0);
+    return '<div style="background:var(--bg2);border-radius:8px;padding:12px;min-height:120px">'
+      +'<div style="font-weight:700;color:'+(STAGE_COLOR[s]||'#333')+';margin-bottom:8px;font-size:.9em">'+s.toUpperCase()+' ('+emps.length+')</div>'
+      +emps.map(e=>'<div style="background:var(--white);border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:.83em;border-left:3px solid '+(STAGE_COLOR[s]||'#ccc')+'">'
+        +'<strong>'+e.nombre+'</strong>'
+        +(e.empleados?'<br><span style="color:var(--muted)">'+e.empleados+' empleados</span>':'')
+        +'</div>').join('')
+      +(total>0?'<div style="font-size:.8em;color:var(--muted);margin-top:6px;text-align:right">Contratos: $'+total.toLocaleString('es-MX',{minimumFractionDigits:2})+'</div>':'')
+      +'</div>';
+  }).join('');
+  // Summary cards
+  var totalContratos=crmData.contratos.filter(c=>c.estado==='Activo').reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  summary.innerHTML=[
+    {label:'Prospectos',val:crmData.empresas.filter(e=>e.estado==='Prospecto').length,icon:'🎯',color:'#fb8c00'},
+    {label:'Clientes activos',val:crmData.empresas.filter(e=>e.estado==='Activo').length,icon:'✅',color:'#43a047'},
+    {label:'Contratos activos',val:crmData.contratos.filter(c=>c.estado==='Activo').length,icon:'📄',color:'#1565c0'},
+    {label:'Ingreso anual',val:'$'+totalContratos.toLocaleString('es-MX',{minimumFractionDigits:2}),icon:'💰',color:'#6a1b9a'}
+  ].map(s=>'<div style="background:var(--white);border-radius:8px;padding:14px;border-left:4px solid '+s.color+'">'
+    +'<div style="font-size:1.5em">'+s.icon+'</div>'
+    +'<div style="font-weight:700;font-size:1.3em;color:'+s.color+'">'+s.val+'</div>'
+    +'<div style="font-size:.8em;color:var(--muted)">'+s.label+'</div>'
+    +'</div>').join('');
+}
+
+// ── PORTAL AUTOAGENDA ─────────────────────────────────
+var portalSelectedSlot = null;
+
+function initPortal() {
+  // Set minimum date to today
+  var today = new Date();
+  var yyyy = today.getFullYear();
+  var mm   = String(today.getMonth()+1).padStart(2,'0');
+  var dd   = String(today.getDate()).padStart(2,'0');
+  var fechaEl = document.getElementById('portal-fecha');
+  if(fechaEl) fechaEl.min = yyyy+'-'+mm+'-'+dd;
+  portalSelectedSlot = null;
+  // Hide step2 and slots until date is picked
+  document.getElementById('portal-step2').style.display = 'none';
+  document.getElementById('portal-slots-wrap').style.display = 'none';
+  document.getElementById('portal-slots-loading').style.display = 'none';
+  document.getElementById('portal-slots-empty').style.display = 'none';
+  document.getElementById('portal-err').style.display = 'none';
+  document.getElementById('portal-ok').style.display = 'none';
+  // Show/hide Meet note on modalidad change
+  var sel = document.getElementById('portal-modalidad');
+  if(sel) sel.onchange = function() {
+    document.getElementById('portal-virtual-note').style.display = this.value === 'Virtual' ? 'block' : 'none';
+  };
+}
+
+function loadPortalSlots() {
+  var fecha = document.getElementById('portal-fecha').value;
+  if(!fecha) return;
+  // Don't allow Sundays (0)
+  var d = new Date(fecha + 'T12:00:00');
+  if(d.getDay() === 0) {
+    document.getElementById('portal-slots-wrap').style.display = 'none';
+    document.getElementById('portal-slots-empty').style.display = 'block';
+    document.getElementById('portal-slots-empty').textContent = '😔 No hay consultas los domingos. Por favor selecciona otro día.';
+    document.getElementById('portal-step2').style.display = 'none';
+    return;
+  }
+  document.getElementById('portal-slots-wrap').style.display = 'none';
+  document.getElementById('portal-slots-empty').style.display = 'none';
+  document.getElementById('portal-slots-loading').style.display = 'block';
+  document.getElementById('portal-step2').style.display = 'none';
+  portalSelectedSlot = null;
+  if(typeof google === 'undefined' || !google.script || !google.script.run) {
+    document.getElementById('portal-slots-loading').style.display = 'none';
+    document.getElementById('portal-slots-empty').style.display = 'block';
+    document.getElementById('portal-slots-empty').textContent = 'Esta app debe abrirse desde la URL de Google Apps Script.';
+    return;
+  }
+  google.script.run
+    .withSuccessHandler(function(res) {
+      document.getElementById('portal-slots-loading').style.display = 'none';
+      var r; try{ r=JSON.parse(res); }catch(e){ r={ok:false}; }
+      if(!r.ok || !r.slots || !r.slots.length) {
+        document.getElementById('portal-slots-empty').style.display = 'block';
+        document.getElementById('portal-slots-empty').textContent = '😔 No hay horarios disponibles para esta fecha. Por favor selecciona otro día.';
+        return;
+      }
+      var grid = document.getElementById('portal-slots-grid');
+      grid.innerHTML = '';
+      r.slots.forEach(function(slot) {
+        var btn = document.createElement('button');
+        btn.className = 'portal-slot';
+        btn.textContent = slot;
+        btn.onclick = function() {
+          document.querySelectorAll('.portal-slot').forEach(function(b){ b.classList.remove('sel'); });
+          btn.classList.add('sel');
+          portalSelectedSlot = slot;
+          document.getElementById('portal-step2').style.display = 'block';
+          document.getElementById('portal-step2').scrollIntoView({behavior:'smooth',block:'nearest'});
+        };
+        grid.appendChild(btn);
+      });
+      document.getElementById('portal-slots-wrap').style.display = 'block';
+    })
+    .withFailureHandler(function() {
+      document.getElementById('portal-slots-loading').style.display = 'none';
+      document.getElementById('portal-slots-empty').style.display = 'block';
+      document.getElementById('portal-slots-empty').textContent = 'Error al cargar horarios. Intenta de nuevo.';
+    })
+    .serverAction(JSON.stringify({action:'getAvailableSlots', fecha:fecha}));
+}
+
+function submitPortal() {
+  var fecha    = document.getElementById('portal-fecha').value;
+  var nombre   = document.getElementById('portal-nombre').value.trim();
+  var tel      = document.getElementById('portal-tel').value.trim();
+  var email    = document.getElementById('portal-email').value.trim();
+  var modalidad= document.getElementById('portal-modalidad').value;
+  var empresa  = document.getElementById('portal-empresa').value.trim();
+  var motivo   = document.getElementById('portal-motivo').value.trim();
+  var errEl    = document.getElementById('portal-err');
+  var okEl     = document.getElementById('portal-ok');
+  var btn      = document.getElementById('portal-submit-btn');
+
+  function portalErr(msg) {
+    errEl.innerHTML = '<strong>❌</strong> ' + msg;
+    errEl.style.display = 'block';
+    okEl.style.display = 'none';
+    if(btn){ btn.disabled=false; btn.textContent='📅 Confirmar cita'; }
+    errEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if(!fecha)           { portalErr('Selecciona una fecha.'); return; }
+  if(!portalSelectedSlot){ portalErr('Selecciona un horario.'); return; }
+  if(!nombre)          { portalErr('Ingresa tu nombre completo.'); return; }
+  if(!tel)             { portalErr('Ingresa tu número de teléfono.'); return; }
+  if(!email || email.indexOf('@')===-1){ portalErr('Ingresa un correo electrónico válido.'); return; }
+  if(!motivo)          { portalErr('Describe el motivo de tu consulta.'); return; }
+
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Confirmando cita…'; }
+  if(typeof google === 'undefined' || !google.script || !google.script.run) {
+    portalErr('Esta app debe abrirse desde la URL de Google Apps Script.');
+    return;
+  }
+  var done = false;
+  var t = setTimeout(function(){
+    if(!done){ done=true; portalErr('Sin respuesta del servidor (30s). Intenta nuevamente.'); }
+  }, 30000);
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if(done) return; done=true; clearTimeout(t);
+      if(btn){ btn.disabled=false; btn.textContent='📅 Confirmar cita'; }
+      var r; try{ r=JSON.parse(res); }catch(e){ portalErr('Respuesta inválida del servidor.'); return; }
+      if(!r.ok){ portalErr(r.error||'Error al confirmar la cita. Intenta nuevamente.'); return; }
+      // Success!
+      document.getElementById('portal-step1').style.display = 'none';
+      document.getElementById('portal-step2').style.display = 'none';
+      okEl.innerHTML = '<div style="text-align:center;padding:8px 0">'
+        + '<div style="font-size:2.5em;margin-bottom:8px">🎉</div>'
+        + '<strong style="font-size:1.1em">¡Cita confirmada!</strong><br>'
+        + '<span style="font-size:.92em">'+fecha+' a las '+portalSelectedSlot+'</span><br>'
+        + (r.meetLink ? '<br><a href="'+r.meetLink+'" target="_blank" style="color:#2e7d32;font-weight:700">🎥 Enlace de Google Meet</a><br>' : '')
+        + '<span style="font-size:.82em;color:var(--gris)">Recibirás la confirmación en <strong>'+email+'</strong></span>'
+        + '</div>';
+      okEl.style.display = 'block';
+    })
+    .withFailureHandler(function(e) {
+      if(done) return; done=true; clearTimeout(t);
+      portalErr('Error del servidor: '+(e?e.message||String(e):'desconocido'));
+    })
+    .serverAction(JSON.stringify({action:'saveAutoAgenda', booking:{
+      fecha:fecha, hora:portalSelectedSlot,
+      nombre:nombre, telefono:tel, email:email,
+      modalidad:modalidad, empresa:empresa, motivo:motivo
+    }}));
+}
+
+// On page load, check for portal URL parameter
+(function() {
+  try {
+    if(typeof google !== 'undefined' && google.script && google.script.url) {
+      google.script.url.getLocation(function(loc) {
+        if(loc && loc.parameter && loc.parameter.portal === '1') {
+          showScreen('portal');
+          initPortal();
+        }
+      });
+    }
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- AUDITORÍAS STPS -->
@@ -6158,4 +7381,4 @@ function saveHistorialNota() {
 </div>
 
 </body>
-</html>
+</html                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
