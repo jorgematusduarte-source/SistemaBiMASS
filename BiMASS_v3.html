@@ -16,8 +16,14 @@ body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:#333;min
 .btn-out{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.82em}
 .screen{display:none;padding:20px 16px;max-width:940px;margin:0 auto}
 .screen.active{display:block}
-.auth-wrap{max-width:420px;margin:50px auto;background:var(--white);border-radius:var(--rad);box-shadow:var(--shad);padding:32px}
-.auth-logo{text-align:center;margin-bottom:20px}
+.auth-wrap{max-width:460px;width:94%;margin:clamp(10px,4vh,50px) auto;background:var(--white);border-radius:var(--rad);box-shadow:var(--shad);padding:clamp(18px,4vw,36px)}
+.auth-logo{text-align:center;margin-bottom:16px}
+.auth-portal-cta{margin:0 0 16px;text-align:center}
+.auth-portal-btn{display:block;background:linear-gradient(135deg,var(--teal),var(--teal-m));color:#fff;font-size:clamp(1em,3.5vw,1.18em);font-weight:700;padding:14px 20px;border-radius:12px;text-decoration:none;text-align:center;box-shadow:0 4px 14px rgba(40,170,164,.35);transition:transform .15s,box-shadow .15s;line-height:1.35}
+.auth-portal-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(40,170,164,.45);color:#fff;text-decoration:none}
+.auth-sep{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--gris);font-size:.82em;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.auth-sep::before,.auth-sep::after{content:"";flex:1;height:1px;background:var(--brd)}
+@media(max-width:480px){.auth-wrap{border-radius:0;width:100%;min-height:100vh;box-shadow:none;margin:0 auto}.screen#screen-auth{padding:0}}
 .auth-tabs{display:flex;border-bottom:2px solid var(--brd);margin-bottom:20px}
 .auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;color:var(--gris);font-weight:600;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
 .auth-tab.active{color:var(--azul);border-bottom-color:var(--teal)}
@@ -134,6 +140,7 @@ tr:hover td{background:#f0faf9}
   <span class="nav-mod" id="nav-mod"></span>
   <span class="nav-user" id="nav-user"></span>
   <span class="nav-user nav-u-sub" id="nav-centro" style="display:none"></span>
+  <button id="nav-cambiar-centro" onclick="cambiarCentro()" style="display:none;background:none;border:1px solid rgba(255,255,255,.4);color:#fff;font-size:.72em;padding:2px 8px;border-radius:10px;cursor:pointer;margin-left:4px;opacity:.8" title="Cambiar centro de trabajo">⇄ Cambiar</button>
   <button class="btn-out" onclick="doLogout()">Salir</button>
 </nav>
 
@@ -141,7 +148,7 @@ tr:hover td{background:#f0faf9}
 <div id="screen-auth" class="screen active">
 <div class="auth-wrap">
   <div class="auth-logo">
-    <svg viewBox="200 65 280 245" width="155" height="135" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="200 65 280 245" width="120" height="104" xmlns="http://www.w3.org/2000/svg">
       <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#2a4e7a" transform="rotate(0,340,155)"/>
       <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#28aaa4" transform="rotate(60,340,155)"/>
       <path d="M340,148 C356,145 370,116 370,100 A30,20,0,0,0 310,100 C310,116 324,145 340,148Z" fill="#7ecdc8" transform="rotate(120,340,155)"/>
@@ -152,8 +159,19 @@ tr:hover td{background:#f0faf9}
       <rect x="303" y="138" width="74" height="34" rx="11" fill="white"/>
       <text x="340" y="293" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="52" font-weight="700" letter-spacing="2" fill="#636875">BiMASS</text>
     </svg>
-    <div class="muted" style="margin-top:4px">Sistema Médico Integral</div>
+    <div style="font-size:1.05em;font-weight:700;color:var(--azul);margin-top:4px">Sistema Médico Integral</div>
   </div>
+
+  <!-- Portal CTA — prominente para pacientes -->
+  <div class="auth-portal-cta">
+    <a id="portal-link" href="#" onclick="showScreen('portal');initPortal();return false;" class="auth-portal-btn">
+      📅 ¿Eres paciente?<br><span style="font-size:.88em;font-weight:500;opacity:.92">Agenda tu cita aquí</span>
+    </a>
+  </div>
+
+  <!-- Separador staff -->
+  <div class="auth-sep">¿Eres personal de salud? Ingresa aquí</div>
+
   <div class="auth-tabs">
     <div class="auth-tab active" id="tab-login" onclick="showAuthTab('login')">Iniciar sesión</div>
     <div class="auth-tab" id="tab-register" onclick="showAuthTab('register')">Registrarse</div>
@@ -215,9 +233,18 @@ tr:hover td{background:#f0faf9}
   </div>
 </div>
 </div>
-<div style="text-align:center;margin-top:14px;font-size:.82em">
-  <span style="color:var(--gris)">¿Paciente? </span>
-  <a id="portal-link" href="#" onclick="showScreen('portal');initPortal();return false;" style="color:var(--teal);font-weight:600">📅 Agenda tu cita aquí</a>
+
+<!-- ── MODAL SELECTOR CENTRO DE TRABAJO ──────────────── -->
+<div id="centro-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(20,40,80,.7);z-index:19999;align-items:center;justify-content:center">
+  <div class="card" style="width:380px;max-width:92vw;padding:28px;text-align:center">
+    <div style="font-size:2.2em;margin-bottom:6px">🏢</div>
+    <h3 style="margin:0 0 6px;color:#2a4e7a;font-size:1.2em">Selecciona tu centro de trabajo</h3>
+    <p style="font-size:.88em;color:var(--gris);margin:0 0 18px">Los datos mostrados corresponden al centro seleccionado</p>
+    <div class="fg" style="margin-bottom:20px">
+      <select id="centro-picker-select" style="width:100%;padding:10px 14px;font-size:1em;border:2px solid var(--azul);border-radius:8px;background:#fff;color:#2a4e7a;font-weight:600"></select>
+    </div>
+    <button class="btn btn-p btn-lg w100" onclick="doSelectCentro()">Continuar →</button>
+  </div>
 </div>
 
 <!-- PORTAL AUTOAGENDA -->
@@ -1676,6 +1703,7 @@ tr:hover td{background:#f0faf9}
     <div class="fg" style="margin-bottom:16px">
       <label>Centro de trabajo *</label>
       <select id="approve-centro">
+        <option value="Todos">⭐ Todos (acceso completo)</option>
         <option value="Clínica BiMASS">Clínica BiMASS</option>
       </select>
     </div>
@@ -1707,6 +1735,7 @@ tr:hover td{background:#f0faf9}
     <div class="fg" style="margin-bottom:16px">
       <label>Centro de trabajo</label>
       <select id="edit-centro">
+        <option value="Todos">⭐ Todos (acceso completo)</option>
         <option value="Clínica BiMASS">Clínica BiMASS</option>
       </select>
     </div>
@@ -1726,6 +1755,7 @@ tr:hover td{background:#f0faf9}
 // MÓDULO COTIZACIONES
 // ══════════════════════════════════════════════════════════════
 var cotizCache = [];
+var centroActivoActual = null;
 
 function initCotizForm() {
   // Set today's date
@@ -1863,8 +1893,8 @@ function saveCotizacion() {
 
 function loadCotizaciones() {
   gasPost({action:'loadCotizaciones'}, function(r) {
-    if(r && r.items) {
-      cotizCache = r.items;
+    if(r && r.cotizaciones) {
+      cotizCache = r.cotizaciones;
       renderCotizaciones(cotizCache);
       // Set next folio hint
       var yr = new Date().getFullYear();
@@ -1926,17 +1956,6 @@ function filterCotizaciones() {
            (c.status||'').toLowerCase().includes(q);
   });
   renderCotizaciones(filtered);
-}
-
-function updateCotizStatus(id, status, idx) {
-  gasPost({action:'updateCotizStatus', id:id, status:status}, function(r) {
-    if(r && r.ok) {
-      if(typeof idx !== 'undefined' && cotizCache[idx]) cotizCache[idx].status = status;
-    } else {
-      alert('Error al actualizar status');
-      loadCotizaciones();
-    }
-  });
 }
 
 function buildCotizHTML(c, forPrint) {
@@ -2367,27 +2386,7 @@ function doLogin() {
       if(!r.user){ showErr('El servidor respondió pero no devolvió datos de usuario.'); return; }
       try {
         currentUser = r.user;
-        document.getElementById('navbar').style.display = 'flex';
-        document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
-        var navCentro = document.getElementById('nav-centro');
-        if(currentUser.centroTrabajo) {
-          navCentro.textContent = '🏢 ' + currentUser.centroTrabajo;
-          navCentro.style.display = 'inline';
-        } else {
-          navCentro.style.display = 'none';
-        }
-        const adminRow = document.getElementById('home-admin-row');
-        if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
-        const cardInv = document.getElementById('card-inv');
-        if(cardInv) cardInv.style.display = canAccess('inventario') ? '' : 'none';
-        const isLabUser = currentUser.perfil === 'Laboratorio';
-        if(isLabUser) {
-          document.querySelectorAll('.home-grid .home-card').forEach(c => {
-            c.style.display = (c.id==='card-lab'||c.id==='card-xray') ? '' : 'none';
-          });
-        }
-        document.getElementById('home-greeting').textContent = 'Bienvenido, ' + currentUser.nombre.split(' ')[0];
-        showScreen('home');
+        showCentroPicker();
       } catch(e){ showErr('Error al abrir el sistema: ' + e.message); }
     })
     .withFailureHandler(function(e){
@@ -2395,6 +2394,77 @@ function doLogin() {
       showErr('Error del servidor GAS: ' + (e ? e.message||String(e) : 'desconocido') + '. Si es un despliegue nuevo, ábrelo en el navegador para autorizar permisos.');
     })
     .serverAction(JSON.stringify({action:'login', email:email, password:pass}));
+}
+
+// ── CENTRO DE TRABAJO SELECTOR ────────────────────────
+function canSwitchCentro() {
+  if(!currentUser) return false;
+  var p = currentUser.perfil || '';
+  return p === 'Director' || p === 'Admin medico' || p === 'Admin médico' || currentUser.centroTrabajo === 'Todos';
+}
+
+function showCentroPicker() {
+  var sel = document.getElementById('centro-picker-select');
+  if(!sel) { finishLogin('Clinica BiMASS'); return; }
+  if(canSwitchCentro()) {
+    // Load all empresas for the dropdown
+    gasPost({action:'loadEmpresas'}, function(r) {
+      var items = r.ok ? (r.items||[]) : [];
+      var centros = ['Clinica BiMASS'].concat(items.map(function(e){ return e.nombre; }));
+      // Remove duplicates
+      centros = centros.filter(function(v,i,a){ return a.indexOf(v)===i; });
+      sel.innerHTML = centros.map(function(c){
+        return '<option value="'+c+'">'+c+'</option>';
+      }).join('');
+      document.getElementById('centro-picker-modal').style.display = 'flex';
+    });
+  } else {
+    // User has a fixed centro - auto-select and skip the picker
+    var assigned = currentUser.centroTrabajo || 'Clinica BiMASS';
+    centroActivoActual = assigned;
+    finishLogin(assigned);
+  }
+}
+
+function doSelectCentro() {
+  var sel = document.getElementById('centro-picker-select');
+  var centro = sel ? sel.value : (currentUser.centroTrabajo || 'Clinica BiMASS');
+  centroActivoActual = centro;
+  document.getElementById('centro-picker-modal').style.display = 'none';
+  finishLogin(centro);
+}
+
+function finishLogin(centro) {
+  centroActivoActual = centro;
+  // Update navbar centro
+  var navCentro = document.getElementById('nav-centro');
+  if(navCentro) {
+    navCentro.textContent = '🏢 ' + centro;
+    navCentro.style.display = 'inline';
+  }
+  document.getElementById('navbar').style.display = 'flex';
+  document.getElementById('nav-user').textContent = currentUser.nombre + ' · ' + (currentUser.perfil||'');
+  // Show/hide home cards based on access
+  const adminRow = document.getElementById('home-admin-row');
+  if(adminRow) adminRow.style.display = canAccess('reportes') ? 'block' : 'none';
+  const cardInv = document.getElementById('card-inv');
+  if(cardInv) cardInv.style.display = canAccess('inventario') ? '' : 'none';
+  const isLabUser = currentUser.perfil === 'Laboratorio';
+  if(isLabUser) {
+    document.querySelectorAll('.home-grid .home-card').forEach(function(c) {
+      c.style.display = (c.id==='card-lab'||c.id==='card-xray') ? '' : 'none';
+    });
+  }
+  document.getElementById('home-greeting').textContent = 'Bienvenido, ' + currentUser.nombre.split(' ')[0];
+  // Show "cambiar centro" link for multi-centro users
+  var cambiarEl = document.getElementById('nav-cambiar-centro');
+  if(cambiarEl) cambiarEl.style.display = canSwitchCentro() ? 'inline' : 'none';
+  showScreen('home');
+}
+
+function cambiarCentro() {
+  if(!canSwitchCentro()) return;
+  showCentroPicker();
 }
 
 // File preview handlers for registration
@@ -2585,139 +2655,6 @@ function selectPatient(idx) {
       showScreen('hist');
     } else {
       showVTypeScreen();
-    }
-  });
-}
-
-function renderPatHistorial(items) {
-  const div = document.getElementById('hist-table');
-  if(!div) return;
-  if(!items || !items.length){ div.innerHTML='<div class="muted tc">Sin visitas registradas</div>'; return; }
-  let html = '<div class="tw"><table><thead><tr>'
-    +'<th>Fecha</th><th>Dx / Motivo</th><th>Tipo de visita</th><th>Aptitud laboral</th><th class="no-print">Acciones</th>'
-    +'</tr></thead><tbody>';
-  items.forEach(function(v,i){
-    const fecha = v.ts ? new Date(v.ts).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-    const dx = (v.conclusion && v.conclusion.ciePrimary) ? (v.conclusion.ciePrimary.c+' '+v.conclusion.ciePrimary.d) : (v.hc && v.hc.padecimiento ? v.hc.padecimiento.slice(0,50) : '—');
-    const tipo = (v.hc && v.hc.tipoVisita) ? v.hc.tipoVisita : '—';
-    const aptitud = (v.conclusion && v.conclusion.resultado) ? v.conclusion.resultado : '—';
-    const auditor = (v._audit && v._audit.length) ? '<br><span style="font-size:.72em;color:#999">Últ. edición: '+v._audit[v._audit.length-1].medico+' '+v._audit[v._audit.length-1].fecha+'</span>' : '';
-    html += '<tr>'
-      +'<td>'+fecha+auditor+'</td>'
-      +'<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+dx+'">'+dx+'</td>'
-      +'<td>'+tipo+'</td>'
-      +'<td>'+aptitud+'</td>'
-      +'<td class="no-print" style="white-space:nowrap">'
-      +'<button class="btn btn-o btn-sm" style="padding:4px 8px" title="Visualizar" onclick="viewHistVisit('+i+')">👁</button> '
-      +'<button class="btn btn-sm" style="background:#2a4e7a;color:#fff;padding:4px 8px" title="Editar (agregar nota)" onclick="editHistVisit('+i+')">✏️</button>'
-      +'</td>'
-      +'</tr>';
-  });
-  html += '</tbody></table></div>';
-  div.innerHTML = html;
-}
-
-function filterHistorial() {
-  const q = (document.getElementById('hist-q').value||'').toLowerCase();
-  if(!q){ renderPatHistorial(patHistorialData); return; }
-  const filtered = patHistorialData.filter(function(v){
-    const dx = (v.conclusion && v.conclusion.ciePrimary) ? (v.conclusion.ciePrimary.c+' '+v.conclusion.ciePrimary.d).toLowerCase() : '';
-    const tipo = (v.hc && v.hc.tipoVisita||'').toLowerCase();
-    const fecha = v.ts ? new Date(v.ts).toLocaleDateString('es-MX') : '';
-    return dx.includes(q) || tipo.includes(q) || fecha.includes(q) || (v.hc && (v.hc.padecimiento||'').toLowerCase().includes(q));
-  });
-  renderPatHistorial(filtered);
-}
-
-function viewHistVisit(idx) {
-  const v = patHistorialData[idx];
-  if(!v) return;
-  const fecha = v.ts ? new Date(v.ts).toLocaleString('es-MX') : '—';
-  const modal = document.getElementById('hist-view-modal');
-  document.getElementById('hvm-title').textContent = '👁 Visita del ' + fecha;
-  let body = '';
-  // HC básico
-  if(v.hc) {
-    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px">Datos clínicos</h4>';
-    body += '<table style="width:100%;font-size:.85em;border-collapse:collapse">';
-    body += '<tr><td><b>Paciente:</b> '+(v.hc.nombre||'—')+'</td><td><b>Tipo visita:</b> '+(v.hc.tipoVisita||'—')+'</td></tr>';
-    body += '<tr><td><b>Empresa:</b> '+(v.hc.empresa||'—')+'</td><td><b>Puesto:</b> '+(v.hc.puesto||'—')+'</td></tr>';
-    if(v.hc.padecimiento) body += '<tr><td colspan="2"><b>Padecimiento:</b> '+v.hc.padecimiento+'</td></tr>';
-    body += '</table>';
-  }
-  // Examen físico
-  if(v.exams && v.exams.fisico) {
-    const f = v.exams.fisico;
-    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px;margin-top:12px">Examen físico</h4>';
-    body += '<table style="width:100%;font-size:.85em;border-collapse:collapse">';
-    body += '<tr><td><b>Peso:</b> '+f.peso+' kg</td><td><b>Talla:</b> '+f.talla+' cm</td><td><b>IMC:</b> '+f.imc+'</td><td><b>TA:</b> '+f.ta+'</td></tr>';
-    body += '<tr><td><b>FC:</b> '+f.fc+' lpm</td><td><b>FR:</b> '+f.fr+' rpm</td><td><b>Temp:</b> '+f.temp+'°C</td><td><b>SpO2:</b> '+f.spo2+'%</td></tr>';
-    if(f.sistemas) body += '<tr><td colspan="4"><b>Sistemas:</b> '+f.sistemas+'</td></tr>';
-    body += '</table>';
-  }
-  // Conclusión
-  if(v.conclusion) {
-    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px;margin-top:12px">Conclusión</h4>';
-    if(v.conclusion.ciePrimary) body += '<p style="font-size:.85em"><b>Dx principal:</b> '+v.conclusion.ciePrimary.c+' — '+v.conclusion.ciePrimary.d+'</p>';
-    if(v.conclusion.resultado) body += '<p style="font-size:.85em"><b>Aptitud laboral:</b> '+v.conclusion.resultado+'</p>';
-    if(v.conclusion.comentarios) body += '<p style="font-size:.85em"><b>Comentarios:</b> '+v.conclusion.comentarios+'</p>';
-  }
-  // Notas adicionales (audit trail)
-  if(v.notasAdicionales && v.notasAdicionales.length) {
-    body += '<h4 style="color:#2a4e7a;border-bottom:1px solid #eee;padding-bottom:4px;margin-top:12px">Notas adicionales</h4>';
-    v.notasAdicionales.forEach(function(n){
-      body += '<div style="background:#f5f7fa;border-left:3px solid #28aaa4;padding:8px 12px;margin-bottom:6px;font-size:.85em;border-radius:0 6px 6px 0">';
-      body += '<span style="color:#999;font-size:.85em">'+(n.medico||'')+(n.fecha?' — '+n.fecha:'')+'</span><br>';
-      body += '<span style="white-space:pre-line">'+n.texto+'</span></div>';
-    });
-  }
-  // Audit trail
-  if(v._audit && v._audit.length) {
-    body += '<p style="font-size:.75em;color:#aaa;margin-top:12px">Historial de guardado: ';
-    body += v._audit.map(function(a){ return a.medico+' '+a.fecha; }).join(' · ');
-    body += '</p>';
-  }
-  document.getElementById('hvm-body').innerHTML = body || '<p class="muted">Sin datos detallados</p>';
-  modal.style.display = 'block';
-}
-
-function editHistVisit(idx) {
-  const v = patHistorialData[idx];
-  if(!v) return;
-  const modal = document.getElementById('hist-edit-modal');
-  document.getElementById('hem-visit-id').value = v.id || '';
-  // Mostrar notas previas
-  let prevHtml = '';
-  if(v.notasAdicionales && v.notasAdicionales.length) {
-    prevHtml = '<div style="margin-bottom:8px"><b style="font-size:.88em">Notas anteriores:</b>';
-    v.notasAdicionales.forEach(function(n){
-      prevHtml += '<div style="background:#f5f7fa;border-left:3px solid #28aaa4;padding:6px 10px;margin:4px 0;font-size:.82em;border-radius:0 6px 6px 0">';
-      prevHtml += '<span style="color:#999">'+(n.medico||'')+(n.fecha?' — '+n.fecha:'')+'</span><br>';
-      prevHtml += '<span style="white-space:pre-line">'+n.texto+'</span></div>';
-    });
-    prevHtml += '</div>';
-  }
-  document.getElementById('hem-prev-notas').innerHTML = prevHtml;
-  document.getElementById('hem-nota').value = '';
-  modal.style.display = 'block';
-}
-
-function saveHistorialNota() {
-  const visitId = document.getElementById('hem-visit-id').value;
-  const texto = document.getElementById('hem-nota').value.trim();
-  if(!texto){ alert('Escriba una nota antes de guardar'); return; }
-  const ahora = new Date().toLocaleString('es-MX');
-  const nota = { medico: currentUser ? currentUser.nombre : 'Sistema', fecha: ahora, texto: texto };
-  gasPost({action:'addVisitNota', visitId:visitId, patientId:currentPatient?currentPatient.id:'', nota:nota}, function(r){
-    if(r.ok){
-      // Actualizar en memoria
-      const v = patHistorialData.find(function(x){ return x.id===visitId; });
-      if(v){ if(!v.notasAdicionales) v.notasAdicionales=[]; v.notasAdicionales.push(nota); }
-      document.getElementById('hist-edit-modal').style.display='none';
-      renderPatHistorial(patHistorialData);
-      alert('✅ Nota guardada correctamente');
-    } else {
-      alert('Error al guardar nota: '+(r.error||''));
     }
   });
 }
@@ -4364,8 +4301,9 @@ function loadEmpresas(cb) {
     ['approve-centro','edit-centro'].forEach(function(selId) {
       var sel = document.getElementById(selId);
       if(!sel) return;
-      // Keep Clínica BiMASS as first option
-      sel.innerHTML = '<option value="Clínica BiMASS">Clínica BiMASS</option>';
+      // Todos first, then Clínica BiMASS, then empresas
+      sel.innerHTML = '<option value="Todos">⭐ Todos (acceso completo)</option>'
+        + '<option value="Clínica BiMASS">Clínica BiMASS</option>';
       empresasCache.forEach(function(e) {
         sel.innerHTML += '<option value="'+e.nombre+'">'+e.nombre+'</option>';
       });
@@ -6091,6 +6029,14 @@ function saveLabResult(mod) {
   // Get tipos: chip array for lab, text input for xray
   var tipos = [];
   if(mod==='lab') {
+    // Auto-commit any text currently in the input field (user may not have pressed Enter/Add)
+    var pendingInp = document.getElementById('lab-tipo-input');
+    if(pendingInp && pendingInp.value.trim()) {
+      if(!labTiposData['lab']) labTiposData['lab'] = [];
+      labTiposData['lab'].push(pendingInp.value.trim());
+      pendingInp.value = '';
+      renderLabTipos('lab');
+    }
     tipos = (labTiposData['lab']||[]).slice();
   } else {
     var tipoInp = document.getElementById(mod+'-tipo');
@@ -7018,6 +6964,8 @@ function submitPortal() {
 </div>
 
 <!-- ══ LABORATORIO ══════════════════════════════════════════ -->
+
+<!-- ══ LABORATORIO ══════════════════════════════════════════ -->
 <div id="screen-lab" class="screen">
 <div class="sec-hdr no-print">
   <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
@@ -7034,7 +6982,7 @@ function submitPortal() {
   </div>
   <div class="form-row">
     <div class="fg" style="flex:2">
-      <label>Tipos de estudio * <span class="muted" style="font-size:.78em">(agrega uno o más)</span></label>
+      <label>Tipos de estudio * <span class="muted" style="font-size:.78em">(agrega uno o mas)</span></label>
       <div id="lab-tipos-chips" style="display:flex;flex-wrap:wrap;gap:5px;min-height:32px;border:1px solid var(--brd);border-radius:6px;padding:4px 6px;background:#f9f9f9;margin-bottom:5px">
         <span style="color:#aaa;font-size:.82em;padding:2px 4px">Sin estudios seleccionados...</span>
       </div>
@@ -7044,42 +6992,36 @@ function submitPortal() {
         <button type="button" onclick="addLabTipo('lab')" style="background:var(--teal);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:700;font-size:1.1em">+</button>
       </div>
       <datalist id="lab-tipo-list">
-        <option>Biometría hemática completa</option>
-        <option>Química sanguínea</option>
+        <option>Biometria hematica completa</option>
+        <option>Quimica sanguinea</option>
         <option>Examen general de orina</option>
         <option>Perfil tiroideo (TSH, T3, T4)</option>
-        <option>Perfil lipídico</option>
+        <option>Perfil lipidico</option>
         <option>Glucosa en ayuno</option>
-        <option>HbA1c (hemoglobina glucosilada)</option>
-        <option>Pruebas de función hepática</option>
-        <option>Pruebas de función renal</option>
-        <option>VDRL / RPR</option>
-        <option>VIH (ELISA)</option>
-        <option>Antidoping (5 drogas)</option>
-        <option>Antidoping (10 drogas)</option>
-        <option>Prueba de embarazo</option>
-        <option>Coprológico general</option>
-        <option>Cultivo de secreción</option>
-        <option>Hemocultivo</option>
+        <option>Hemoglobina glucosilada (HbA1c)</option>
         <option>Urocultivo</option>
-        <option>Proteína C reactiva</option>
-        <option>Factor reumatoide</option>
-        <option>Espirometría</option>
-        <option>Audiometría</option>
-        <option>Electrocardiograma</option>
-        <option>Examen de la vista</option>
         <option>Coprocultivo</option>
-        <option>Panel hepático completo</option>
+        <option>Antidoping orina (5 drogas)</option>
+        <option>Antidoping orina (10 drogas)</option>
+        <option>VDRL (sifilis)</option>
+        <option>VIH (ELISA)</option>
+        <option>Hepatitis B (HBsAg)</option>
+        <option>Hepatitis C (anti-VHC)</option>
+        <option>Rx Torax PA</option>
+        <option>Audiometria</option>
+        <option>Espirometria</option>
+        <option>Electrocardiograma</option>
       </datalist>
     </div>
-    <div class="fg"><label>Observaciones / Resultado texto</label><input id="lab-obs" type="text" placeholder="Resumen del resultado..."></div>
+    <div class="fg">
+      <label>Observaciones</label>
+      <textarea id="lab-obs" rows="3" style="width:100%;resize:vertical"></textarea>
+    </div>
   </div>
   <div class="form-row">
-    <div class="fg"><label>Archivo (PDF o imagen)</label>
-      <input id="lab-file" type="file" accept=".pdf,.jpg,.jpeg,.png" style="font-size:.88em">
-    </div>
+    <div class="fg"><label>Archivo (PDF/imagen)</label><input id="lab-file" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
     <div class="fg" style="display:flex;align-items:flex-end">
-      <div id="lab-upload-status" class="muted" style="font-size:.82em"></div>
+      <span id="lab-upload-status" style="font-size:.85em;color:var(--teal)"></span>
     </div>
   </div>
   <div class="flex gap8 mt8">
@@ -7093,22 +7035,23 @@ function submitPortal() {
     <div class="fg"><label>Desde</label><input id="lab-f-desde" type="date"></div>
     <div class="fg"><label>Hasta</label><input id="lab-f-hasta" type="date"></div>
     <div class="fg"><label>Paciente</label><input id="lab-f-pac" type="text" placeholder="Filtrar..."></div>
-    <div class="fg"><label>Tipo</label><input id="lab-f-tipo" type="text" placeholder="Filtrar..."></div>
+    <div class="fg"><label>Tipo de estudio</label><input id="lab-f-tipo" type="text" placeholder="Filtrar..."></div>
     <button class="btn btn-p btn-sm" onclick="renderLabResults('lab')">Filtrar</button>
+    <button class="btn btn-o btn-sm" onclick="loadLabResults()">Actualizar</button>
   </div>
 </div>
-<div id="lab-list"></div>
+<div id="lab-list" class="card"><div style="color:var(--muted);font-size:.88em;padding:10px">Cargando resultados...</div></div>
 </div>
 
-<!-- ══ RAYOS X ════════════════════════════════════════════════ -->
+<!-- ══ IMAGENOLOGIA ══════════════════════════════════════════ -->
 <div id="screen-xray" class="screen">
 <div class="sec-hdr no-print">
   <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
-  <h2>🩻 Imagenología</h2>
+  <h2>🩻 Imagenologia</h2>
   <button class="btn btn-p btn-sm" onclick="document.getElementById('xray-form').style.display=document.getElementById('xray-form').style.display==='none'?'':'none'">+ Cargar imagen</button>
 </div>
 <div id="xray-form" class="card" style="display:none">
-  <div class="card-title">Nueva imagen de Imagenología</div>
+  <div class="card-title">Nuevo resultado de imagenologia</div>
   <div id="err-xray" class="alert alert-d" style="display:none"></div>
   <div class="form-row">
     <div class="fg"><label>Paciente</label><input id="xray-pac" type="text" placeholder="Nombre del paciente (opcional)"></div>
@@ -7116,269 +7059,153 @@ function submitPortal() {
     <div class="fg"><label>Fecha del estudio *</label><input id="xray-fecha" type="date"></div>
   </div>
   <div class="form-row">
-    <div class="fg" style="flex:2"><label>Tipo de estudio *</label>
-      <input id="xray-tipo" type="text" list="xray-tipo-list" placeholder="Ej: Tórax PA, Columna lumbar...">
+    <div class="fg">
+      <label>Tipo de estudio *</label>
+      <input id="xray-tipo" type="text" list="xray-tipo-list" placeholder="Selecciona o escribe el tipo de estudio">
       <datalist id="xray-tipo-list">
-        <option>Tórax PA y lateral</option>
-        <option>Tórax AP</option>
-        <option>Columna cervical</option>
-        <option>Columna dorsal</option>
-        <option>Columna lumbar</option>
-        <option>Columna lumbosacra</option>
-        <option>Rodilla AP y lateral</option>
-        <option>Hombro AP</option>
-        <option>Mano AP y oblicua</option>
-        <option>Muñeca AP y lateral</option>
-        <option>Cadera AP</option>
-        <option>Pelvis AP</option>
-        <option>Pie AP y lateral</option>
-        <option>Tobillo AP y lateral</option>
-        <option>Cráneo AP y lateral</option>
-        <option>Senos paranasales</option>
-        <option>Abdomen simple</option>
-        <option>Codo AP y lateral</option>
+        <option>Radiografia de torax PA</option>
+        <option>Radiografia columna lumbar</option>
+        <option>Radiografia columna cervical</option>
+        <option>Radiografia de rodilla</option>
+        <option>Radiografia de hombro</option>
+        <option>Ultrasonido abdominal</option>
+        <option>Ultrasonido renal</option>
+        <option>Ultrasonido pelvico</option>
+        <option>TAC de torax</option>
+        <option>TAC de abdomen</option>
+        <option>Resonancia magnetica de columna</option>
+        <option>Densitometria osea</option>
+        <option>Ecocardiograma</option>
       </datalist>
     </div>
-    <div class="fg"><label>Interpretación / Hallazgos</label><input id="xray-obs" type="text" placeholder="Hallazgos o diagnóstico radiológico..."></div>
+    <div class="fg">
+      <label>Observaciones / Hallazgos</label>
+      <textarea id="xray-obs" rows="3" style="width:100%;resize:vertical"></textarea>
+    </div>
   </div>
   <div class="form-row">
-    <div class="fg"><label>Archivo (PDF, JPG o PNG)</label>
-      <input id="xray-file" type="file" accept=".pdf,.jpg,.jpeg,.png" style="font-size:.88em">
-    </div>
+    <div class="fg"><label>Imagen (JPG/PNG/PDF)</label><input id="xray-file" type="file" accept=".jpg,.jpeg,.png,.pdf"></div>
     <div class="fg" style="display:flex;align-items:flex-end">
-      <div id="xray-upload-status" class="muted" style="font-size:.82em"></div>
+      <span id="xray-upload-status" style="font-size:.85em;color:var(--teal)"></span>
     </div>
   </div>
   <div class="flex gap8 mt8">
-    <button class="btn btn-p" onclick="saveLabResult('xray')">💾 Guardar imagen</button>
+    <button class="btn btn-p" onclick="saveLabResult('xray')">💾 Guardar resultado</button>
     <button class="btn btn-o" onclick="document.getElementById('xray-form').style.display='none'">Cancelar</button>
   </div>
 </div>
+<!-- Filtros -->
 <div class="card">
   <div class="rep-filter">
     <div class="fg"><label>Desde</label><input id="xray-f-desde" type="date"></div>
     <div class="fg"><label>Hasta</label><input id="xray-f-hasta" type="date"></div>
     <div class="fg"><label>Paciente</label><input id="xray-f-pac" type="text" placeholder="Filtrar..."></div>
-    <div class="fg"><label>Tipo</label><input id="xray-f-tipo" type="text" placeholder="Filtrar..."></div>
+    <div class="fg"><label>Tipo de estudio</label><input id="xray-f-tipo" type="text" placeholder="Filtrar..."></div>
     <button class="btn btn-p btn-sm" onclick="renderLabResults('xray')">Filtrar</button>
+    <button class="btn btn-o btn-sm" onclick="loadXrayResults()">Actualizar</button>
   </div>
 </div>
-<div id="xray-list"></div>
-</div>
-
-<!-- ══ HISTORIAL DE VISITAS ══════════════════════════════════ -->
-<div id="screen-hist" class="screen">
-<div class="sec-hdr no-print">
-  <button class="btn btn-o btn-sm" onclick="showScreen('patient')">← Pacientes</button>
-  <h2 id="hist-pat-name">📋 Historial de visitas</h2>
-  <button class="btn btn-p btn-sm" onclick="showVTypeScreen()">Iniciar atención →</button>
-</div>
-<!-- Allergy banner -->
-<div id="hist-alrg" class="aler-alrg" style="display:none"></div>
-<!-- Search bar -->
-<div class="card" style="padding:10px 14px">
-  <div class="flex gap8">
-    <input id="hist-search" type="text" placeholder="Buscar por dx, tipo de visita, fecha..." style="flex:1;padding:7px 10px;border:1px solid var(--brd);border-radius:6px;font-size:.9em" oninput="filterHistorial()">
-    <span id="hist-count" class="muted" style="align-self:center;font-size:.82em"></span>
-  </div>
-</div>
-<div id="hist-list"></div>
-<!-- Modal ver visita -->
-<div id="hist-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;overflow-y:auto">
-  <div style="background:#fff;max-width:720px;margin:30px auto;border-radius:12px;padding:24px;position:relative">
-    <button onclick="document.getElementById('hist-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.4em;cursor:pointer;color:#888">✕</button>
-    <div id="hist-modal-content"></div>
-    <!-- Agregar nota -->
-    <div style="margin-top:16px;border-top:1px solid var(--brd);padding-top:12px">
-      <div style="font-weight:700;color:var(--azul);font-size:.9em;margin-bottom:8px">➕ Agregar nota / complemento</div>
-      <textarea id="hist-nota-txt" rows="3" placeholder="Escribe aquí información adicional que deseas agregar a esta visita..." style="width:100%;padding:8px;border:1px solid var(--brd);border-radius:6px;font-size:.9em;resize:vertical"></textarea>
-      <button class="btn btn-p btn-sm" style="margin-top:6px" onclick="saveHistorialNota()">💾 Guardar nota</button>
-      <span class="muted" style="font-size:.78em;margin-left:8px">La información guardada no puede eliminarse.</span>
-    </div>
-  </div>
-</div>
+<div id="xray-list" class="card"><div style="color:var(--muted);font-size:.88em;padding:10px">Cargando resultados...</div></div>
 </div>
 
 <!-- ══ COTIZACIONES ══════════════════════════════════════════ -->
 <div id="screen-cotiz" class="screen">
 <div class="sec-hdr no-print">
   <button class="btn btn-o btn-sm" onclick="showScreen('home')">← Inicio</button>
-  <h2>📝 Cotizaciones</h2>
+  <h2>📋 Cotizaciones</h2>
 </div>
 
-<!-- ─── FORMULARIO NUEVA COTIZACIÓN ───────────────────────── -->
+<!-- Formulario nueva cotizacion -->
 <div class="card">
-  <div class="card-title">➕ Nueva cotización</div>
-  <div class="fg-row" style="flex-wrap:wrap;gap:14px;margin-bottom:12px">
-    <div class="fg" style="flex:1;min-width:140px">
-      <label class="lbl">Folio</label>
-      <input id="cotiz-folio" type="text" readonly style="background:var(--bg2);font-weight:700;color:var(--teal)" placeholder="Auto">
-    </div>
-    <div class="fg" style="flex:1;min-width:140px">
-      <label class="lbl">Fecha</label>
-      <input id="cotiz-fecha" type="date">
-    </div>
-    <div class="fg" style="flex:2;min-width:200px">
-      <label class="lbl">Empresa / Organización</label>
-      <input id="cotiz-empresa" type="text" placeholder="Nombre de la empresa (o NO APLICA)">
-    </div>
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+    <span>Nueva Cotizacion</span>
+    <span id="cotiz-folio" style="font-size:.85em;color:var(--muted);font-weight:400" placeholder="Folio (auto)"></span>
   </div>
-  <div class="fg-row" style="gap:14px;margin-bottom:12px">
-    <div class="fg" style="flex:1">
-      <label class="lbl">En atención a</label>
-      <input id="cotiz-atencion" type="text" placeholder="Nombre del contacto o responsable">
-    </div>
+  <div class="form-row">
+    <div class="fg"><label>Empresa / Cliente</label><input id="cotiz-empresa" type="text" placeholder="Nombre de la empresa o cliente"></div>
+    <div class="fg"><label>A la atencion de</label><input id="cotiz-atencion" type="text" placeholder="Nombre del contacto"></div>
+    <div class="fg"><label>Fecha</label><input id="cotiz-fecha" type="date"></div>
+  </div>
+  <div class="form-row">
+    <div class="fg"><label>Director / Responsable</label><input id="cotiz-director" type="text" placeholder="Dr. / Responsable que firma"></div>
+    <div class="fg" style="flex:2"><label>Observaciones / Notas</label><input id="cotiz-obs" type="text" placeholder="Condiciones, vigencia, notas..."></div>
   </div>
 
-  <!-- Tabla de ítems -->
-  <div style="overflow-x:auto;margin-bottom:10px">
-    <table style="width:100%;border-collapse:collapse;font-size:.88em" id="cotiz-items-table">
-      <thead>
-        <tr style="background:var(--azul);color:#fff">
-          <th style="padding:7px 10px;text-align:left;border-radius:6px 0 0 0">Item</th>
-          <th style="padding:7px 10px;text-align:left">Descripción</th>
-          <th style="padding:7px 10px;text-align:center;width:80px">Cantidad</th>
-          <th style="padding:7px 10px;text-align:right;width:120px">Precio unit.</th>
-          <th style="padding:7px 10px;text-align:right;width:120px">Subtotal</th>
-          <th style="padding:7px 10px;text-align:center;width:50px;border-radius:0 6px 0 0">✕</th>
+  <!-- Tabla de conceptos -->
+  <div style="margin-top:12px;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.9em">
+      <thead style="background:var(--azul);color:#fff">
+        <tr>
+          <th style="padding:8px 10px;text-align:left;width:40px">#</th>
+          <th style="padding:8px 10px;text-align:left">Descripcion del servicio / producto</th>
+          <th style="padding:8px 10px;text-align:center;width:80px">Cant.</th>
+          <th style="padding:8px 10px;text-align:right;width:110px">Precio unit.</th>
+          <th style="padding:8px 10px;text-align:right;width:110px">Subtotal</th>
+          <th style="padding:8px 10px;text-align:center;width:40px"></th>
         </tr>
       </thead>
-      <tbody id="cotiz-items-body">
-        <!-- rows added dynamically -->
-      </tbody>
+      <tbody id="cotiz-items-body"></tbody>
     </table>
   </div>
-  <button class="btn btn-o btn-sm" onclick="addCotizRow()" style="margin-bottom:14px">+ Agregar concepto</button>
+  <div class="flex gap8 mt8" style="justify-content:flex-start">
+    <button class="btn btn-o btn-sm" onclick="addCotizRow()">+ Agregar concepto</button>
+  </div>
 
   <!-- Totales -->
-  <div style="display:flex;justify-content:flex-end">
-    <div style="min-width:280px">
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--brd)">
-        <span class="muted">Subtotal</span>
-        <span id="cotiz-subtotal-disp" style="font-weight:600">$0.00</span>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--brd)">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" id="cotiz-iva-chk" onchange="calcCotizTotals()">
-          <span class="muted">IVA 16%</span>
-        </label>
-        <span id="cotiz-iva-disp" style="font-weight:600;color:var(--muted)">$0.00</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0">
-        <span style="font-weight:700;font-size:1.05em">Total</span>
-        <span id="cotiz-total-disp" style="font-weight:800;font-size:1.1em;color:var(--teal)">$0.00</span>
-      </div>
+  <div style="margin-top:16px;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+    <div style="display:flex;gap:16px;font-size:.9em">
+      <span style="color:var(--muted)">Subtotal:</span>
+      <span id="cotiz-subtotal-disp" style="font-weight:600;min-width:100px;text-align:right">$0.00</span>
+    </div>
+    <div style="display:flex;gap:16px;font-size:.9em;align-items:center">
+      <label style="color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input id="cotiz-iva-chk" type="checkbox" onchange="calcCotizTotals()"> IVA 16%
+      </label>
+      <span id="cotiz-iva-disp" style="font-weight:600;min-width:100px;text-align:right;color:var(--muted)">$0.00</span>
+    </div>
+    <div style="display:flex;gap:16px;font-size:1.05em;font-weight:700;border-top:2px solid var(--brd);padding-top:6px;margin-top:2px">
+      <span>Total:</span>
+      <span id="cotiz-total-disp" style="min-width:100px;text-align:right;color:var(--azul)">$0.00</span>
     </div>
   </div>
 
-  <!-- Observaciones y firma -->
-  <div class="fg-row" style="gap:14px;margin-top:10px">
-    <div class="fg" style="flex:2">
-      <label class="lbl">Observaciones</label>
-      <textarea id="cotiz-obs" rows="3" placeholder="Condiciones de pago, vigencia de la cotización, notas adicionales..."></textarea>
-    </div>
-    <div class="fg" style="flex:1">
-      <label class="lbl">Nombre y puesto de personal BiMASS</label>
-      <input id="cotiz-director" type="text" placeholder="Dr. Nombre Apellido">
-      <div style="margin-top:6px;border-top:1px solid var(--brd);padding-top:6px;font-size:.8em;color:var(--teal);text-align:center;font-weight:600;letter-spacing:.03em">BiMASS · Construimos Bienestar</div>
-    </div>
-  </div>
-
-  <div style="margin-top:14px;display:flex;gap:10px">
-    <button class="btn btn-p" onclick="saveCotizacion()">💾 Guardar cotización</button>
-    <button class="btn btn-o" onclick="clearCotizForm()">✕ Limpiar</button>
+  <div class="flex gap8 mt12">
+    <button class="btn btn-p btn-lg" onclick="saveCotizacion()">💾 Guardar cotizacion</button>
+    <button class="btn btn-o" onclick="clearCotizForm()">Limpiar</button>
   </div>
 </div>
 
-<!-- ─── LISTA DE COTIZACIONES ──────────────────────────────── -->
-<div class="card" style="margin-top:16px">
-  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-    <span>📋 Cotizaciones guardadas</span>
-    <input id="cotiz-q" type="text" placeholder="Buscar..." style="max-width:220px;padding:5px 10px;font-size:.85em;border-radius:6px;border:1px solid var(--brd)" oninput="filterCotizaciones()">
+<!-- Lista de cotizaciones -->
+<div class="card">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+    <span>Historial de cotizaciones</span>
+    <input id="cotiz-q" type="text" placeholder="Buscar..." oninput="filterCotizaciones()" style="padding:5px 10px;border:1px solid var(--brd);border-radius:6px;font-size:.88em;width:200px">
   </div>
-  <div id="cotiz-list-wrap" style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;font-size:.86em" id="cotiz-list-table">
-      <thead>
-        <tr style="background:var(--bg2);color:var(--azul)">
-          <th style="padding:8px 10px;text-align:left">Folio</th>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.88em">
+      <thead style="background:var(--azul);color:#fff">
+        <tr>
+          <th style="padding:8px 10px;text-align:left">ID / Folio</th>
           <th style="padding:8px 10px;text-align:left">Fecha</th>
-          <th style="padding:8px 10px;text-align:left">En atención a</th>
+          <th style="padding:8px 10px;text-align:left">A la atencion de</th>
           <th style="padding:8px 10px;text-align:left">Empresa</th>
-          <th style="padding:8px 10px;text-align:right">Monto</th>
+          <th style="padding:8px 10px;text-align:right">Total</th>
           <th style="padding:8px 10px;text-align:center">Status</th>
           <th style="padding:8px 10px;text-align:center">Acciones</th>
         </tr>
       </thead>
       <tbody id="cotiz-list-body">
-        <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Cargando...</td></tr>
+        <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Cargando cotizaciones...</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- Modal ver cotización -->
-<div id="cotiz-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;overflow-y:auto">
-  <div style="background:#fff;max-width:760px;margin:30px auto;border-radius:12px;padding:28px;position:relative">
-    <button onclick="document.getElementById('cotiz-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.4em;cursor:pointer;color:#888">✕</button>
-    <div id="cotiz-modal-content"></div>
-  </div>
-</div>
-<!-- Modal post-save cotización -->
-<div id="cotiz-saved-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
-  <div style="background:#fff;max-width:460px;width:90%;border-radius:14px;padding:28px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-    <div id="cotiz-saved-content"></div>
-  </div>
-</div>
-</div><!-- end screen-cotiz -->
-
-
-<!-- ═══ MODAL: CONSENTIMIENTO INFORMADO NOM-024 ═══ -->
-<div id="ci-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:10000;overflow-y:auto">
-  <div style="background:#fff;max-width:640px;margin:40px auto;border-radius:12px;padding:32px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.3)">
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:2em">🏥</div>
-      <h2 style="color:#2a4e7a;margin:6px 0">Consentimiento Informado</h2>
-      <p style="color:#636875;font-size:.85em;margin:0">Clínica BiMASS · NOM-024-SSA3-2012</p>
+<!-- Modal visualizacion -->
+<div id="cotiz-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;overflow-y:auto;padding:20px">
+  <div style="max-width:800px;margin:auto;background:#fff;border-radius:12px;overflow:hidden">
+    <div style="background:var(--azul);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+      <strong>Vista previa de cotizacion</strong>
+      <button onclick="document.getElementById('cotiz-modal').style.display='none'" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer">×</button>
     </div>
-    <div id="ci-body" style="background:#f8f9fa;border-radius:8px;padding:16px;font-size:.88em;max-height:260px;overflow-y:auto;margin-bottom:16px;line-height:1.6">
-      <p><strong>Estimado/a paciente,</strong></p>
-      <p>De acuerdo con la <strong>NOM-024-SSA3-2012</strong> de expediente clínico electrónico, le informamos que:</p>
-      <ul style="margin:8px 0;padding-left:20px">
-        <li>Sus datos personales y de salud serán almacenados en un expediente clínico electrónico conforme a la normativa mexicana.</li>
-        <li>La información será utilizada exclusivamente para la prestación de servicios médicos en Clínica BiMASS.</li>
-        <li>Sus datos están protegidos bajo la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares</strong>.</li>
-        <li>Tiene derecho a acceder, rectificar, cancelar u oponerse al tratamiento de sus datos (derechos ARCO).</li>
-        <li>El expediente podrá ser compartido con médicos tratantes o autoridades sanitarias cuando la ley lo requiera.</li>
-        <li>Sus datos de salud no serán compartidos con terceros sin su consentimiento expreso, salvo por imperativo legal.</li>
-      </ul>
-      <p>Al aceptar este consentimiento, confirma que ha leído y comprendido las condiciones anteriores.</p>
-    </div>
-    <div id="ci-checks" style="margin-bottom:20px">
-      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer">
-        <input type="checkbox" id="ci-chk1" style="margin-top:2px;width:16px;height:16px;flex-shrink:0">
-        <span style="font-size:.88em">Acepto que mis datos de salud sean almacenados en el expediente clínico electrónico de Clínica BiMASS.</span>
-      </label>
-      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer">
-        <input type="checkbox" id="ci-chk2" style="margin-top:2px;width:16px;height:16px;flex-shrink:0">
-        <span style="font-size:.88em">He sido informado/a sobre mis derechos ARCO y la Ley Federal de Protección de Datos Personales.</span>
-      </label>
-      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-        <input type="checkbox" id="ci-chk3" style="margin-top:2px;width:16px;height:16px;flex-shrink:0">
-        <span style="font-size:.88em">Autorizo al personal médico de Clínica BiMASS a realizar la evaluación y tratamiento correspondiente a este tipo de visita.</span>
-      </label>
-    </div>
-    <div id="ci-info" style="background:#e8f5e9;border-radius:6px;padding:10px 14px;font-size:.8em;color:#2e7d32;margin-bottom:16px">
-      <strong>Paciente:</strong> <span id="ci-paciente-name"></span><br>
-      <strong>Tipo de visita:</strong> <span id="ci-visit-type"></span><br>
-      <strong>Médico responsable:</strong> <span id="ci-medico-name"></span>
-    </div>
-    <div style="display:flex;gap:12px;justify-content:flex-end">
-      <button class="btn btn-o" onclick="closeCIModal()">Cancelar</button>
-      <button id="ci-accept-btn" class="btn" style="background:#28aaa4;color:#fff" onclick="acceptConsentimiento()" disabled>✓ Acepto y Continúo</button>
-    </div>
-    <p id="ci-error" style="color:#e53935;font-size:.82em;text-align:center;display:none;margin-top:8px">⚠ Debe aceptar todos los puntos para continuar.</p>
-  </div>
-</div>
-
-</body>
-</html                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+    <div id="cotiz-mod                                                                                                                                                                                                                                                                                                                                        
